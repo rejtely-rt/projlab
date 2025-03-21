@@ -2,7 +2,7 @@ package fungorium.spores;
 
 import fungorium.model.Insect;
 
-public class Spore {
+public abstract class Spore {
     private int cooldown;
 
     public int getCooldown() {
@@ -10,14 +10,13 @@ public class Spore {
     }
 
     public void decreaseCooldown() {
-        // Implementation needed
+        cooldown--; // Decrease the cooldown value by 1
     }
 
-    public void applyEffect(Insect target) {
-        // Implementation needed
-    }
+    public abstract void applyEffect(Insect target);
 
     public void removeEffect(Insect target) {
-        // Implementation needed
+        target.changeSpeed(2);
+        target.changeCut(true);
     }
 }
