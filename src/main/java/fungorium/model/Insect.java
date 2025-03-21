@@ -1,14 +1,18 @@
 package fungorium.model;
 
+import fungorium.spores.CannotCutSpore;
 import fungorium.spores.Spore;
 import fungorium.tectons.Tecton;
 import fungorium.model.Thread;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Insect {
     private int speed;
     private boolean cut;
     private Tecton location;
+
+    private int sporeCount;
 
     public Insect() {
         this.speed = 2;
@@ -28,8 +32,11 @@ public class Insect {
     }
 
     List<Spore> getScore() {
-        // Implementation needed
-        return null; // Example return value
+        List<Spore> spores = new ArrayList<>();
+        for (int i = 0; i < sporeCount; i++) {
+            spores.add(new CannotCutSpore()); // TODO: HMMMMMMMMMMMMMMMMMM
+        }
+        return spores;
     }
     
     public void changeSpeed(int value) {
@@ -90,10 +97,10 @@ public class Insect {
 
     public void consumeSpore(Spore spore) {
         spore.applyEffect(this);
+        this.sporeCount++;
     }
     
     public boolean coolDownCheck() {
-        // Implementation needed
-        return false; // Example return value
+        return this.speed == 2 && this.cut;
     }
 }
