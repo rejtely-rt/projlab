@@ -28,6 +28,10 @@ public class Insect {
     public void cutThread(Thread thread) {
         // Implementation needed
     }
+
+    public void consumeSpore(){
+        // Implementation needed
+    }
     
     public boolean coolDownCheck() {
         // Implementation needed

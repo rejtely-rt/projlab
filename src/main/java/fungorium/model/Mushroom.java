@@ -31,7 +31,7 @@ public class Mushroom {
         // Implementation needed
     }
     
-    public void addThread(Thread t) {
+    public void addThread(Tecton t) {
         // Implementation needed
     }
     
