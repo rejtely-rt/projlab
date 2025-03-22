@@ -10,7 +10,13 @@ public class Thread {
     public int getSize() {
         return size;
     }
-    public void changeSize() {
+    public void changeSize(int newSize) {
         // Implementation needed
+    }
+    public void decreaseSize() {
+        this.changeSize(size - 1);
+    }
+    public void increaseSize() {
+        this.changeSize(size + 1);
     }
 }
