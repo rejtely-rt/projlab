@@ -2,7 +2,7 @@ package fungorium.spores;
 
 import fungorium.model.Insect;
 
-public class Spore {
+public abstract class Spore {
     private int cooldown;
 
     public int getCooldown() {
@@ -10,14 +10,22 @@ public class Spore {
     }
 
     public void decreaseCooldown() {
-        // Implementation needed
+        cooldown--; // Decrease the cooldown value by 1
     }
 
-    public void applyEffect(Insect target) {
-        // Implementation needed
-    }
+    /**
+     * Apply the effect of the spore to the target insect.
+     * @param target the insect that the spore is applied to
+     * @note It is an abstract method that should be implemented by the subclasses.
+     */
+    public abstract void applyEffect(Insect target);
 
+    /**
+     * Remove the effect of the spore from the target insect.
+     * @param target the insect that the spore is applied to
+     */
     public void removeEffect(Insect target) {
-        // Implementation needed
+        target.changeSpeed(2);
+        target.changeCut(true);
     }
 }
