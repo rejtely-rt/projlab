@@ -151,10 +151,10 @@ public class Insect {
 
     /**
      * Consume the given spore.
-     * @param spore the spore to be consumed
      * @note The insect can consume the spore and apply its effect.
      */
-    public void consumeSpore(Spore spore) {
+    public void consumeSpore(){
+        Spore spore = this.location.getSpores().get(0);
         spore.applyEffect(this);
         this.spores.add(spore);
     }
