@@ -8,45 +8,94 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Insect {
+
+    /**
+     * Speed if the insect is defined by an integer value.
+     * In norman conditions, speed is 2. It can be fastened,
+     * lowered or set to 0 by spores.
+     */
     private int speed;
+
+    /**
+     * In norman conditions, cut is true. It can be set to false by spores.
+     */
     private boolean cut;
+
+    /**
+     * It is the current location of the insect.
+     */
     private Tecton location;
 
-    private int sporeCount;
+    /**
+     * Spores is defined by a list of Spore objects.
+     * It is the spores that the insect has consumed.
+     */
+    private final List<Spore> spores;
 
+    /**
+     * Constructor of the Insect class.
+     * It initializes the speed, cut and spores fields.
+     */
     public Insect() {
         this.speed = 2;
         this.cut = true;
+        this.spores = new ArrayList<>();
     }
 
+    /**
+     * Getter method for the speed field.
+     * @return the speed of the insect
+     */
     public int getSpeed() {
         return speed;
     }
 
+
+    /**
+     * Getter method for the cut field.
+     * @return the cut of the insect
+     */
     public boolean getCut() {
         return cut;
     }
 
+    /**
+     * Getter method for the location field.
+     * @return the location of the insect
+     */
     public Tecton getLocation() {
         return location;
     }
 
-    List<Spore> getScore() {
-        List<Spore> spores = new ArrayList<>();
-        for (int i = 0; i < sporeCount; i++) {
-            spores.add(new CannotCutSpore()); // TODO: HMMMMMMMMMMMMMMMMMM
-        }
-        return spores;
-    }
-    
+    /**
+     * Getter method for the spores field.
+     * @return the spores of the insect
+     */
+    List<Spore> getScore() { return spores; }
+
+    /**
+     * Change the speed of the insect.
+     * @param value the new speed value
+     */
     public void changeSpeed(int value) {
         this.speed = value;
     }
-    
+
+    /**
+     * Change the cut of the insect.
+     * @param value the new cut value
+     */
     public void changeCut(boolean value) {
         this.cut = value;
     }
-    
+
+    /**
+     * Change the location of the insect.
+     * @param target the new location
+     * @return true if the insect can move to the target location, false otherwise
+     * @note The insect can move to the target location if the speed is not 0 and there is
+     *       a connecting thread between the current and target locations.
+     */
     public boolean moveTo(Tecton target) {
         if (this.speed == 0) {
             return false; // If the speed is 0, the insect cannot move
@@ -69,7 +118,13 @@ public class Insect {
 
         return false; // If there is no connecting thread, the insect cannot move
     }
-    
+
+    /**
+     * Cut the given thread.
+     * @param thread the thread to be cut
+     * @return true if the thread is cut, false otherwise
+     * @note The insect can cut the thread and remove it from the parent mushroom.
+     */
     public boolean cutThread(Thread thread) {
         if (!this.cut) {
             return false; // If the insect cannot cut, the thread cannot be cut
@@ -95,11 +150,21 @@ public class Insect {
         return true;
     }
 
+    /**
+     * Consume the given spore.
+     * @param spore the spore to be consumed
+     * @note The insect can consume the spore and apply its effect.
+     */
     public void consumeSpore(Spore spore) {
         spore.applyEffect(this);
-        this.sporeCount++;
+        this.spores.add(spore);
     }
-    
+
+    /**
+     * Check if the insect can consume the given spore.
+     * @return true if the insect is under the effect if any spore, false otherwise
+     * @note If the speed is normal and the cut is true, the is not under the effect of any spore.
+     */
     public boolean coolDownCheck() {
         return this.speed == 2 && this.cut;
     }
