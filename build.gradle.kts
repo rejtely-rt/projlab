@@ -1,5 +1,6 @@
 plugins {
     application
+    java
 }
 
 repositories {
@@ -13,5 +14,11 @@ application {
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "fungorium.Main"
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
