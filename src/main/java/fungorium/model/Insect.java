@@ -1,6 +1,5 @@
 package fungorium.model;
 
-import fungorium.spores.CannotCutSpore;
 import fungorium.spores.Spore;
 import fungorium.tectons.Tecton;
 import fungorium.model.Thread;
