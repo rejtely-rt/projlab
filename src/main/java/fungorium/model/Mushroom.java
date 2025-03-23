@@ -12,8 +12,10 @@ public class Mushroom {
     private List<Spore> spores = new ArrayList<>();
     private List<Thread> threads = new ArrayList<>();
 
-    //default konstruktor
-    //logger create függvénye
+    public Mushroom() {
+        Logger.create(this); 
+    }
+    
     
     public int getLevel() {
         Logger.enter(this, "getLevel");

@@ -7,6 +7,10 @@ public class Thread {
     //default konstruktor
     //logger create függvénye
     private Mushroom parent;
+
+    public Thread() {
+        Logger.create(this); 
+    }
     
     public Mushroom getParent() {
         return parent;
