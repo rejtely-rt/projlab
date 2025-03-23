@@ -1,10 +1,14 @@
 package fungorium.tectons;
 
+import fungorium.model.Mushroom;
 import fungorium.utils.Logger;
 
 public class ThreadAbsorberTecton extends Tecton {
     public ThreadAbsorberTecton() {
-        Logger.create(this);
+    }
+    
+    public ThreadAbsorberTecton(Mushroom m) {
+        this.mushroom = m;
     }
 
    @Override 
