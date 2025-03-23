@@ -32,24 +32,14 @@ public class Tecton {
         return result;
     }
 
-    /**
-     * addMushroom: Skeleton-verzió:
-     *  1) Megkérdezi a felhasználót, van-e már gomba ezen a Tectonon
-     *  2) Ha van, akkor false-szal tér vissza
-     *  3) Ha nincs, megkérdezi, vannak-e spórák
-     *  4) Ha nincs spóra, false
-     *  5) Egyébként létrehoz egy gombát és true-t ad vissza
-     */
     public boolean addMushroom() {
         Logger.enter(this, "addMushroom");
-        boolean alreadyHasMushroom = Logger.question("Does this Tecton already have a Mushroom?");
-        if (alreadyHasMushroom) {
+        if (mushroom != null) {
             System.out.println("   -> Already has mushroom, can't add a new one.");
             Logger.exit(false);
             return false;
         }
-        boolean hasSpores = Logger.question("Does this Tecton have at least one spore?");
-        if (!hasSpores) {
+        if (spores.size() == 0) {
             System.out.println("   -> No spores, can't grow mushroom.");
             Logger.exit(false);
             return false;
@@ -67,20 +57,8 @@ public class Tecton {
         return mushroom;
     }
 
-    /**
-     * addThread: Skeleton-verzió:
-     *  1) Megkérdezi a loggerrel, szabad-e ide fonalat rakni
-     *  2) Ha user szerint nem, akkor false
-     *  3) Ha igen, threads.add(...)
-     */
     public boolean addThread(Thread thread) {
         Logger.enter(this, "addThread");
-        boolean canAdd = Logger.question("Is it allowed to add this thread to Tecton?");
-        if (!canAdd) {
-            System.out.println("   -> Thread addition refused by user input.");
-            Logger.exit(false);
-            return false;
-        }
         threads.add(thread);
         System.out.println("   -> 0 added to Tecton.");
         Logger.exit(true);
@@ -96,13 +74,7 @@ public class Tecton {
 
     public void removeThread(Thread t) {
         Logger.enter(this, "removeThread");
-        boolean doRemove = Logger.question("Should we remove this thread?");
-        if (doRemove) {
-            threads.remove(t);
-            System.out.println("   -> Thread removed from Tecton.");
-        } else {
-            System.out.println("   -> Removal cancelled by user.");
-        }
+        threads.remove(t);
         Logger.exit("");
     }
 
@@ -180,6 +152,11 @@ public class Tecton {
         this.absorbThread();
         t2.absorbThread();
     
+        Logger.exit("");
+    }
+
+    public void applyEffect() {
+        Logger.enter(this, "applyEffect");
         Logger.exit("");
     }
     

@@ -1,6 +1,5 @@
 package fungorium.tectons;
 
-import fungorium.model.Mushroom;
 import fungorium.utils.Logger;
 
 public class NoMushTecton extends Tecton {
@@ -8,9 +7,11 @@ public class NoMushTecton extends Tecton {
         Logger.create(this);
     }
 
-    public void addMushroom(Mushroom m) {
+    @Override
+    public boolean addMushroom() {
         Logger.enter(this, "addMushroom");
         System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
-        Logger.exit("");
+        Logger.exit(false);
+        return false;
     }
 }

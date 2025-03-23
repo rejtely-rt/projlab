@@ -7,6 +7,7 @@ public class ThreadAbsorberTecton extends Tecton {
         Logger.create(this);
     }
 
+   @Override 
     public void applyEffect() {
         Logger.enter(this, "applyEffect");
         this.absorbThread();
