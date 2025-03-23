@@ -63,10 +63,7 @@ public class Mushroom {
     
     public boolean addThread(Tecton t) {
         Logger.enter(this, "addThread");
-        if (t instanceof OneThreadTecton && !t.getThreads().isEmpty()) {
-            Logger.exit(false);
-            return false;
-        }
+    
         List <Tecton> targetTectonNeighbors= t.getNeighbors();
 
 
@@ -81,7 +78,7 @@ public class Mushroom {
                 t.addThread(newThread);
                 neighbor.addThread(newThread);
                 Logger.exit(true);
-                return true;
+                return t.addThread(newThread);
             }
 
             // ha mondjuk épp a threadet találtuk meg a tekton szomszédjában
@@ -92,10 +89,9 @@ public class Mushroom {
                 if (this.equals(parentMushroom)) {
                     Thread newThread = new Thread();
                     newThread.setParent(this);
-                    t.addThread(newThread);
                     neighbor.addThread(newThread);
                     Logger.exit(true);
-                    return true;
+                    return t.addThread(newThread);
                 }
             }
 
@@ -114,11 +110,8 @@ public class Mushroom {
 
     //DFS implementálás
     public void threadCollector(Tecton t) {
-        List<Tecton> neighborTectons = t.getNeighbors();
-
-        for (Tecton neighborTecton :neighborTectons) {
-            Mushroom foundMushroom = neighborTecton.getMushroom();
-            
-        }
+        Logger.enter(this, "threadCollector");
+        System.out.println("Egy teljes fonalat törlünk");
+        Logger.exit(null);
     }
 }
