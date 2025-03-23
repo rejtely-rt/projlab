@@ -153,6 +153,26 @@ public class Logger {
     }
 
     /**
+     * Asks the user a question about a number (provided in questionText) using the current
+     * indentation.
+     * Re-prompts if the answer is not a number.
+     * Returns the number.
+     */
+    public static int questionNumber(String questionText) {
+        System.out.print(getIndent() + questionText + " (number): ");
+        int input;
+        while (true) {
+            try {
+                input = Integer.parseInt(scanner.nextLine().trim());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.print(getIndent() + "Please answer with a number: ");
+            }
+        }
+        return input;
+    }
+
+    /**
      * Helper method to build the current indent string.
      */
     private static String getIndent() {
