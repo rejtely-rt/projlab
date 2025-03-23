@@ -14,7 +14,6 @@ public class Main {
                 "Shoot spores on neighbor's neighbor",
                 "Tecton break",
                 "Thread grow next to a thread",
-                "Thread grow next to a thread on a SingleThreadTecton",
                 "Thread grow first of a Mushroom",
                 "Thread grow first of a Mushroom on a SingleThreadTecton",
                 "Insect consume spore that affects its speed",
@@ -34,20 +33,58 @@ public class Main {
                 initialize();
             }
 
-            public void test1() { System.out.println("[Teszt 1] Shoot spores on neighbor"); }
-            public void test2() { System.out.println("[Teszt 2] Shoot spores on neighbor's neighbor"); }
-            public void test3() { System.out.println("[Teszt 3] Tecton break"); }
-            public void test4() { System.out.println("[Teszt 4] Thread grow next to a thread"); }
-            public void test5() { System.out.println("[Teszt 5] Thread grow next to a thread on a SingleThreadTecton"); }
-            public void test6() { System.out.println("[Teszt 6] Thread grow first of a Mushroom"); }
-            public void test7() { System.out.println("[Teszt 7] Thread grow first of a Mushroom on a SingleThreadTecton"); }
-            public void test8() { System.out.println("[Teszt 8] Insect consume spore that affects its speed"); }
-            public void test9() { System.out.println("[Teszt 9] Insect consume cannotCutSpore"); }
-            public void test10() { System.out.println("[Teszt 10] Thread cut with insect"); }
-            public void test11() { System.out.println("[Teszt 11] Thread absorb"); }
-            public void test12() { System.out.println("[Teszt 12] Insect move"); }
-            public void test13() { System.out.println("[Teszt 13] Effect check"); }
-            public void test14() { System.out.println("[Teszt 14] Mushroom grow"); }
+            public void test1() { 
+                System.out.println("[Teszt 1] Shoot spores on neighbor");
+                m1.shootSpores(t4);
+            }
+            public void test2() {
+                System.out.println("[Teszt 2] Shoot spores on neighbor's neighbor");
+                m1.shootSpores(t3);
+            }
+            public void test3() {
+                System.out.println("[Teszt 3] Tecton break");
+                t1.breakTecton();
+            }
+            public void test4() {
+                System.out.println("[Teszt 4] Thread grow next to a thread");
+                m1.addThread(t3);
+            }
+            public void test5() {
+                System.out.println("[Teszt 5] Thread grow first of a Mushroom");
+                m2.addThread(t2);
+            }
+            public void test6() {
+                System.out.println("[Teszt 6] Thread grow first of a Mushroom on a SingleThreadTecton");
+                m2.addThread(t4);
+            }
+            public void test7() {
+                System.out.println("[Teszt 7] Insect consume spore that affects its speed");
+                i1.consumeSpore();
+            }
+            public void test8() {
+                System.out.println("[Teszt 8] Insect consume cannotCutSpore");
+                i1.consumeSpore();
+            }
+            public void test9() {
+                System.out.println("[Teszt 9] Thread cut with insect");
+                i1.cutThread(th1);
+            }
+            public void test10() {
+                System.out.println("[Teszt 10] Thread absorb");
+                t3.absorbThread();
+            }
+            public void test11() {
+                System.out.println("[Teszt 11] Insect move");
+                i1.moveTo(t1);
+            }
+            public void test12() {
+                System.out.println("[Teszt 12] Effect check");
+                i1.coolDownCheck();
+            }
+            public void test13() {
+                System.out.println("[Teszt 13] Mushroom grow");
+                t4.addMushroom();
+            }
         }
 
         do {
@@ -77,7 +114,6 @@ public class Main {
                 case "11" -> new Tests().test11();
                 case "12" -> new Tests().test12();
                 case "13" -> new Tests().test13();
-                case "14" -> new Tests().test14();
                 case "0" -> System.out.println("Kilépés...");
                 default -> System.out.println("Érvénytelen választás. Kérlek, próbáld újra.");
             }
