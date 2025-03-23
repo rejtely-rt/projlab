@@ -25,10 +25,8 @@ public class Insect {
      * It initializes the speed, cut and spores fields.
      */
     public Insect() {
-        Logger.enter(this, "Insect");
         this.spores = new ArrayList<>();
         Logger.create(this);
-        Logger.exit("");
     }
 
     /**
@@ -37,7 +35,7 @@ public class Insect {
      */
     public int getSpeed() {
         Logger.enter(this, "getSpeed");
-        int speed = Logger.question("What is the insect's speed?") ? 2 : 0;
+        int speed = Logger.questionNumber("What is the speed of the insect?");
         Logger.exit(speed);
         return speed;
     }
@@ -74,7 +72,7 @@ public class Insect {
      */
     public void changeSpeed(int value) {
         Logger.enter(this, "changeSpeed");
-        Logger.exit(value);
+        Logger.exit("");
     }
 
     /**
@@ -83,7 +81,7 @@ public class Insect {
      */
     public void changeCut(boolean value) {
         Logger.enter(this, "changeCut");
-        Logger.exit(value);
+        Logger.exit("");
     }
 
     /**
@@ -133,16 +131,18 @@ public class Insect {
         Mushroom parentMushroom = thread.getParent();
         if (parentMushroom != null) {
             parentMushroom.removeThread(thread);
+            this.location.removeThread(thread);
         }
         if (this.location != null) {
             List<Tecton> neighbors = this.location.getNeighbors();
             for (Tecton t : neighbors) {
-                if (t.getThreads().isEmpty()) {
-                    assert parentMushroom != null;
-                    parentMushroom.threadCollector(t);
+                if (t.getThreads().contains(thread)) {
+                    t.removeThread(thread);
                 }
             }
         }
+        parentMushroom.threadCollector(this.location);
+
         Logger.exit(true);
         return true;
     }
@@ -161,13 +161,17 @@ public class Insect {
 
     /**
      * Check if the insect can consume the given spore.
-     * @return true if the insect is under the effect if any spore, false otherwise
      * @note If the speed is normal and the cut is true, the is not under the effect of any spore.
      */
-    public boolean coolDownCheck() {
+    public void coolDownCheck() {
         Logger.enter(this, "coolDownCheck");
-        boolean result = getSpeed() == 2 && getCut();
-        Logger.exit(result);
-        return result;
+        for (Spore spore : spores) {
+            spore.decreaseCooldown();
+            int cooldown = spore.getCooldown();
+            if (cooldown == 0) {
+                spore.removeEffect(this);
+            }
+        }
+        Logger.exit("");
     }
 }
