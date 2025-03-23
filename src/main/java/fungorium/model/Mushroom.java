@@ -109,15 +109,15 @@ public class Mushroom {
         //The tecton is a neighbor
         for (Tecton neighbor : targetTectonNeighbors) {
             Mushroom neighborMushroom = neighbor.getMushroom();
-            // ha először a Mushroomot találtuk meg a Tekton szomszédjában
+            // If Mushroom is found first
             if (neighborMushroom.equals(this)) {
-                //hozzáadjuk a Mushroom threadjét
                 Thread newThread = new Thread();
+                boolean successfullyAdded = t.addThread(newThread);
+                if (!successfullyAdded) return false;
                 newThread.setParent(this);
-                t.addThread(newThread);
                 neighbor.addThread(newThread);
                 Logger.exit(true);
-                return t.addThread(newThread);
+                return true;
             }
 
             // The thread is next to the tecton
@@ -127,10 +127,12 @@ public class Mushroom {
                 Mushroom parentMushroom = neighborThread.getParent();
                 if (this.equals(parentMushroom)) {
                     Thread newThread = new Thread();
+                    boolean successfullyAdded = t.addThread(newThread);
+                    if (!successfullyAdded) return false;
                     newThread.setParent(this);
                     neighbor.addThread(newThread);
                     Logger.exit(true);
-                    return t.addThread(newThread);
+                    return true;
                 }
             }
 
