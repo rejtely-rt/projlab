@@ -18,13 +18,12 @@ public class Tecton {
         // Skeleton: a létrehozásnál bejegyezzük magunkat a loggerbe
         Logger.create(this);
     }
-
+    
     public void addNeighbour(Tecton t) {
         Logger.enter(this, "addNeighbour");
         neighbors.add(t);
         Logger.exit("");
     }
-
     public List<Tecton> getNeighbors() {
         Logger.enter(this, "getNeighbors");
         List<Tecton> result = new ArrayList<>(neighbors);
