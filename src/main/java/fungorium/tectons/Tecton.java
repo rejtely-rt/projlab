@@ -39,9 +39,32 @@ public class Tecton {
         threads.remove(t);
     }
 
-    public void addSpores(List<Spore> spores) {
-        this.spores.addAll(spores);
+    public boolean addSpores(List<Spore> spores, Mushroom mushroom) {
+        int mushLevel = mushroom.getLevel();
+        for (Tecton neighborTecton: neighbors) {
+            if (mushroom.equals(neighborTecton.getMushroom())) {
+                for (Spore spore : spores ) {
+                    spores.add(spore);
+                }
+                return true;
+            }
+
+            if (mushLevel ==2) {
+                List<Tecton> neighborNeigborTectons = neighborTecton.getNeighbors();
+                for (Tecton neighborNeigborTecton : neighborNeigborTectons) {
+                    if (mushroom.equals(neighborNeigborTecton.getMushroom())) {
+                        for (Spore spore : spores ) {
+                            spores.add(spore);
+                        }
+                        return true;
+                    }
+                } 
+            }
+        }
+        return false;
+
     }
+    
 
     public List<Spore> getSpores() {
         return new ArrayList<>(spores);
