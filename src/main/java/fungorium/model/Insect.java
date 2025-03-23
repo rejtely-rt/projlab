@@ -5,20 +5,9 @@ import fungorium.tectons.Tecton;
 import fungorium.model.Thread;
 import java.util.List;
 import java.util.ArrayList;
+import fungorium.utils.Logger;
 
 public class Insect {
-
-    /**
-     * Speed if the insect is defined by an integer value.
-     * In norman conditions, speed is 2. It can be fastened,
-     * lowered or set to 0 by spores.
-     */
-    private int speed;
-
-    /**
-     * In norman conditions, cut is true. It can be set to false by spores.
-     */
-    private boolean cut;
 
     /**
      * It is the current location of the insect.
@@ -36,9 +25,10 @@ public class Insect {
      * It initializes the speed, cut and spores fields.
      */
     public Insect() {
-        this.speed = 2;
-        this.cut = true;
+        Logger.enter(this, "Insect");
         this.spores = new ArrayList<>();
+        Logger.create(this);
+        Logger.exit("");
     }
 
     /**
@@ -46,23 +36,29 @@ public class Insect {
      * @return the speed of the insect
      */
     public int getSpeed() {
+        Logger.enter(this, "getSpeed");
+        int speed = Logger.question("What is the insect's speed?") ? 2 : 0;
+        Logger.exit(speed);
         return speed;
     }
-
 
     /**
      * Getter method for the cut field.
      * @return the cut of the insect
      */
     public boolean getCut() {
+        Logger.enter(this, "getCut");
+        boolean cut = Logger.question("Can the insect cut?");
+        Logger.exit(cut);
         return cut;
     }
-
     /**
      * Getter method for the location field.
      * @return the location of the insect
      */
     public Tecton getLocation() {
+        Logger.enter(this, "getLocation");
+        Logger.exit(location);
         return location;
     }
 
@@ -77,7 +73,8 @@ public class Insect {
      * @param value the new speed value
      */
     public void changeSpeed(int value) {
-        this.speed = value;
+        Logger.enter(this, "changeSpeed");
+        Logger.exit(value);
     }
 
     /**
@@ -85,7 +82,8 @@ public class Insect {
      * @param value the new cut value
      */
     public void changeCut(boolean value) {
-        this.cut = value;
+        Logger.enter(this, "changeCut");
+        Logger.exit(value);
     }
 
     /**
@@ -95,29 +93,30 @@ public class Insect {
      * @note The insect can move to the target location if the speed is not 0 and there is
      *       a connecting thread between the current and target locations.
      */
-    public boolean moveTo(Tecton target) {
-        if (this.speed == 0) {
-            return false; // If the speed is 0, the insect cannot move
+    public void moveTo(Tecton target) {
+        Logger.enter(this, "moveTo");
+        if (getSpeed() == 0) {
+            Logger.exit(""); // If the speed is 0, the insect cannot move
+            return;
         }
 
         if (this.location == null || target == null) {
-            return false; // If the current or target Tecton is null, the insect cannot move
+            Logger.exit(""); // If the current or target Tecton is null, the insect cannot move
+            return;
         }
 
         // Current and target Tecton threads
         List<Thread> currentThreads = this.location.getThreads();
         List<Thread> targetThreads = target.getThreads();
-
         for (Thread thread : currentThreads) {
-            if (targetThreads.contains(thread)) {   // If there is a connecting thread
+            if (targetThreads.contains(thread)) { // If there is a connecting thread
                 this.location = target; // Successful move
-                return true;
+                Logger.exit("");
+                return;
             }
         }
-
-        return false; // If there is no connecting thread, the insect cannot move
+        Logger.exit(""); // If there is no connecting thread, the insect cannot move
     }
-
     /**
      * Cut the given thread.
      * @param thread the thread to be cut
@@ -125,27 +124,25 @@ public class Insect {
      * @note The insect can cut the thread and remove it from the parent mushroom.
      */
     public boolean cutThread(Thread thread) {
-        if (!this.cut) {
-            return false; // If the insect cannot cut, the thread cannot be cut
+        Logger.enter(this, "cutThread");
+        if (!getCut()) {
+            Logger.exit(false);
+            return false;
         }
-
-
-        // The parent mushroom of the thread
         Mushroom parentMushroom = thread.getParent();
         if (parentMushroom != null) {
             parentMushroom.removeThread(thread);
         }
-
-        // If the thread is cut, the insect cannot move
         if (this.location != null) {
             List<Tecton> neighbors = this.location.getNeighbors();
             for (Tecton t : neighbors) {
-                if (t.getThreads().isEmpty()) { // If the Tecton has no threads
+                if (t.getThreads().isEmpty()) {
                     assert parentMushroom != null;
                     parentMushroom.threadCollector(t);
                 }
             }
         }
+        Logger.exit(true);
         return true;
     }
 
@@ -154,9 +151,11 @@ public class Insect {
      * @note The insect can consume the spore and apply its effect.
      */
     public void consumeSpore(){
+        Logger.enter(this, "consumeSpore");
         Spore spore = this.location.getSpores().get(0);
         spore.applyEffect(this);
         this.spores.add(spore);
+        Logger.exit(null);
     }
 
     /**
@@ -165,6 +164,9 @@ public class Insect {
      * @note If the speed is normal and the cut is true, the is not under the effect of any spore.
      */
     public boolean coolDownCheck() {
-        return this.speed == 2 && this.cut;
+        Logger.enter(this, "coolDownCheck");
+        boolean result = getSpeed() == 2 && getCut();
+        Logger.exit(result);
+        return result;
     }
 }
