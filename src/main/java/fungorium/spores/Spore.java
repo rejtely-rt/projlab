@@ -11,27 +11,9 @@ public abstract class Spore {
 
     public int getCooldown() {
         Logger.enter(this, "getCooldown");
-
-        if (Logger.question("Is the cooldown 0?")) {
-            Logger.exit(0);
-            return 0;
-        }
-        if (Logger.question("Is the cooldown 1?")) {
-            Logger.exit(1);
-            return 1;
-        }
-        if (Logger.question("Is the cooldown 2?")) {
-            Logger.exit(2);
-            return 2;
-        }
-        if (Logger.question("Is the cooldown 3?")) {
-            Logger.exit(3);
-            return 3;
-        }
-
-        // Ha valamiért egyik válasz sem volt megfelelő, alapértelmezésként 0-t adunk vissza.
-        Logger.exit(0);
-        return 0;
+        int value = Logger.questionNumber("What is the cooldown of the spore?");
+        Logger.exit(value);
+        return value;
     }
 
 
@@ -39,7 +21,7 @@ public abstract class Spore {
         Logger.enter(this, "decreaseCooldown");
 
         int currentCooldown = getCooldown();
-        if (currentCooldown == 0) {
+        if (currentCooldown == -1) {
             Logger.exit(""); // A cooldown már nem csökkenhet tovább
             return;
         }
