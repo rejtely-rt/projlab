@@ -29,7 +29,7 @@ mvn exec:java -Dexec.mainClass="fungorium.Main"
 Ha Gradle-t használsz:
 
 ```sh
-gradle build
+./gradlew build
 java -cp build/classes/java/main fungorium.Main
 ```
 ## Gradle letöltése
