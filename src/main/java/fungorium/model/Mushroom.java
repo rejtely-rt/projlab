@@ -9,8 +9,11 @@ import fungorium.spores.*;
 import fungorium.utils.*;;
 
 public class Mushroom {
-    private List<Spore> spores = new ArrayList<>();;
-    private List<Thread> threads = new ArrayList<>();;
+    private List<Spore> spores = new ArrayList<>();
+    private List<Thread> threads = new ArrayList<>();
+
+    //default konstruktor
+    //logger create függvénye
     
     public int getLevel() {
         Logger.enter(this, "getLevel");

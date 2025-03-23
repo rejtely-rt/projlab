@@ -3,6 +3,9 @@ package fungorium.model;
 import fungorium.utils.Logger;
 
 public class Thread {
+
+    //default konstruktor
+    //logger create függvénye
     private Mushroom parent;
     
     public Mushroom getParent() {
