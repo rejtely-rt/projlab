@@ -18,7 +18,7 @@ public class Tecton {
         // Skeleton: a létrehozásnál bejegyezzük magunkat a loggerbe
         Logger.create(this);
     }
-    
+
     public void addNeighbour(Tecton t) {
         Logger.enter(this, "addNeighbour");
         neighbors.add(t);
@@ -125,7 +125,7 @@ public class Tecton {
         List<Thread> threadsCopy = new ArrayList<>(threads);
     
         for (Thread th : threadsCopy) {
-            th.decreaseSize();
+            th.changeSize(-1);
     
             int size = th.getSize();    
             if (size == 0) {

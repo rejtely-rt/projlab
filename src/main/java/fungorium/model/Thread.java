@@ -21,6 +21,8 @@ public class Thread {
      * @return the {@link Mushroom} that owns this thread.
      */
     public Mushroom getParent() {
+        Logger.enter(this, "getParent");
+        Logger.exit(parent);
         return parent;
     }
 
@@ -30,7 +32,9 @@ public class Thread {
      * @param pMushroom the {@link Mushroom} that owns this thread.
      */
     public void setParent(Mushroom pMushroom) {
+        Logger.enter(this, "setParent");
         parent = pMushroom;
+        Logger.exit(null);
     }
 
      /**
@@ -41,7 +45,10 @@ public class Thread {
      * @return 5 if the thread is high-level, otherwise 1.
      */
     public int getSize() {
+        Logger.enter(this, "getSize");
         boolean isSizeHigh = Logger.question("A fonál elég magas szintű?");
+        int integer =0;
+        Logger.exit(integer);
         if (isSizeHigh) return 5;
         return 1;
     } 
@@ -50,7 +57,9 @@ public class Thread {
      * Changes the size of the thread.
      * Implementation is currently not provided.
      */
-    public void changeSize() {
-        // Implementation needed
+    public void changeSize(int size) {
+        Logger.enter(this, "changeSize");
+        System.out.println("Size is changed by value");
+        Logger.exit(null);
     }
 }
