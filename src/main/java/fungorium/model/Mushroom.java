@@ -112,10 +112,11 @@ public class Mushroom {
             // If Mushroom is found first
             if (neighborMushroom.equals(this)) {
                 Thread newThread = new Thread();
-                boolean successfullyAdded = t.addThread(newThread);
-                if (!successfullyAdded) return false;
+                boolean tSuccessfullyAdded = t.addThread(newThread);
+                if (!tSuccessfullyAdded) return false;
                 newThread.setParent(this);
-                neighbor.addThread(newThread);
+                boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
+                if (!neighborSuccessfullyAdded) return false;
                 Logger.exit(true);
                 return true;
             }
@@ -130,7 +131,8 @@ public class Mushroom {
                     boolean successfullyAdded = t.addThread(newThread);
                     if (!successfullyAdded) return false;
                     newThread.setParent(this);
-                    neighbor.addThread(newThread);
+                    boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
+                    if (!neighborSuccessfullyAdded) return false;
                     Logger.exit(true);
                     return true;
                 }
