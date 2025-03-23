@@ -46,11 +46,9 @@ public class Thread {
      */
     public int getSize() {
         Logger.enter(this, "getSize");
-        boolean isSizeHigh = Logger.question("A fonál elég magas szintű?");
-        int integer =0;
-        Logger.exit(integer);
-        if (isSizeHigh) return 5;
-        return 1;
+        int size = Logger.question("A fonál elég magas szintű?") ? 5 : 1;
+        Logger.exit(size);
+        return size;
     } 
 
     /**

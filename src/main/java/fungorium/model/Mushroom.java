@@ -28,11 +28,9 @@ public class Mushroom {
      */
     public int getLevel() {
         Logger.enter(this, "getLevel");
-        boolean isLevel1 = Logger.question("A gomba 1-es szintű?");
-        int level = 0;
+        int level = Logger.question("A gomba 1-es szintű?") ? 1: 2;
         Logger.exit(level);
-        if (isLevel1) return level = 1;
-        return level = 2;
+        return level;
         
         
     }
