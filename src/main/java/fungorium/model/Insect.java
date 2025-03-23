@@ -101,6 +101,7 @@ public class Insect {
         }
 
         if (this.location == null || target == null) {
+            this.location = target;
             Logger.exit(""); // If the current or target Tecton is null, the insect cannot move
             return;
         }
