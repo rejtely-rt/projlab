@@ -24,7 +24,6 @@ public class Tecton {
         neighbors.add(t);
         Logger.exit("");
     }
-
     public List<Tecton> getNeighbors() {
         Logger.enter(this, "getNeighbors");
         List<Tecton> result = new ArrayList<>(neighbors);
@@ -78,17 +77,32 @@ public class Tecton {
         Logger.exit("");
     }
 
-    /**
-     * addSpores: skeleton-megvalósítás
-     *  - eldöntjük, tényleg hozzáadjuk-e őket
-     *  - a paraméterek itt illusztratív jellegűek
-     */
-    public boolean addSpores(List<Spore> sporeList) {
-        Logger.enter(this, "addSpores");
-        spores.addAll(sporeList);
-        Logger.exit(true);
-        return true;
+    public boolean addSpores(List<Spore> spores, Mushroom mushroom) {
+        int mushLevel = mushroom.getLevel();
+        for (Tecton neighborTecton: neighbors) {
+            if (mushroom.equals(neighborTecton.getMushroom())) {
+                for (Spore spore : spores ) {
+                    spores.add(spore);
+                }
+                return true;
+            }
+
+            if (mushLevel ==2) {
+                List<Tecton> neighborNeigborTectons = neighborTecton.getNeighbors();
+                for (Tecton neighborNeigborTecton : neighborNeigborTectons) {
+                    if (mushroom.equals(neighborNeigborTecton.getMushroom())) {
+                        for (Spore spore : spores ) {
+                            spores.add(spore);
+                        }
+                        return true;
+                    }
+                } 
+            }
+        }
+        return false;
+
     }
+    
 
     public List<Spore> getSpores() {
         Logger.enter(this, "getSpores");
@@ -111,7 +125,7 @@ public class Tecton {
         List<Thread> threadsCopy = new ArrayList<>(threads);
     
         for (Thread th : threadsCopy) {
-            th.decreaseSize();
+            th.changeSize(-1);
     
             int size = th.getSize();    
             if (size == 0) {
