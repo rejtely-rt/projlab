@@ -21,22 +21,12 @@ public class Tecton {
 
     public void addNeighbour(Tecton t) {
         Logger.enter(this, "addNeighbour");
-
-        // Skeleton: eldöntjük, akarjuk-e ténylegesen hozzáadni?
-        boolean shouldAdd = Logger.question("Should we add this Tecton as a neighbor?");
-        if (shouldAdd) {
-            neighbors.add(t);
-            System.out.println("   -> Neighbor added.");
-        } else {
-            System.out.println("   -> User chose NOT to add neighbor.");
-        }
-
+        neighbors.add(t);
         Logger.exit("");
     }
 
     public List<Tecton> getNeighbors() {
         Logger.enter(this, "getNeighbors");
-        // Egyszerűen visszaadjuk, de a skeleton kód miatt lehetne user input is
         List<Tecton> result = new ArrayList<>(neighbors);
         Logger.exit(result); 
         return result;
@@ -123,17 +113,9 @@ public class Tecton {
      */
     public boolean addSpores(List<Spore> sporeList) {
         Logger.enter(this, "addSpores");
-        boolean shallAdd = Logger.question("Shall we add these spores to Tecton?");
-        if (shallAdd) {
-            spores.addAll(sporeList);
-            System.out.println("   -> Spores added to Tecton.");
-            Logger.exit(true);
-            return true;
-        } else {
-            System.out.println("   -> Spores not added.");
-            Logger.exit(false);
-            return false;
-        }
+        spores.addAll(sporeList);
+        Logger.exit(true);
+        return true;
     }
 
     public List<Spore> getSpores() {
@@ -145,13 +127,7 @@ public class Tecton {
 
     public void removeSpore(Spore s) {
         Logger.enter(this, "removeSpore");
-        boolean doRemove = Logger.question("Should we remove this spore from Tecton?");
-        if (doRemove) {
-            spores.remove(s);
-            System.out.println("   -> Spore removed.");
-        } else {
-            System.out.println("   -> Not removed, user cancelled.");
-        }
+        spores.remove(s);
         Logger.exit("");
     }
 
@@ -165,10 +141,7 @@ public class Tecton {
         for (Thread th : threadsCopy) {
             th.decreaseSize();
     
-            int size = th.getSize();
-            Logger.enter(th, "getSize");
-            Logger.exit(size);
-    
+            int size = th.getSize();    
             if (size == 0) {
                 // Tecton eltávolítja magából a szálat
                 this.removeThread(th);
