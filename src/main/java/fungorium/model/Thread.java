@@ -17,13 +17,9 @@ public class Thread {
     }
 
     public int getSize() {
-        //return size;
-        boolean isSizeHigh = Logger.question("A fonál elég magas szintű?");
-        if (isSizeHigh) return 5;
-        return 1;
-    } 
-    /* 
-    public void changeSize(int value) {
-        size+=value;
-    } */
+        return size;
+    }
+    public void changeSize() {
+        // Implementation needed
+    }
 }
