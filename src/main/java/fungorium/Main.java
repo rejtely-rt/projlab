@@ -1,8 +1,12 @@
 package fungorium;
 
+import fungorium.spores.CannotCutSpore;
 import fungorium.tectons.Tecton;
 import fungorium.utils.Initialize;
+import fungorium.spores.Spore;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -31,7 +35,9 @@ public class Main {
 
         class Tests extends Initialize {
             public Tests() {
+                System.out.println("Inicializáció...");
                 initialize();
+                System.out.println("Inicializáció vége");
             }
 
             public void test1() {
@@ -56,12 +62,12 @@ public class Main {
 
             public void test5() {
                 System.out.println("[Teszt 5] Thread grow first of a Mushroom");
-                m2.addThread(t2);
+                m2.addThread(t4);
             }
 
             public void test6() {
                 System.out.println("[Teszt 6] Thread grow first of a Mushroom on a SingleThreadTecton");
-                m2.addThread(t4);
+                m2.addThread(t2);
             }
 
             public void test7() {
@@ -71,7 +77,12 @@ public class Main {
 
             public void test8() {
                 System.out.println("[Teszt 8] Insect consume cannotCutSpore");
-                i1.consumeSpore();
+                t4.getSpores().clear();
+                CannotCutSpore c1 = new CannotCutSpore();
+                List<Spore> list = new ArrayList<Spore>();
+                list.add(c1);
+                t4.addSpores(list, m1);
+                i3.consumeSpore();
             }
 
             public void test9() {
@@ -81,6 +92,7 @@ public class Main {
 
             public void test10() {
                 System.out.println("[Teszt 10] Thread absorb");
+                m1.addThread(t3);
                 t3.absorbThread();
             }
 
@@ -96,7 +108,7 @@ public class Main {
 
             public void test13() {
                 System.out.println("[Teszt 13] Mushroom grow");
-                t4.addMushroom();
+                t1.addMushroom();
             }
         }
 

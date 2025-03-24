@@ -48,6 +48,11 @@ public class Tecton {
             Logger.exit(false);
             return false;
         }
+        if (threads.size() == 0) {
+            System.out.println("   -> No threads, can't grow mushroom.");
+            Logger.exit(false);
+            return false;
+        }
         Mushroom m = new Mushroom();
         this.mushroom = m;
         System.out.println("   -> New mushroom created on Tecton.");
@@ -123,30 +128,7 @@ public class Tecton {
 
 
     public void absorbThread() {
-        Logger.enter(this, "absorbThread");
-    
-        // Másolat, hogy elkerüljük ConcurrentModificationException-t
-        List<Thread> threadsCopy = new ArrayList<>(threads);
-    
-        for (Thread th : threadsCopy) {
-            th.changeSize(-1);
-    
-            int size = th.getSize();    
-            if (size == 0) {
-                // Tecton eltávolítja magából a szálat
-                this.removeThread(th);
-    
-                // Minden szomszéd Tectonból is eltávolítjuk a szálat
-                for (Tecton neighbor : neighbors) {
-                    List<Thread> neighborThreads = neighbor.getThreads();
-                    if (neighborThreads.contains(th)) {
-                        neighbor.removeThread(th);
-                        neighbor.getMushroom().threadCollector(this);
-                    }
-                }
-            }
-        }
-    
+        Logger.enter(this, "absorbThread");    
         Logger.exit("");
     }
     
@@ -166,14 +148,9 @@ public class Tecton {
         // A két tekton egymás szomszédja lesz
         this.addNeighbour(t2);
         t2.addNeighbour(this);
+        // A szálakat eltávolítjuk a tectonokról
     
         Logger.exit(t2);
         return t2;
     }
-
-    public void applyEffect() {
-        Logger.enter(this, "applyEffect");
-        Logger.exit("");
-    }
-    
 }

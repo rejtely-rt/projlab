@@ -8,9 +8,9 @@ import fungorium.tectons.*;
 public abstract class Initialize {
     // Common objects for tests
     protected Tecton t1;
-    protected OneThreadTecton t2;
-    protected NoMushTecton t3;
-    protected ThreadAbsorberTecton t4;
+    protected NoMushTecton t2;
+    protected ThreadAbsorberTecton t3;
+    protected OneThreadTecton t4;
     protected Mushroom m1;
     protected Mushroom m2;
     protected Insect i1;
@@ -29,9 +29,9 @@ public abstract class Initialize {
         m2 = new Mushroom();
 
         t1 = new Tecton(m1);
-        t2 = new OneThreadTecton();
-        t3 = new NoMushTecton(m2);
-        t4 = new ThreadAbsorberTecton();
+        t2 = new NoMushTecton();
+        t3 = new ThreadAbsorberTecton(m2);
+        t4 = new OneThreadTecton();
         t1.addNeighbour(t2);
         t2.addNeighbour(t1);
         t2.addNeighbour(t3);
