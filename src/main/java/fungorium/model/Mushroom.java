@@ -73,6 +73,16 @@ public class Mushroom {
      */
     public void produceSpores() {
         Logger.enter(this, "produceSpores");
+        List<Spore> sporeList = new ArrayList<>();
+        Spore cspore = new CannotCutSpore();
+        sporeList.add(cspore);
+        Spore pspore = new ParalyzeSpore();
+        sporeList.add(pspore);
+        Spore spspore = new SpeedySpore();
+        sporeList.add(spspore);
+        Spore slspore = new SlowlySpore();
+        sporeList.add(slspore);
+        spores.addAll(sporeList);
         Logger.exit(null);
     }
     
@@ -86,9 +96,7 @@ public class Mushroom {
     public void shootSpores(Tecton to) {
         boolean successfullShoot = to.addSpores(spores, this);
         if (successfullShoot) {
-            for (Spore spore : spores) {
-                spores.remove(spore);
-            }
+            spores.clear();
         }
 
     }
@@ -110,7 +118,7 @@ public class Mushroom {
         for (Tecton neighbor : targetTectonNeighbors) {
             Mushroom neighborMushroom = neighbor.getMushroom();
             // If Mushroom is found first
-            if (neighborMushroom.equals(this)) {
+            if (neighborMushroom != null && neighborMushroom.equals(this)) {
                 Thread newThread = new Thread();
                 boolean tSuccessfullyAdded = t.addThread(newThread);
                 if (!tSuccessfullyAdded) return false;
