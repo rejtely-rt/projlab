@@ -28,7 +28,7 @@ public class Mushroom {
      */
     public int getLevel() {
         Logger.enter(this, "getLevel");
-        int level = Logger.question("A gomba 1-es szintű?") ? 1: 2;
+        int level = Logger.questionNumber("Hányas szintű a gomba?");
         Logger.exit(level);
         return level;
         
@@ -125,6 +125,7 @@ public class Mushroom {
                 newThread.setParent(this);
                 boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
                 if (!neighborSuccessfullyAdded) return false;
+                threads.add(newThread);
                 Logger.exit(true);
                 return true;
             }
@@ -141,6 +142,7 @@ public class Mushroom {
                     newThread.setParent(this);
                     boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
                     if (!neighborSuccessfullyAdded) return false;
+                    threads.add(newThread);
                     Logger.exit(true);
                     return true;
                 }
