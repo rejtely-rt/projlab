@@ -14,6 +14,13 @@ public class OneThreadTecton extends Tecton {
 
     @Override
     public boolean addThread(Thread thread) {
-        return super.addThread(thread);
+        Logger.enter(this, "addThread");
+        if (threads.size() == 1) {
+            Logger.exit(false);
+            return false;
+        }
+        boolean returnValue = super.addThread(thread);
+        Logger.exit(returnValue);
+        return returnValue;
     }
 }

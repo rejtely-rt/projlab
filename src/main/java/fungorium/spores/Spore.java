@@ -19,18 +19,7 @@ public abstract class Spore {
 
     public void decreaseCooldown() {
         Logger.enter(this, "decreaseCooldown");
-
-        int currentCooldown = getCooldown();
-        if (currentCooldown == -1) {
-            Logger.exit(""); // A cooldown már nem csökkenhet tovább
-            return;
-        }
-
-        if (Logger.question("Decrease cooldown to " + (currentCooldown - 1) + "?")) {
-            Logger.exit("");
-        } else {
-            Logger.exit(""); // Ha nem csökkentjük, marad az eredeti érték
-        }
+        Logger.exit(""); // Ha nem csökkentjük, marad az eredeti érték
     }
 
     /**
@@ -48,7 +37,6 @@ public abstract class Spore {
         Logger.enter(this, "removeEffect");
         target.changeSpeed(2);
         target.changeCut(true);
-
         Logger.exit("");
     }
 }
