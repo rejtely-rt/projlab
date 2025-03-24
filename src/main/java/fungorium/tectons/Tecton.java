@@ -9,14 +9,19 @@ import fungorium.utils.Logger;
 
 public class Tecton {
 
-    private List<Tecton> neighbors = new ArrayList<>();
-    private List<Thread> threads = new ArrayList<>();
-    private List<Spore> spores = new ArrayList<>();
-    private Mushroom mushroom = null;
+    protected List<Tecton> neighbors = new ArrayList<>();
+    protected List<Thread> threads = new ArrayList<>();
+    protected List<Spore> spores = new ArrayList<>();
+    protected Mushroom mushroom = null;
 
     public Tecton() {
         // Skeleton: a létrehozásnál bejegyezzük magunkat a loggerbe
         Logger.create(this);
+    }
+
+    public Tecton(Mushroom m) {
+        Logger.create(this);
+        this.mushroom = m;
     }
 
     public void addNeighbour(Tecton t) {
@@ -82,7 +87,7 @@ public class Tecton {
         for (Tecton neighborTecton: neighbors) {
             if (mushroom.equals(neighborTecton.getMushroom())) {
                 for (Spore spore : spores ) {
-                    spores.add(spore);
+                    this.spores.add(spore);
                 }
                 return true;
             }
@@ -92,7 +97,7 @@ public class Tecton {
                 for (Tecton neighborNeigborTecton : neighborNeigborTectons) {
                     if (mushroom.equals(neighborNeigborTecton.getMushroom())) {
                         for (Spore spore : spores ) {
-                            spores.add(spore);
+                            this.spores.add(spore);
                         }
                         return true;
                     }
@@ -106,9 +111,8 @@ public class Tecton {
 
     public List<Spore> getSpores() {
         Logger.enter(this, "getSpores");
-        List<Spore> result = new ArrayList<>(spores);
-        Logger.exit(result);
-        return result;
+        Logger.exit(spores);
+        return spores;
     }
 
     public void removeSpore(Spore s) {

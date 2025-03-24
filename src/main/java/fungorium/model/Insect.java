@@ -93,14 +93,13 @@ public class Insect {
      */
     public void moveTo(Tecton target) {
         Logger.enter(this, "moveTo");
-        if (getSpeed() == 0) {
-            Logger.exit(""); // If the speed is 0, the insect cannot move
+        if (this.location == null) {
+            this.location = target;
+            Logger.exit("");
             return;
         }
-
-        if (this.location == null || target == null) {
-            this.location = target;
-            Logger.exit(""); // If the current or target Tecton is null, the insect cannot move
+        if (getSpeed() == 0) {
+            Logger.exit(""); // If the speed is 0, the insect cannot move
             return;
         }
 
@@ -153,7 +152,13 @@ public class Insect {
      */
     public void consumeSpore(){
         Logger.enter(this, "consumeSpore");
-        Spore spore = this.location.getSpores().get(0);
+        List<Spore> sporeList = this.location.getSpores();
+        if (sporeList.isEmpty()){
+            Logger.exit(null);
+            return;
+        }
+        Spore spore = sporeList.get(0);
+        sporeList.remove(0);
         spore.applyEffect(this);
         this.spores.add(spore);
         Logger.exit(null);
