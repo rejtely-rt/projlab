@@ -1,5 +1,6 @@
 package fungorium;
 
+import fungorium.tectons.Tecton;
 import fungorium.utils.Initialize;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class Main {
 
             public void test3() {
                 System.out.println("[Teszt 3] Tecton break");
-                t1.breakTecton();
+                Tecton t5 = t1.breakTecton();
             }
 
             public void test4() {

@@ -151,7 +151,7 @@ public class Tecton {
     }
     
 
-    public void breakTecton() {
+    public Tecton breakTecton() {
         Logger.enter(this, "breakTecton");
     
         // Új Tecton létrehozása
@@ -167,10 +167,8 @@ public class Tecton {
         this.addNeighbour(t2);
         t2.addNeighbour(this);
     
-        this.absorbThread();
-        t2.absorbThread();
-    
-        Logger.exit("");
+        Logger.exit(t2);
+        return t2;
     }
 
     public void applyEffect() {
