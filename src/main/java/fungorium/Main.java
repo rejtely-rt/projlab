@@ -27,7 +27,8 @@ public class Main {
                 "Thread absorb",
                 "Insect move",
                 "Effect check",
-                "Mushroom grow"
+                "Unsuccessful mushroom grow",
+                "Successful mushroom grow"
         );
 
         Scanner scanner = new Scanner(System.in);
@@ -62,12 +63,12 @@ public class Main {
 
             public void test5() {
                 System.out.println("[Teszt 5] Thread grow first of a Mushroom");
-                m2.addThread(t4);
+                m2.addThread(t2);
             }
 
             public void test6() {
                 System.out.println("[Teszt 6] Thread grow first of a Mushroom on a SingleThreadTecton");
-                m2.addThread(t2);
+                m2.addThread(t4);
             }
 
             public void test7() {
@@ -81,7 +82,7 @@ public class Main {
                 CannotCutSpore c1 = new CannotCutSpore();
                 List<Spore> list = new ArrayList<Spore>();
                 list.add(c1);
-                t4.addSpores(list, m1);
+                t4.forceAddSpores(list);
                 i3.consumeSpore();
             }
 
@@ -92,6 +93,8 @@ public class Main {
 
             public void test10() {
                 System.out.println("[Teszt 10] Thread absorb");
+                System.out.println("    This test is needed to run test 10.");
+                System.out.println("    [Teszt 4] Thread grow next to a thread");
                 m1.addThread(t3);
                 t3.absorbThread();
             }
@@ -107,8 +110,13 @@ public class Main {
             }
 
             public void test13() {
-                System.out.println("[Teszt 13] Mushroom grow");
+                System.out.println("[Teszt 13] Unsuccessful mushroom grow");
                 t1.addMushroom();
+            }
+
+            public void test14() {
+                System.out.println("[Teszt 14] Successful mushroom grow");
+                t4.addMushroom();
             }
         }
 
@@ -139,6 +147,7 @@ public class Main {
                 case "11" -> new Tests().test11();
                 case "12" -> new Tests().test12();
                 case "13" -> new Tests().test13();
+                case "14" -> new Tests().test14();
                 case "0" -> System.out.println("Kilépés...");
                 default -> System.out.println("Érvénytelen választás. Kérlek, próbáld újra.");
             }

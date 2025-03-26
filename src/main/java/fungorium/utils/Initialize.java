@@ -1,7 +1,14 @@
 package fungorium.utils;
 
+import java.util.List;
+
 import fungorium.model.*;
 import fungorium.model.Thread;
+import fungorium.spores.CannotCutSpore;
+import fungorium.spores.ParalyzeSpore;
+import fungorium.spores.SlowlySpore;
+import fungorium.spores.SpeedySpore;
+import fungorium.spores.Spore;
 import fungorium.tectons.*;
 
 
@@ -25,6 +32,7 @@ public abstract class Initialize {
      * This method should be called at the beginning of each test.
      */
     public void initialize() {
+        Logger.reset();
         m1 = new Mushroom();
         m2 = new Mushroom();
 
@@ -45,10 +53,30 @@ public abstract class Initialize {
         m1.addThread(t4);
         th1 = t2.getThreads().get(0);
         th2 = t4.getThreads().get(0);
+
+        /* 
         m1.produceSpores();
         m1.shootSpores(t2);
         m1.produceSpores();
         m1.shootSpores(t4);
+        */
+        //Ezek helyett, hogy ne legyen kérdés Force-oljuk
+        //--------------------------------------------------
+        List<Spore> sporesForT2 = List.of(
+            new CannotCutSpore(),
+            new ParalyzeSpore(),
+            new SpeedySpore(),
+            new SlowlySpore()
+        );
+        t2.forceAddSpores(sporesForT2);
+        List<Spore> sporesForT4 = List.of(
+            new CannotCutSpore(),
+            new ParalyzeSpore(),
+            new SpeedySpore(),
+            new SlowlySpore()
+        );
+        t4.forceAddSpores(sporesForT4);
+        //--------------------------------------------------
         m1.produceSpores();
 
         i1 = new Insect();

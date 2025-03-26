@@ -125,20 +125,25 @@ public class Tecton {
     public void removeThread(Thread t) {
         Logger.enter(this, "removeThread");
         threads.remove(t);
-        // Minden szomszéd Tectonból is eltávolítjuk a szálat
         for (Tecton neighbor : neighbors) {
-            List<Thread> neighborThreads = neighbor.getThreads();
-            if (neighborThreads.contains(t)) {
-                neighbor.removeThread(t);
-                Mushroom m1 = t.getParent();
-                m1.removeThread(t);
-                threads.remove(t);
-                m1.threadCollector(this);
+            if (neighbor.getThreads().contains(t)) {
+                neighbor.removeThreadLocally(t); // új metódus, csak a belső listát módosítja
+
             }
         }
         Logger.exit("");
     }
+    //for testing, because the ThreadCollector is not implemented
+    public void removeThreadLocally(Thread t) {
+        threads.remove(t);
+    }    
+    //--------------------------------------------
 
+    public void forceAddSpores(List<Spore> spores) { //JUST FOR INITIALIZATION
+        Logger.enter(this, "forceAddSpores");
+        this.spores.addAll(spores);
+        Logger.exit(true);
+    }
     /**
      * Adds spores to the current Tecton if the given mushroom is found in the neighboring Tectons.
      * If the mushroom's level is 2, it also checks the neighbors of the neighboring Tectons.
@@ -148,30 +153,38 @@ public class Tecton {
      * @return true if the spores were added, false otherwise
      */
     public boolean addSpores(List<Spore> spores, Mushroom mushroom) {
+        Logger.enter(this, "addSpores");
+    
         int mushLevel = mushroom.getLevel();
-        for (Tecton neighborTecton: neighbors) {
-            if (mushroom.equals(neighborTecton.getMushroom())) {
-                for (Spore spore : spores ) {
-                    this.spores.add(spore);
+    
+        if (mushLevel == 1) {
+            // LEVEL 1: közvetlen szomszédnál keresünk gombát
+            for (Tecton neighbor : neighbors) {
+                if (mushroom.equals(neighbor.getMushroom())) {
+                    this.spores.addAll(spores);
+                    Logger.exit(true);
+                    return true;
                 }
-                return true;
-            }
-
-            if (mushLevel ==2) {
-                List<Tecton> neighborNeigborTectons = neighborTecton.getNeighbors();
-                for (Tecton neighborNeigborTecton : neighborNeigborTectons) {
-                    if (mushroom.equals(neighborNeigborTecton.getMushroom())) {
-                        for (Spore spore : spores ) {
-                            this.spores.add(spore);
-                        }
-                        return true;
-                    }
-                } 
             }
         }
+    
+        if (mushLevel == 2) {
+            // LEVEL 2: szomszéd szomszédjánál keresünk gombát
+            for (Tecton neighbor : neighbors) {
+                List<Tecton> neighborsOfNeighbor = neighbor.getNeighbors();
+                for (Tecton n2 : neighborsOfNeighbor) {
+                    if (mushroom.equals(n2.getMushroom())) {
+                        this.spores.addAll(spores);
+                        Logger.exit(true);
+                        return true;
+                    }
+                }
+            }
+        }
+    
+        Logger.exit(false);
         return false;
-
-    }
+    }    
     
 
     /**
@@ -200,7 +213,6 @@ public class Tecton {
         Logger.enter(this, "absorbThread");    
         Logger.exit("");
     }
-    
 
     /**
      * Breaks the current Tecton into two by creating a new Tecton and 
@@ -212,7 +224,13 @@ public class Tecton {
      */
     public Tecton breakTecton() {
         Logger.enter(this, "breakTecton");
-    
+        List<Thread> threads = new ArrayList<>(this.threads);
+        for (Thread thread : threads) {
+            Mushroom m1 = thread.getParent();
+            m1.removeThread(thread);
+            this.removeThread(thread);
+            m1.threadCollector(this);
+        }
         // Új Tecton létrehozása
         Tecton t2 = new Tecton();
     
@@ -225,14 +243,7 @@ public class Tecton {
         // A két tekton egymás szomszédja lesz
         this.addNeighbour(t2);
         t2.addNeighbour(this);
-        
-        List<Thread> threadsCopy = new ArrayList<>(threads);
 
-        // A szálakat eltávolítjuk a tectonokról
-        for (Thread th : threadsCopy) {
-            // Tecton eltávolítja magából a szálat
-            this.removeThread(th);
-        }
     
         Logger.exit(t2);
         return t2;

@@ -95,11 +95,11 @@ public class Insect {
         Logger.enter(this, "moveTo");
         if (this.location == null) {
             this.location = target;
-            Logger.exit("");
+            Logger.exit(false);
             return;
         }
         if (getSpeed() == 0) {
-            Logger.exit(""); // If the speed is 0, the insect cannot move
+            Logger.exit(false); // If the speed is 0, the insect cannot move
             return;
         }
 
@@ -109,11 +109,11 @@ public class Insect {
         for (Thread thread : currentThreads) {
             if (targetThreads.contains(thread)) { // If there is a connecting thread
                 this.location = target; // Successful move
-                Logger.exit("");
+                Logger.exit(true);
                 return;
             }
         }
-        Logger.exit(""); // If there is no connecting thread, the insect cannot move
+        Logger.exit(false); // If there is no connecting thread, the insect cannot move
     }
     /**
      * Cut the given thread.
