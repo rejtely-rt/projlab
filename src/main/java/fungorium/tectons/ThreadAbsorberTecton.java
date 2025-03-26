@@ -9,7 +9,6 @@ import fungorium.model.Thread;
 
 public class ThreadAbsorberTecton extends Tecton {
     public ThreadAbsorberTecton() {
-        Logger.create(this);
     }
     
     public ThreadAbsorberTecton(Mushroom m) {

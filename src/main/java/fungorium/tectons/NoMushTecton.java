@@ -5,7 +5,6 @@ import fungorium.utils.Logger;
 
 public class NoMushTecton extends Tecton {
     public NoMushTecton() {
-        Logger.create(this);
     }
     
     public NoMushTecton(Mushroom m) {
