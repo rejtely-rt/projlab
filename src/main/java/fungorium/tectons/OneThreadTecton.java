@@ -6,7 +6,6 @@ import fungorium.model.Thread;;
 
 public class OneThreadTecton extends Tecton {
     public OneThreadTecton() {
-        Logger.create(this);
     }   
     
     public OneThreadTecton(Mushroom m) {
