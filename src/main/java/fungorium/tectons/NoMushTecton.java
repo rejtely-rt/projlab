@@ -8,7 +8,7 @@ public class NoMushTecton extends Tecton {
     }
     
     public NoMushTecton(Mushroom m) {
-        this.mushroom = m;
+        System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
     }
 
     @Override

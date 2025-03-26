@@ -182,4 +182,11 @@ public class Logger {
         }
         return sb.toString();
     }
+
+    public static void reset() {
+        objectNames.clear();
+        prefixCounters.clear();
+        computedPrefixes.clear();
+        indentLevel = 0;
+    }    
 }

@@ -173,7 +173,6 @@ public class Mushroom {
      */
     public void threadCollector(Tecton t) {
         Logger.enter(this, "threadCollector");
-        System.out.println("Egy teljes fonalat törlünk");
         Logger.exit(null);
     }
 }
