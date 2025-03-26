@@ -128,6 +128,7 @@ public class Tecton {
         for (Tecton neighbor : neighbors) {
             if (neighbor.getThreads().contains(t)) {
                 neighbor.removeThreadLocally(t); // új metódus, csak a belső listát módosítja
+
             }
         }
         Logger.exit("");
@@ -143,7 +144,6 @@ public class Tecton {
         this.spores.addAll(spores);
         Logger.exit(true);
     }
-
     /**
      * Adds spores to the current Tecton if the given mushroom is found in the neighboring Tectons.
      * If the mushroom's level is 2, it also checks the neighbors of the neighboring Tectons.
@@ -243,7 +243,7 @@ public class Tecton {
         // A két tekton egymás szomszédja lesz
         this.addNeighbour(t2);
         t2.addNeighbour(this);
-        
+
     
         Logger.exit(t2);
         return t2;

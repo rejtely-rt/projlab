@@ -9,6 +9,11 @@ public abstract class Spore {
         Logger.create(this);
     }
 
+    /**
+     * Gets the cooldown value of the spore.
+     *
+     * @return the cooldown value.
+     */
     public int getCooldown() {
         Logger.enter(this, "getCooldown");
         int value = Logger.questionNumber("What is the cooldown of the spore?");
@@ -17,6 +22,11 @@ public abstract class Spore {
     }
 
 
+    /**
+     * Decreases the cooldown period for the spore. This method logs the entry and exit
+     * of the function using the Logger class. If the cooldown is not decreased, the 
+     * original value remains unchanged.
+     */
     public void decreaseCooldown() {
         Logger.enter(this, "decreaseCooldown");
         Logger.exit(""); // Ha nem csökkentjük, marad az eredeti érték

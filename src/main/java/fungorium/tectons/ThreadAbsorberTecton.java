@@ -9,12 +9,22 @@ import fungorium.model.Thread;
 
 public class ThreadAbsorberTecton extends Tecton {
     public ThreadAbsorberTecton() {
+        Logger.create(this);
     }
     
     public ThreadAbsorberTecton(Mushroom m) {
         this.mushroom = m;
     }
 
+    /**
+     * Absorbs threads from the current Tecton. This method iterates through a copy of the 
+     * threads list to avoid ConcurrentModificationException. For each thread, it decreases 
+     * its size by 1. If the size of the thread becomes 0, the thread is removed from the 
+     * current Tecton and all its neighboring Tectons. Additionally, the thread is removed 
+     * from its parent Mushroom, and the parent Mushroom's thread collector is updated.
+     * 
+     * This method logs entry and exit points for debugging purposes.
+     */
     @Override 
     public void absorbThread(){
         Logger.enter(this, "absorbThread");
@@ -28,18 +38,6 @@ public class ThreadAbsorberTecton extends Tecton {
             if (size == 0) {
                 // Tecton eltávolítja magából a szálat
                 this.removeThread(th);
-    
-                // Minden szomszéd Tectonból is eltávolítjuk a szálat
-                for (Tecton neighbor : neighbors) {
-                    List<Thread> neighborThreads = neighbor.getThreads();
-                    if (neighborThreads.contains(th)) {
-                        neighbor.removeThread(th);
-                        Mushroom m1 = th.getParent();
-                        m1.removeThread(th);
-                        threads.remove(th);
-                        m1.threadCollector(this);
-                    }
-                }
             }
         }
         Logger.exit("");

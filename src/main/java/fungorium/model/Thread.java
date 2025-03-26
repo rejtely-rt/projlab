@@ -54,6 +54,7 @@ public class Thread {
     /**
      * Changes the size of the thread.
      * Implementation is currently not provided.
+     * @param size the new size of the thread.
      */
     public void changeSize(int size) {
         Logger.enter(this, "changeSize");
