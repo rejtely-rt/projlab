@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.ArrayList;
 import fungorium.utils.Logger;
 
-public class Insect {
 
+
+public class Insect {
+    public enum Player {
+        INSESCIST,
+        MYCOLOGIST,
+    }
     /**
      * It is the current location of the insect.
      */
@@ -19,6 +24,38 @@ public class Insect {
      * It is the spores that the insect has consumed.
      */
     private final List<Spore> spores;
+
+    private Player owner;
+
+    public Player getOwner() {
+        Logger.enter(this, "getOwner");
+        Logger.exit(owner);
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        Logger.enter(this, "setOwner");
+        this.owner = owner;
+        Logger.exit("");
+    }
+
+    public void setLocation(Tecton location) {
+        Logger.enter(this, "setLocation");
+        this.location = location;
+        Logger.exit("");
+    }
+
+    public void setSpeed(int speed) {
+        Logger.enter(this, "setSpeed");
+        //this.speed = speed;
+        Logger.exit("");
+    }
+
+    public void setCut(boolean cut) {
+        Logger.enter(this, "setCut");
+        //this.cut = cut;
+        Logger.exit("");
+    }
 
     /**
      * Constructor of the Insect class.
@@ -93,14 +130,13 @@ public class Insect {
      */
     public void moveTo(Tecton target) {
         Logger.enter(this, "moveTo");
-        if (getSpeed() == 0) {
-            Logger.exit(""); // If the speed is 0, the insect cannot move
+        if (this.location == null) {
+            this.location = target;
+            Logger.exit(false);
             return;
         }
-
-        if (this.location == null || target == null) {
-            this.location = target;
-            Logger.exit(""); // If the current or target Tecton is null, the insect cannot move
+        if (getSpeed() == 0) {
+            Logger.exit(false); // If the speed is 0, the insect cannot move
             return;
         }
 
@@ -110,11 +146,11 @@ public class Insect {
         for (Thread thread : currentThreads) {
             if (targetThreads.contains(thread)) { // If there is a connecting thread
                 this.location = target; // Successful move
-                Logger.exit("");
+                Logger.exit(true);
                 return;
             }
         }
-        Logger.exit(""); // If there is no connecting thread, the insect cannot move
+        Logger.exit(false); // If there is no connecting thread, the insect cannot move
     }
     /**
      * Cut the given thread.
@@ -153,7 +189,13 @@ public class Insect {
      */
     public void consumeSpore(){
         Logger.enter(this, "consumeSpore");
-        Spore spore = this.location.getSpores().get(0);
+        List<Spore> sporeList = this.location.getSpores();
+        if (sporeList.isEmpty()){
+            Logger.exit(null);
+            return;
+        }
+        Spore spore = sporeList.get(0);
+        sporeList.remove(0);
         spore.applyEffect(this);
         this.spores.add(spore);
         Logger.exit(null);
