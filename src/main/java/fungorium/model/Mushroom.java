@@ -171,8 +171,71 @@ public class Mushroom {
      * 
      * @param t The starting Tecton.
      */
-    public void threadCollector(Tecton t) {
-        Logger.enter(this, "threadCollector");
-        Logger.exit(null);
+    public void threadCollector(Tecton startTecton) {
+        // Step 1: Find the Tecton where the mushroom is located
+        Tecton mushroomTecton = null;
+        List<Tecton> visited = new ArrayList<>();
+        List<Tecton> stack = new ArrayList<>();
+        stack.add(startTecton);
+
+        while (!stack.isEmpty()) {
+            Tecton current = stack.remove(stack.size() - 1);
+            if (visited.contains(current)) continue;
+            visited.add(current);
+
+            // Check if the current Tecton contains this mushroom
+            if (current.getMushroom() == this) {
+                mushroomTecton = current;
+            }
+
+            // Add neighbors to the stack for further traversal
+            List<Tecton> neighbors = current.getNeighbors();
+            for (Tecton neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    stack.add(neighbor);
+                }
+            }
+        }
+
+        List<Tecton> allTectons = visited;
+
+        // If the mushroom's Tecton is not found, exit
+        if (mushroomTecton == null) {
+            return;
+        }
+
+        // Step 2: Perform DFS from the mushroom's Tecton through the threads to build the connected network
+        visited.clear();
+        stack.clear();
+        stack.add(mushroomTecton);
+
+        while (!stack.isEmpty()) {
+            Tecton current = stack.remove(stack.size() - 1);
+            if (visited.contains(current)) continue;
+            visited.add(current);
+
+            // Add neighbors to the stack for further traversal
+            List<Tecton> neighbors = current.getNeighbors();
+            for (Tecton neighbor : neighbors) {
+                List<Thread> neighborThreads = neighbor.getThreads();
+                for (Thread neighborThread : neighborThreads){
+                    if (neighborThread.getParent() == this && current.getThreads().contains(neighborThread)) {
+                        stack.add(neighbor);
+                    }
+                }
+            }
+        }
+
+        allTectons.removeAll(visited);
+        List<Thread> toRemove = new ArrayList<>();
+        for (Tecton tecton : allTectons) {
+            for (Thread thread : threads){
+                if (tecton.getThreads().contains(thread)){
+                    toRemove.add(thread);
+                    tecton.removeThread(thread);
+                }
+            }
+        }
+        threads.removeAll(toRemove);
     }
 }
