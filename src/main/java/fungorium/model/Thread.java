@@ -46,7 +46,7 @@ public class Thread {
      */
     public int getSize() {
         Logger.enter(this, "getSize");
-        int size = Logger.question("A fonál elég magas szintű?") ? 5 : 1;
+        int size = Logger.questionNumber("Milyen vastag a fonál?");
         Logger.exit(size);
         return size;
     } 
@@ -54,6 +54,7 @@ public class Thread {
     /**
      * Changes the size of the thread.
      * Implementation is currently not provided.
+     * @param size the new size of the thread.
      */
     public void changeSize(int size) {
         Logger.enter(this, "changeSize");

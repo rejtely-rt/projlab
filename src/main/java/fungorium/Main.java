@@ -1,7 +1,12 @@
 package fungorium;
 
+import fungorium.spores.CannotCutSpore;
+import fungorium.tectons.Tecton;
 import fungorium.utils.Initialize;
+import fungorium.spores.Spore;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,7 +19,6 @@ public class Main {
                 "Shoot spores on neighbor's neighbor",
                 "Tecton break",
                 "Thread grow next to a thread",
-                "Thread grow next to a thread on a SingleThreadTecton",
                 "Thread grow first of a Mushroom",
                 "Thread grow first of a Mushroom on a SingleThreadTecton",
                 "Insect consume spore that affects its speed",
@@ -23,7 +27,8 @@ public class Main {
                 "Thread absorb",
                 "Insect move",
                 "Effect check",
-                "Mushroom grow"
+                "Unsuccessful mushroom grow",
+                "Successful mushroom grow"
         );
 
         Scanner scanner = new Scanner(System.in);
@@ -31,23 +36,88 @@ public class Main {
 
         class Tests extends Initialize {
             public Tests() {
+                System.out.println("Inicializáció...");
                 initialize();
+                System.out.println("Inicializáció vége");
             }
 
-            public void test1() { System.out.println("[Teszt 1] Shoot spores on neighbor"); }
-            public void test2() { System.out.println("[Teszt 2] Shoot spores on neighbor's neighbor"); }
-            public void test3() { System.out.println("[Teszt 3] Tecton break"); }
-            public void test4() { System.out.println("[Teszt 4] Thread grow next to a thread"); }
-            public void test5() { System.out.println("[Teszt 5] Thread grow next to a thread on a SingleThreadTecton"); }
-            public void test6() { System.out.println("[Teszt 6] Thread grow first of a Mushroom"); }
-            public void test7() { System.out.println("[Teszt 7] Thread grow first of a Mushroom on a SingleThreadTecton"); }
-            public void test8() { System.out.println("[Teszt 8] Insect consume spore that affects its speed"); }
-            public void test9() { System.out.println("[Teszt 9] Insect consume cannotCutSpore"); }
-            public void test10() { System.out.println("[Teszt 10] Thread cut with insect"); }
-            public void test11() { System.out.println("[Teszt 11] Thread absorb"); }
-            public void test12() { System.out.println("[Teszt 12] Insect move"); }
-            public void test13() { System.out.println("[Teszt 13] Effect check"); }
-            public void test14() { System.out.println("[Teszt 14] Mushroom grow"); }
+            public void test1() {
+                System.out.println("[Teszt 1] Shoot spores on neighbor");
+                m1.shootSpores(t4);
+            }
+
+            public void test2() {
+                System.out.println("[Teszt 2] Shoot spores on neighbor's neighbor");
+                m1.shootSpores(t3);
+            }
+
+            public void test3() {
+                System.out.println("[Teszt 3] Tecton break");
+                Tecton t5 = t1.breakTecton();
+            }
+
+            public void test4() {
+                System.out.println("[Teszt 4] Thread grow next to a thread");
+                m1.addThread(t3);
+            }
+
+            public void test5() {
+                System.out.println("[Teszt 5] Thread grow first of a Mushroom");
+                m2.addThread(t2);
+            }
+
+            public void test6() {
+                System.out.println("[Teszt 6] Thread grow first of a Mushroom on a SingleThreadTecton");
+                m2.addThread(t4);
+            }
+
+            public void test7() {
+                System.out.println("[Teszt 7] Insect consume spore that affects its speed");
+                i1.consumeSpore();
+            }
+
+            public void test8() {
+                System.out.println("[Teszt 8] Insect consume cannotCutSpore");
+                t4.getSpores().clear();
+                CannotCutSpore c1 = new CannotCutSpore();
+                List<Spore> list = new ArrayList<Spore>();
+                list.add(c1);
+                t4.forceAddSpores(list);
+                i3.consumeSpore();
+            }
+
+            public void test9() {
+                System.out.println("[Teszt 9] Thread cut with insect");
+                i1.cutThread(th1);
+            }
+
+            public void test10() {
+                System.out.println("[Teszt 10] Thread absorb");
+                System.out.println("    This test is needed to run test 10.");
+                System.out.println("    [Teszt 4] Thread grow next to a thread");
+                m1.addThread(t3);
+                t3.absorbThread();
+            }
+
+            public void test11() {
+                System.out.println("[Teszt 11] Insect move");
+                i1.moveTo(t1);
+            }
+
+            public void test12() {
+                System.out.println("[Teszt 12] Effect check");
+                i1.coolDownCheck();
+            }
+
+            public void test13() {
+                System.out.println("[Teszt 13] Unsuccessful mushroom grow");
+                t1.addMushroom();
+            }
+
+            public void test14() {
+                System.out.println("[Teszt 14] Successful mushroom grow");
+                t4.addMushroom();
+            }
         }
 
         do {

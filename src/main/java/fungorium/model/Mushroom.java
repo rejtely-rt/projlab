@@ -28,7 +28,7 @@ public class Mushroom {
      */
     public int getLevel() {
         Logger.enter(this, "getLevel");
-        int level = Logger.question("A gomba 1-es szintű?") ? 1: 2;
+        int level = Logger.questionNumber("Hányas szintű a gomba?");
         Logger.exit(level);
         return level;
         
@@ -73,6 +73,16 @@ public class Mushroom {
      */
     public void produceSpores() {
         Logger.enter(this, "produceSpores");
+        List<Spore> sporeList = new ArrayList<>();
+        Spore cspore = new CannotCutSpore();
+        sporeList.add(cspore);
+        Spore pspore = new ParalyzeSpore();
+        sporeList.add(pspore);
+        Spore spspore = new SpeedySpore();
+        sporeList.add(spspore);
+        Spore slspore = new SlowlySpore();
+        sporeList.add(slspore);
+        spores.addAll(sporeList);
         Logger.exit(null);
     }
     
@@ -86,9 +96,7 @@ public class Mushroom {
     public void shootSpores(Tecton to) {
         boolean successfullShoot = to.addSpores(spores, this);
         if (successfullShoot) {
-            for (Spore spore : spores) {
-                spores.remove(spore);
-            }
+            spores.clear();
         }
 
     }
@@ -110,12 +118,14 @@ public class Mushroom {
         for (Tecton neighbor : targetTectonNeighbors) {
             Mushroom neighborMushroom = neighbor.getMushroom();
             // If Mushroom is found first
-            if (neighborMushroom.equals(this)) {
+            if (neighborMushroom != null && neighborMushroom.equals(this)) {
                 Thread newThread = new Thread();
-                boolean successfullyAdded = t.addThread(newThread);
-                if (!successfullyAdded) return false;
+                boolean tSuccessfullyAdded = t.addThread(newThread);
+                if (!tSuccessfullyAdded) return false;
                 newThread.setParent(this);
-                neighbor.addThread(newThread);
+                boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
+                if (!neighborSuccessfullyAdded) return false;
+                threads.add(newThread);
                 Logger.exit(true);
                 return true;
             }
@@ -130,7 +140,9 @@ public class Mushroom {
                     boolean successfullyAdded = t.addThread(newThread);
                     if (!successfullyAdded) return false;
                     newThread.setParent(this);
-                    neighbor.addThread(newThread);
+                    boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
+                    if (!neighborSuccessfullyAdded) return false;
+                    threads.add(newThread);
                     Logger.exit(true);
                     return true;
                 }
@@ -161,7 +173,6 @@ public class Mushroom {
      */
     public void threadCollector(Tecton t) {
         Logger.enter(this, "threadCollector");
-        System.out.println("Egy teljes fonalat törlünk");
         Logger.exit(null);
     }
 }
