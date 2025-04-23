@@ -7,8 +7,13 @@ import java.util.List;
 import java.util.ArrayList;
 import fungorium.utils.Logger;
 
-public class Insect {
 
+
+public class Insect {
+    public enum Player {
+        INSESCIST,
+        MYCOLOGIST,
+    }
     /**
      * It is the current location of the insect.
      */
@@ -19,6 +24,38 @@ public class Insect {
      * It is the spores that the insect has consumed.
      */
     private final List<Spore> spores;
+
+    private Player owner;
+
+    public Player getOwner() {
+        Logger.enter(this, "getOwner");
+        Logger.exit(owner);
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        Logger.enter(this, "setOwner");
+        this.owner = owner;
+        Logger.exit("");
+    }
+
+    public void setLocation(Tecton location) {
+        Logger.enter(this, "setLocation");
+        this.location = location;
+        Logger.exit("");
+    }
+
+    public void setSpeed(int speed) {
+        Logger.enter(this, "setSpeed");
+        //this.speed = speed;
+        Logger.exit("");
+    }
+
+    public void setCut(boolean cut) {
+        Logger.enter(this, "setCut");
+        //this.cut = cut;
+        Logger.exit("");
+    }
 
     /**
      * Constructor of the Insect class.
