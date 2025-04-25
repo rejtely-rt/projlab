@@ -5,8 +5,11 @@ import fungorium.utils.Logger;
 
 public abstract class Spore {
 
-    public Spore () {
+    private int cooldown; // Cooldown attribútum hozzáadása
+
+    public Spore() {
         Logger.create(this);
+        this.cooldown = 0; // Alapértelmezett érték
     }
 
     /**
@@ -16,26 +19,24 @@ public abstract class Spore {
      */
     public int getCooldown() {
         Logger.enter(this, "getCooldown");
-        int value = Logger.questionNumber("What is the cooldown of the spore?");
-        Logger.exit(value);
-        return value;
+        Logger.exit(cooldown);
+        return cooldown;
     }
 
-
     /**
-     * Decreases the cooldown period for the spore. This method logs the entry and exit
-     * of the function using the Logger class. If the cooldown is not decreased, the 
-     * original value remains unchanged.
+     * Decreases the cooldown period for the spore.
      */
     public void decreaseCooldown() {
         Logger.enter(this, "decreaseCooldown");
-        Logger.exit(""); // Ha nem csökkentjük, marad az eredeti érték
+        if (cooldown > 0) {
+            cooldown--; // Csökkenti a cooldown értékét
+        }
+        Logger.exit(cooldown);
     }
 
     /**
      * Apply the effect of the spore to the target insect.
      * @param target the insect that the spore is applied to
-     * @note It is an abstract method that should be implemented by the subclasses.
      */
     public abstract void applyEffect(Insect target);
 

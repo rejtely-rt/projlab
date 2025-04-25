@@ -210,7 +210,38 @@ public class Tecton {
     }
 
     public void absorbThread() {
-        Logger.enter(this, "absorbThread");    
+        Logger.enter(this, "absorbThread");
+        // Másolat a szálak listájáról, hogy elkerüljük a ConcurrentModificationException-t
+        List<Thread> threadsCopy = new ArrayList<>(threads);
+    
+        for (Thread thread : threadsCopy) {
+            // Ellenőrizzük, hogy a szál el van-e vágva
+            if (!thread.isCutOff()) {
+                continue;
+            }
+    
+            // Csökkentjük a szál méretét
+            thread.changeSize(-1);
+    
+            // Ha a szál mérete 0, eltávolítjuk
+            if (thread.getSize() == 0) {
+                // Eltávolítás a jelenlegi Tecton-ból
+                this.removeThread(thread);
+    
+                // Eltávolítás a szomszédos Tecton-okból
+                for (Tecton neighbor : this.getNeighbors()) {
+                    if (neighbor.getThreads().contains(thread)) {
+                        neighbor.removeThread(thread);
+                    }
+                }
+    
+                // Eltávolítás a szülő Mushroom-ból
+                if (this.mushroom != null) {
+                    this.mushroom.removeThread(thread);
+                    this.mushroom.threadCollector(this);
+                }
+            }
+        }
         Logger.exit("");
     }
 

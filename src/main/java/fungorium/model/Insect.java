@@ -19,11 +19,32 @@ public class Insect {
      */
     private Tecton location;
 
+    //life or dead
+    /**
+     * It is the life of the insect.
+     * If the insect is dead, it cannot move or consume spores.
+     * If the insect is alive, it can move and consume spores.
+     * @note The insect can be dead if a thread eat it, when the insect was paralyzed!
+     */
+    private boolean life;
+    
     /**
      * Spores is defined by a list of Spore objects.
      * It is the spores that the insect has consumed.
      */
     private final List<Spore> spores;
+
+    /**
+     * Determines if the insect can cut threads.
+     * Default value is true.
+     */
+    private boolean cut = true;
+
+    /**
+     * Represents the speed of the insect.
+     * Default value is 2.
+     */
+    private int speed = 2;
 
     private Player owner;
 
@@ -47,13 +68,13 @@ public class Insect {
 
     public void setSpeed(int speed) {
         Logger.enter(this, "setSpeed");
-        //this.speed = speed;
+        this.speed = speed; // Hiányzó hozzárendelés
         Logger.exit("");
     }
 
     public void setCut(boolean cut) {
         Logger.enter(this, "setCut");
-        //this.cut = cut;
+        this.cut = cut; // Hiányzó hozzárendelés
         Logger.exit("");
     }
 
@@ -104,11 +125,39 @@ public class Insect {
     List<Spore> getScore() { return spores; }
 
     /**
+     * Getter method for the spores field.
+     * @return the spores of the insect
+     */
+    public List<Spore> getSpores() {
+        return spores;
+    }
+
+    /**
+     * Getter method for the life field.
+     * @return the life of the insect
+     */
+    public boolean getLife() {
+        Logger.enter(this, "getLife");
+        Logger.exit(life);
+        return life;
+    }
+    /**
+     * Setter method for the life field.
+     * @param life the new life value
+     */
+    public void setLife(boolean life) {
+        Logger.enter(this, "setLife");
+        this.life = life;
+        Logger.exit("");
+    }
+
+    /**
      * Change the speed of the insect.
      * @param value the new speed value
      */
     public void changeSpeed(int value) {
         Logger.enter(this, "changeSpeed");
+        this.speed += value; // Hiányzó logika
         Logger.exit("");
     }
 
@@ -118,6 +167,7 @@ public class Insect {
      */
     public void changeCut(boolean value) {
         Logger.enter(this, "changeCut");
+        this.cut = value; // Hiányzó logika
         Logger.exit("");
     }
 
@@ -135,22 +185,22 @@ public class Insect {
             Logger.exit(false);
             return;
         }
-        if (getSpeed() == 0) {
-            Logger.exit(false); // If the speed is 0, the insect cannot move
+        if (getSpeed() <= 0) { // Ellenőrzés a sebességre
+            Logger.exit(false);
             return;
         }
 
-        // Current and target Tecton threads
+        // További logika a mozgás távolságának ellenőrzésére, ha szükséges
         List<Thread> currentThreads = this.location.getThreads();
         List<Thread> targetThreads = target.getThreads();
         for (Thread thread : currentThreads) {
-            if (targetThreads.contains(thread)) { // If there is a connecting thread
-                this.location = target; // Successful move
+            if (targetThreads.contains(thread)) {
+                this.location = target;
                 Logger.exit(true);
                 return;
             }
         }
-        Logger.exit(false); // If there is no connecting thread, the insect cannot move
+        Logger.exit(false);
     }
     /**
      * Cut the given thread.
@@ -164,21 +214,7 @@ public class Insect {
             Logger.exit(false);
             return false;
         }
-        Mushroom parentMushroom = thread.getParent();
-        if (parentMushroom != null) {
-            parentMushroom.removeThread(thread);
-            this.location.removeThread(thread);
-        }
-        if (this.location != null) {
-            List<Tecton> neighbors = this.location.getNeighbors();
-            for (Tecton t : neighbors) {
-                if (t.getThreads().contains(thread)) {
-                    t.removeThread(thread);
-                }
-            }
-        }
-        parentMushroom.threadCollector(this.location);
-
+        thread.setCutOff(true);
         Logger.exit(true);
         return true;
     }

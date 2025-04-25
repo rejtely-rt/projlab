@@ -1,5 +1,3 @@
-
-
 package fungorium.model;
 
 import java.util.ArrayList;
@@ -11,7 +9,8 @@ import fungorium.utils.*;;
 public class Mushroom {
     private List<Spore> spores = new ArrayList<>();
     private List<Thread> threads = new ArrayList<>();
-
+    private int level = 1; // Alapértelmezett szint
+    private int life;      // Élettartam
 
     /**
      * Default constructor.
@@ -37,23 +36,23 @@ public class Mushroom {
 
     /**
      * Evolves the mushroom to level 2.
-     * Currently does not change internal state, only logs the action.
+     * Changes the internal state and logs the action.
      */
     public void evolve() {
         Logger.enter(this, "evolve");
-        System.out.println("Itt hivatalosan 2-re változik a level, de a felhasználótól úgyis mindig megkérdezzük");
+        this.level = 2; // Szint növelése
         Logger.exit(null);
     }
     
     /**
      * Changes the life value of the mushroom.
-     * Currently only logs the call, no effect on internal state.
+     * Sets the internal life value and logs the action.
      * 
-     * @param i The new life value (currently unused).
+     * @param i The new life value.
      */
     public void changeLife(int i) {
         Logger.enter(this, "changeLife");
-        System.out.println("Ezt még nem szükséges implementálni");
+        this.life = i; // Élettartam beállítása
         Logger.exit(null);
     }
     
@@ -235,7 +234,7 @@ public class Mushroom {
         List<Thread> toRemove = new ArrayList<>();
         for (Tecton tecton : allTectons) {
             for (Thread thread : threads) {
-                if (tecton.getThreads().contains(thread)) {
+                if (tecton.getThreads().contains(thread) && !thread.isKept()) {
                     toRemove.add(thread);
                     tecton.removeThread(thread);
                 }
