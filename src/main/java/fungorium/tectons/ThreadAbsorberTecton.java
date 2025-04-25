@@ -24,21 +24,31 @@ public class ThreadAbsorberTecton extends Tecton {
      * 
      * This method logs entry and exit points for debugging purposes.
      */
-    @Override 
-    public void absorbThread(){
+    @Override
+    public void absorbThread() {
         Logger.enter(this, "absorbThread");
         // Másolat, hogy elkerüljük ConcurrentModificationException-t
         List<Thread> threadsCopy = new ArrayList<>(threads);
-    
+
         for (Thread th : threadsCopy) {
             th.changeSize(-1);
-    
-            int size = th.getSize();    
+
+            int size = th.getSize();
             if (size == 0) {
                 // Tecton eltávolítja magából a szálat
                 this.removeThread(th);
+
+                // Szál eltávolítása a szomszédos Tecton-okból
+                for (Tecton neighbor : this.getNeighbors()) {
+                    neighbor.removeThread(th);
+                }
+
+                // Szál eltávolítása a szülő Mushroom-ból
+                if (this.mushroom != null) {
+                    this.mushroom.removeThread(th);
+                }
             }
         }
         Logger.exit("");
-   }
+    }
 }
