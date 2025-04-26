@@ -20,7 +20,6 @@ public class CloneSpore extends Spore {
         clonedInsect.setLocation(insect.getLocation());
         clonedInsect.setSpeed(insect.getSpeed());
         clonedInsect.setCut(insect.getCut());
-        clonedInsect.setOwner(insect.getOwner());
 
         Logger.exit("");
     }
