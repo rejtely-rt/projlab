@@ -1,0 +1,4 @@
+(T1) Tecton of type default created successfully.
+(insectist1) Insectist created successfully.
+(i1) Insect created successfully at tecton T1
+(i1) input invalid

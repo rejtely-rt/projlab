@@ -1,0 +1,5 @@
+/addt -id T1 -t Tecton
+/addpi -n insectist1
+/addi -id i1 -t T1
+/addsp -t T1 -type CloneSpore
+/consume -i i1
