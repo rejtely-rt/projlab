@@ -5,6 +5,7 @@ import java.util.List;
 import fungorium.model.Thread;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
+import fungorium.utils.Interpreter;
 import fungorium.utils.Logger;
 
 public class Tecton {
@@ -15,8 +16,7 @@ public class Tecton {
     protected Mushroom mushroom = null;
 
     public Tecton() {
-        // Skeleton: a létrehozásnál bejegyezzük magunkat a loggerbe
-        Logger.create(this);
+        Interpreter.create(this);
     }
 
     public Tecton(Mushroom m) {
@@ -30,9 +30,7 @@ public class Tecton {
      * @param t the Tecton to be added as a neighbor
      */
     public void addNeighbour(Tecton t) {
-        Logger.enter(this, "addNeighbour");
         neighbors.add(t);
-        Logger.exit("");
     }
 
     /**
@@ -66,7 +64,6 @@ public class Tecton {
      * @return true if a new mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom() {
-        Logger.enter(this, "addMushroom");
         if (mushroom != null) {
             System.out.println("   -> Already has mushroom, can't add a new one.");
             Logger.exit(false);
@@ -84,8 +81,8 @@ public class Tecton {
         }
         Mushroom m = new Mushroom();
         this.mushroom = m;
+
         System.out.println("   -> New mushroom created on Tecton.");
-        Logger.exit(true);
         return true;
     }
     
