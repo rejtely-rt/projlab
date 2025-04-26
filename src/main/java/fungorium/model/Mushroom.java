@@ -19,6 +19,11 @@ public class Mushroom {
     public Mushroom() {
         Logger.create(this); 
     }
+
+    public Mushroom(int level) {
+        this.level = level;
+        Logger.create(this); 
+    }
     
     /**
      * Asks the user to determine the level of the mushroom.
@@ -97,7 +102,17 @@ public class Mushroom {
         if (successfullShoot) {
             spores.clear();
         }
+    }
 
+    /**
+     * Adds a spore to the internal list.
+     *  
+     * @param spore The spore to be added.
+     */
+    public void addSpore(Spore spore) {
+        Logger.enter(this, "addSpore");
+        spores.add(spore);
+        Logger.exit(null);
     }
 
     /**
