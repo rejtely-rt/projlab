@@ -1,4 +1,4 @@
-addt -id T1 -t Tecton
+/addt -id T1 -t Tecton
 /addt -id T2 -t Tecton
 /addt -id T3 -t ThreadKeeperTecton
 /altt -id T1 -addn T2
