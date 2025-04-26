@@ -541,7 +541,6 @@ public class Interpreter {
                     name = x[i + 1];
                 }
             }
-        0
             if (name == null) {
                 System.out.println("Hiba: hiányzó kötelező paraméter: -n");
                 return;
@@ -580,7 +579,7 @@ public class Interpreter {
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Thread) {
                     Thread thread = (Thread) entry.getValue();
-                    System.out.println(entry.getKey() + " - Size: " + thread.getSize() ;
+                    System.out.println(entry.getKey() + " - Size: " + thread.getSize());
                 }
             }
         });
@@ -612,8 +611,8 @@ public class Interpreter {
             Object insectObj = Interpreter.getObject(id);
             if (insectObj instanceof Insect) {
                 Insect original = (Insect) insectObj;
-                Insect clone = original.cloneInsect(); 
-                Interpreter.create(clone);
+                //Insect clone = original.cloneInsect(); 
+                //Interpreter.create(clone);
                 System.out.println("Rovar klónozva: " + id);
             } else {
                 System.out.println("Hiba: Nem található ilyen rovar.");
@@ -909,7 +908,7 @@ public class Interpreter {
                     Tecton original = (Tecton) tectonObj;
                     Tecton newTecton = original.breakTecton(); 
                     if (newTecton != null) {
-                        Interpreter.putObject(newId, newTecton);
+                        //Interpreter.putObject(newId, newTecton);
                         System.out.println("Tekton törve: " + id + " -> új tekton: " + newId);
                     } else {
                         System.out.println("Hiba: A törés nem sikerült.");
