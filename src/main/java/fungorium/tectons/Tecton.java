@@ -36,6 +36,16 @@ public class Tecton {
     }
 
     /**
+     * Removes a neighboring Tecton from this Tecton's list of neighbors.
+     *
+     * @param t the Tecton to be removed from the list of neighbors
+     */
+    public void removeNeighbour(Tecton t) {
+        Logger.enter(this, "removeNeighbour");
+        neighbors.remove(t);
+        Logger.exit("");
+    }
+    /**
      * Retrieves the list of neighboring Tecton objects.
      *
      * @return a list of Tecton objects that are neighbors to the current Tecton.
@@ -78,7 +88,26 @@ public class Tecton {
         Logger.exit(true);
         return true;
     }
-
+    
+    /**
+     * Attempts to add a mushroom to the Tecton.
+     * Only for testing purposes.
+     * 
+     * @param mushroom the Mushroom object to be added
+     * @return true if the mushroom was successfully added, false otherwise.
+     */
+    public boolean addMushroom(Mushroom mushroom) {
+        Logger.enter(this, "addMushroom");
+        if (mushroom != null) {
+            System.out.println("   -> Already has mushroom, can't add a new one.");
+            Logger.exit(false);
+            return false;
+        }
+        this.mushroom = mushroom;
+        System.out.println("   -> New mushroom created on Tecton.");
+        Logger.exit(true);
+        return true;
+    }
     /**
      * Retrieves the Mushroom object associated with this Tecton.
      *
@@ -104,6 +133,13 @@ public class Tecton {
         return true;
     }
 
+    public void removeThread(Thread thread) {
+        Logger.enter(this, "removeThread");
+        threads.remove(thread);
+        System.out.println("   -> 0 removed from Tecton.");
+        Logger.exit("");
+    }
+
     /**
      * Retrieves a list of threads.
      * It returns a new ArrayList containing the threads.
@@ -116,23 +152,7 @@ public class Tecton {
         Logger.exit(result);
         return result;
     }
-
-    /**
-     * Removes the specified thread from the list of threads.
-     *
-     * @param t the thread to be removed
-     */
-    public void removeThread(Thread t) {
-        Logger.enter(this, "removeThread");
-        threads.remove(t);
-        for (Tecton neighbor : neighbors) {
-            if (neighbor.getThreads().contains(t)) {
-                neighbor.removeThreadLocally(t); // új metódus, csak a belső listát módosítja
-
-            }
-        }
-        Logger.exit("");
-    }
+    
     //for testing, because the ThreadCollector is not implemented
     public void removeThreadLocally(Thread t) {
         threads.remove(t);

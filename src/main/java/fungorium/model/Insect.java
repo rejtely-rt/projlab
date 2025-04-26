@@ -252,4 +252,14 @@ public class Insect {
         }
         Logger.exit("");
     }
+
+    public Insect cloneInsect() {
+        Insect clone = new Insect();
+        clone.setLocation(this.location);
+        clone.setSpeed(this.speed);
+        clone.setCut(this.cut);
+        clone.setLife(this.life);
+        clone.setOwner(this.owner);
+        return clone;
+    }
 }
