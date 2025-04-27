@@ -1,5 +1,7 @@
 package fungorium.model;
 import fungorium.utils.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Thread {
 
@@ -7,6 +9,7 @@ public class Thread {
     private int size;
     private boolean isKept;
     private boolean cutOff;
+    private List<Insect> insects = new ArrayList<>(); // List to store eaten insects
 
     /**
      * Default constructor.
@@ -119,7 +122,7 @@ public class Thread {
     }
 
     /**
-     * Eats a paralyzed insect, causing it to die.
+     * Eats a paralyzed insect, causing it to die and adding it to this thread.
      * 
      * @param insect The insect to be eaten.
      */
@@ -127,7 +130,18 @@ public class Thread {
         Logger.enter(this, "eatInsect");
         if (insect.getSpeed() == 0) { // Check if the insect is paralyzed
             insect.setLife(false); // Set the insect's life to false
+            insect.setLocation(null); // Remove the insect from its current location
+            insects.add(insect); // Add the insect to this thread
         }
         Logger.exit(null);
+    }
+
+    /**
+     * Returns the list of insects associated with this thread.
+     * 
+     * @return the list of insects.
+     */
+    public List<Insect> getInsects() {
+        return insects;
     }
 }
