@@ -1,0 +1,11 @@
+/addt -id T1 -t Tecton
+/addt -id T2 -t Tecton
+/altt -id T1 -addn T2
+/addpm -n mycologist1
+/addpi -n insectist1
+/addm -id m1 -lvl 2 -t T1
+/addi -id i1 -t T1
+/addsp -m m1
+/shoot -m m1 -t T1
+/time
+/move -i i1 -t T2

@@ -1,0 +1,18 @@
+New tecton has created T1
+New tecton has created T2
+New tecton has created T3
+Insect created successfully at tecton T3
+T1 Tecton neighbor T2 added
+T2 Tecton neighbor T3 added
+Mushroom created successfully with default level on tecton T1
+(m1) Thread (th1) grown to tecton T2.
+(m1) Thread (th2) grown to tecton T3 from T2.
+--- Thread list ---
+th1 (T1 <-> T2)
+th2 (T2 <-> T3)
+(i3) Insect cut thread th2.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+--- Thread list ---
+th1 (T1 <-> T2)

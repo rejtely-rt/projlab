@@ -1,0 +1,7 @@
+/addt -id T1 -t Tecton
+/addt -id T2 -t Tecton
+/altt -id T1 -addn T2
+/addm -id m1 -t T1
+/growt -m m1 -tt T2
+/addi -id i3 -t T1
+/move -i i3 -t2

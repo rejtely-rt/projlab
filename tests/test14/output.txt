@@ -1,0 +1,6 @@
+(T1) Tecton of type default created successfully.
+(insectist1) Insectist created successfully.
+(i1) Insect created successfully at tecton T1
+CloneSpore added to tecton T1
+(i1) Insect consumed a CloneSpore
+(i2) Insect created successfully at tecton T1

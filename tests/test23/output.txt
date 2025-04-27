@@ -1,0 +1,11 @@
+(T1) Tecton of type default created successfully.
+(T2) Tecton of type default created successfully.
+Tecton T1: neighbor T2 added
+(mycologist1) Mycologist created successfully.
+(insectist1) Insectist created successfully.
+Mushroom created: m1 with level 2 on tecton T1
+(i1) Insect created successfully at tecton T1
+Spore added to mushroom m1
+Spore shot from m1 to T1
+Time passed for all applicable objects
+(i1) input invalid
