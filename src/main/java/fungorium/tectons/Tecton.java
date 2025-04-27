@@ -5,6 +5,7 @@ import java.util.List;
 import fungorium.model.Thread;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
+import fungorium.utils.Interpreter;
 import fungorium.utils.Logger;
 
 public class Tecton {
@@ -15,8 +16,7 @@ public class Tecton {
     protected Mushroom mushroom = null;
 
     public Tecton() {
-        // Skeleton: a létrehozásnál bejegyezzük magunkat a loggerbe
-        Logger.create(this);
+        Interpreter.create(this);
     }
 
     public Tecton(Mushroom m) {
@@ -30,11 +30,19 @@ public class Tecton {
      * @param t the Tecton to be added as a neighbor
      */
     public void addNeighbour(Tecton t) {
-        Logger.enter(this, "addNeighbour");
         neighbors.add(t);
-        Logger.exit("");
     }
 
+    /**
+     * Removes a neighboring Tecton from this Tecton's list of neighbors.
+     *
+     * @param t the Tecton to be removed from the list of neighbors
+     */
+    public void removeNeighbour(Tecton t) {
+        Logger.enter(this, "removeNeighbour");
+        neighbors.remove(t);
+        Logger.exit("");
+    }
     /**
      * Retrieves the list of neighboring Tecton objects.
      *
@@ -56,7 +64,6 @@ public class Tecton {
      * @return true if a new mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom() {
-        Logger.enter(this, "addMushroom");
         if (mushroom != null) {
             System.out.println("   -> Already has mushroom, can't add a new one.");
             Logger.exit(false);
@@ -74,11 +81,30 @@ public class Tecton {
         }
         Mushroom m = new Mushroom();
         this.mushroom = m;
+
+        System.out.println("   -> New mushroom created on Tecton.");
+        return true;
+    }
+    
+    /**
+     * Attempts to add a mushroom to the Tecton.
+     * Only for testing purposes.
+     * 
+     * @param mushroom the Mushroom object to be added
+     * @return true if the mushroom was successfully added, false otherwise.
+     */
+    public boolean addMushroom(Mushroom mushroom) {
+        Logger.enter(this, "addMushroom");
+        if (mushroom != null) {
+            System.out.println("   -> Already has mushroom, can't add a new one.");
+            Logger.exit(false);
+            return false;
+        }
+        this.mushroom = mushroom;
         System.out.println("   -> New mushroom created on Tecton.");
         Logger.exit(true);
         return true;
     }
-
     /**
      * Retrieves the Mushroom object associated with this Tecton.
      *
@@ -104,6 +130,13 @@ public class Tecton {
         return true;
     }
 
+    public void removeThread(Thread thread) {
+        Logger.enter(this, "removeThread");
+        threads.remove(thread);
+        System.out.println("   -> 0 removed from Tecton.");
+        Logger.exit("");
+    }
+
     /**
      * Retrieves a list of threads.
      * It returns a new ArrayList containing the threads.
@@ -116,23 +149,7 @@ public class Tecton {
         Logger.exit(result);
         return result;
     }
-
-    /**
-     * Removes the specified thread from the list of threads.
-     *
-     * @param t the thread to be removed
-     */
-    public void removeThread(Thread t) {
-        Logger.enter(this, "removeThread");
-        threads.remove(t);
-        for (Tecton neighbor : neighbors) {
-            if (neighbor.getThreads().contains(t)) {
-                neighbor.removeThreadLocally(t); // új metódus, csak a belső listát módosítja
-
-            }
-        }
-        Logger.exit("");
-    }
+    
     //for testing, because the ThreadCollector is not implemented
     public void removeThreadLocally(Thread t) {
         threads.remove(t);
