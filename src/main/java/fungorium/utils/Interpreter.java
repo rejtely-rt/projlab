@@ -517,6 +517,36 @@ public class Interpreter {
             }
         });*/
 
+        /*
+                commands.put("load", (x) -> {
+            String name = null;
+            for (int i = 0; i < x.length - 1; i++) {
+                if ("-n".equals(x[i])) {
+                    name = x[i + 1];
+                    break;
+                }
+            }
+
+            if (name == null) {
+                System.out.println("Hiba: hiányzik a fájlnév (-n).");
+                return;
+            }
+
+            try {
+                String filepath = "tests/" + name + "/input.txt";
+                BufferedReader reader = new BufferedReader(new FileReader(filepath));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    processCommand(line); // <- EZ MEGY
+                }
+                reader.close();
+                System.out.println("Allapot betöltve: test" + name);
+            } catch (Exception e) {
+                System.out.println("Hiba a betöltés közben: " + e.getMessage());
+            }
+        });
+         */
+
         commands.put("load", (x) -> {
             String name = null;
             for (int i = 0; i < x.length - 1; i++) {
@@ -532,7 +562,29 @@ public class Interpreter {
             }
 
             try {
-                String filepath = "tests/test" + name + "/input.txt";
+                // TODO: Implement the loading logic here.
+                System.out.println("Allapot betöltve: " + name);
+            } catch (Exception e) {
+                System.out.println("Hiba a betöltés közben: " + e.getMessage());
+            }
+        });
+
+        commands.put("exec", (x) -> {
+            String name = null;
+            for (int i = 0; i < x.length - 1; i++) {
+                if ("-n".equals(x[i])) {
+                    name = x[i + 1];
+                    break;
+                }
+            }
+
+            if (name == null) {
+                System.out.println("Hiba: hiányzik a fájlnév (-n).");
+                return;
+            }
+
+            try {
+                String filepath = "tests/" + name + "/input.txt";
                 BufferedReader reader = new BufferedReader(new FileReader(filepath));
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -543,31 +595,6 @@ public class Interpreter {
             } catch (Exception e) {
                 System.out.println("Hiba a betöltés közben: " + e.getMessage());
             }
-        });
-
-        commands.put("exec", (x) -> {
-            String path = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                if ("-p".equals(x[i])) {
-                    path = x[i + 1];
-                }
-            }
-        
-            if (path == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter: -p");
-                return;
-            }
-        
-            try {
-                // TODO: Implement the script execution logic here.
-                System.out.println("Script sikeresen lefutott: " + path);
-            } catch (Exception e) {
-                System.out.println("Hiba a script futtatása közben: " + e.getMessage());
-            }
-        });
-        commands.put("execall", (x) -> {
-            // TODO: Implement the logic to execute all scripts in the directory.
         });
 
         commands.put("hlog", (x) -> {
@@ -825,6 +852,12 @@ public class Interpreter {
                 if (mushroomObj instanceof Mushroom && tectonObj instanceof Tecton) {
                     Mushroom mushroom = (Mushroom) mushroomObj;
                     Tecton tecton = (Tecton) tectonObj;
+
+                    if (mushroom.getSpores().isEmpty()) {
+                        System.out.println("Hiba: A gombának nincs elérhető spórája a kilövéshez.");
+                        return; // Ne hajtsa végre a kilövést
+                    }
+
                     mushroom.shootSpores(tecton);
 
                     System.out.println("Spóra kilőve: " + mushroomId + " -> " + tectonId);

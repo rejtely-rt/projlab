@@ -231,4 +231,13 @@ public class Mushroom {
         }
         threads.removeAll(toRemove);
     }
+
+    /**
+     * Returns the list of spores belonging to this mushroom.
+     *
+     * @return A list of Spore instances.
+     */
+    public List<Spore> getSpores() {
+        return spores;
+    }
 }

@@ -1,3 +1,4 @@
+/addt -id T1 -t Tecton
 /addt -id T2 -t Tecton
 /altt -id T1 -addn T2
 /addpm -n mycologist1
