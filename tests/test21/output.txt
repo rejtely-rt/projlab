@@ -1,0 +1,7 @@
+(T1) Tecton created successfully.
+(T2) Tecton created successfully.
+T1 Tecton neighbor T2 added
+Mushroom created successfully with default level on tecton T1
+(m1) Thread (th1) grown to tecton T2.
+(i3) Insect created successfully at tecton T1.
+(i3) Insect moved to tecton T2.
