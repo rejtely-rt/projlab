@@ -1,0 +1,7 @@
+(T1) Tecton of type NoMushTecton created successfully.
+(T2) Tecton created successfully.
+(i1) Insect created successfully at tecton T1.
+T1 Tecton neighbor T2 added.
+Mushroom created successfully with default level on tecton T2
+(m1) Thread (th1) grown to tecton T1.
+(i1) Mushroom cannot grow on tecton T1 via thread th1.
