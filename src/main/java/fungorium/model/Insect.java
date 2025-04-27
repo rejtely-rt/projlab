@@ -47,6 +47,20 @@ public class Insect {
         Interpreter.create(this);
     }
 
+    /**
+     * Constructor of the Insect class.
+     * It initializes the speed, cut, and spores fields with default values.
+     * Also assigns the insect to the given Insectist.
+     * @param insectist the Insectist to which this insect will be assigned
+     */
+    public Insect(Insectist insectist) {
+        this.spores = new ArrayList<>();
+        this.cut = true;
+        this.speed = 2;
+        Interpreter.create(this);
+        insectist.addInsect(this); // Assign the insect to the Insectist
+    }
+
     public void setLocation(Tecton location) {
         this.location = location;
     }

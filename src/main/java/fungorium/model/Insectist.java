@@ -5,7 +5,19 @@ import java.util.List;
 import fungorium.tectons.Tecton;
 
 public class Insectist {
+    /**
+     * List of insects controlled by the Insectist.
+     * This list contains all the insects that the Insectist can command and control.
+     */
     private final List<Insect> insects;
+
+    /**
+     * Score of the Insectist.
+     * This variable keeps track of the number of spores consumed by the Insectist's insects.
+     * It is used to determine the Insectist's performance and progress in the game.
+     */
+    private int score;
+
 
     /**
      * Constructor for the Insectist class.
@@ -71,6 +83,21 @@ public class Insectist {
         } else {
             System.out.println("Invalid insect index.");
         }
+    }
+
+    /**
+     * Adds 1 point to the Insectist's score.
+     */
+    public void addPoint() {
+        score++;
+    }
+
+    /**
+     * Gets the current score of the Insectist.
+     * @return the current score
+     */
+    public int getScore() {
+        return score;
     }
 
     /**

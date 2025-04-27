@@ -6,8 +6,10 @@ import fungorium.model.Thread;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
 import fungorium.utils.Interpreter;
+import fungorium.utils.Tickable;
+import fungorium.model.Insect;
 
-public class Tecton {
+public class Tecton implements Tickable {
 
     protected List<Tecton> neighbors = new ArrayList<>();
     protected List<Thread> threads = new ArrayList<>();
@@ -15,7 +17,6 @@ public class Tecton {
     protected Mushroom mushroom = null;
 
     public Tecton() {
-        System.out.println("Tecton konstruktor meghívva.");
         Interpreter.create(this);
     }
 
@@ -55,6 +56,12 @@ public class Tecton {
      * @return true if a new mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom() {
+        if(threads.stream().anyMatch(thread -> !thread.getInsects().isEmpty())) {
+            Mushroom m = new Mushroom(1);
+            this.mushroom = m;
+            System.out.println("   -> New mushroom created on Tecton.");
+            return true;
+        }
         if (mushroom != null) {
             System.out.println("   -> Already has mushroom, can't add a new one.");
             return false;
@@ -246,5 +253,11 @@ public class Tecton {
         t2.addNeighbour(this);
 
         return t2;
+    }
+
+    @Override
+    public void tick() {
+        absorbThread();
+        breakTecton();
     }
 }

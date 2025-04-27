@@ -105,24 +105,38 @@ public class Thread {
     }
 
     /**
-     * Eats a paralyzed insect, causing it to die and adding it to this thread.
-     * 
-     * @param insect The insect to be eaten.
-     */
-    public void eatInsect(Insect insect) {
-        if (insect.getSpeed() == 0) { // Check if the insect is paralyzed
-            insect.setLife(false); // Set the insect's life to false
-            insect.setLocation(null); // Remove the insect from its current location
-            insects.add(insect); // Add the insect to this thread
-        }
-    }
-
-    /**
      * Returns the list of insects associated with this thread.
      * 
      * @return the list of insects.
      */
     public List<Insect> getInsects() {
         return insects;
+    }
+
+    /**
+     * Attempts to eat a paralyzed insect if this thread is connected to the Tecton
+     * where the insect is located.
+     *
+     * @param insect The insect to be eaten.
+     * @return true if the insect was successfully eaten, false otherwise.
+     */
+    public boolean eatInsect(Insect insect) {
+        if (insect.getSpeed() != 0) {
+            System.out.println("The insect is not paralyzed.");
+            return false;
+        }
+
+        // Check if this thread is connected to the insect's Tecton
+        if (!insect.getLocation().getThreads().contains(this)) {
+            System.out.println("This thread is not connected to the Tecton where the insect is located.");
+            return false;
+        }
+
+        // Eat the insect
+        insect.setLife(false); // Set the insect's life to false
+        insect.setLocation(null); // Remove the insect from its current location
+        this.insects.add(insect); // Add the insect to this thread
+        System.out.println("Insect eaten by this thread.");
+        return true;
     }
 }
