@@ -2,32 +2,25 @@ package fungorium.model;
 
 import fungorium.spores.Spore;
 import fungorium.tectons.Tecton;
-import fungorium.model.Thread;
 import java.util.List;
 import java.util.ArrayList;
+
+import fungorium.utils.Interpreter;
 import fungorium.utils.Logger;
 
-
-
 public class Insect {
-    public enum Player {
-        INSESCIST,
-        MYCOLOGIST,
-    }
     /**
      * It is the current location of the insect.
      */
     private Tecton location;
 
-    //life or dead
     /**
      * It is the life of the insect.
      * If the insect is dead, it cannot move or consume spores.
      * If the insect is alive, it can move and consume spores.
-     * @note The insect can be dead if a thread eat it, when the insect was paralyzed!
      */
     private boolean life;
-    
+
     /**
      * Spores is defined by a list of Spore objects.
      * It is the spores that the insect has consumed.
@@ -36,28 +29,23 @@ public class Insect {
 
     /**
      * Determines if the insect can cut threads.
-     * Default value is true.
      */
-    private boolean cut = true;
+    private boolean cut;
 
     /**
      * Represents the speed of the insect.
-     * Default value is 2.
      */
-    private int speed = 2;
+    private int speed;
 
-    private Player owner;
-
-    public Player getOwner() {
-        Logger.enter(this, "getOwner");
-        Logger.exit(owner);
-        return owner;
-    }
-
-    public void setOwner(Player owner) {
-        Logger.enter(this, "setOwner");
-        this.owner = owner;
-        Logger.exit("");
+    /**
+     * Constructor of the Insect class.
+     * It initializes the speed, cut, and spores fields with default values.
+     */
+    public Insect() {
+        this.spores = new ArrayList<>();
+        this.cut = true;
+        this.speed = 2;
+        Interpreter.create(this);
     }
 
     public void setLocation(Tecton location) {
@@ -68,23 +56,14 @@ public class Insect {
 
     public void setSpeed(int speed) {
         Logger.enter(this, "setSpeed");
-        this.speed = speed; // Hiányzó hozzárendelés
+        this.speed = speed;
         Logger.exit("");
     }
 
     public void setCut(boolean cut) {
         Logger.enter(this, "setCut");
-        this.cut = cut; // Hiányzó hozzárendelés
+        this.cut = cut;
         Logger.exit("");
-    }
-
-    /**
-     * Constructor of the Insect class.
-     * It initializes the speed, cut and spores fields.
-     */
-    public Insect() {
-        this.spores = new ArrayList<>();
-        Logger.create(this);
     }
 
     /**
@@ -108,6 +87,7 @@ public class Insect {
         Logger.exit(cut);
         return cut;
     }
+
     /**
      * Getter method for the location field.
      * @return the location of the insect
@@ -117,12 +97,6 @@ public class Insect {
         Logger.exit(location);
         return location;
     }
-
-    /**
-     * Getter method for the spores field.
-     * @return the spores of the insect
-     */
-    List<Spore> getScore() { return spores; }
 
     /**
      * Getter method for the spores field.
@@ -141,6 +115,7 @@ public class Insect {
         Logger.exit(life);
         return life;
     }
+
     /**
      * Setter method for the life field.
      * @param life the new life value
@@ -157,7 +132,7 @@ public class Insect {
      */
     public void changeSpeed(int value) {
         Logger.enter(this, "changeSpeed");
-        this.speed += value; // Hiányzó logika
+        this.speed += value;
         Logger.exit("");
     }
 
@@ -167,7 +142,7 @@ public class Insect {
      */
     public void changeCut(boolean value) {
         Logger.enter(this, "changeCut");
-        this.cut = value; // Hiányzó logika
+        this.cut = value;
         Logger.exit("");
     }
 
@@ -175,8 +150,6 @@ public class Insect {
      * Change the location of the insect.
      * @param target the new location
      * @return true if the insect can move to the target location, false otherwise
-     * @note The insect can move to the target location if the speed is not 0 and there is
-     *       a connecting thread between the current and target locations.
      */
     public void moveTo(Tecton target) {
         Logger.enter(this, "moveTo");
@@ -185,12 +158,11 @@ public class Insect {
             Logger.exit(false);
             return;
         }
-        if (getSpeed() <= 0) { // Ellenőrzés a sebességre
+        if (getSpeed() <= 0) {
             Logger.exit(false);
             return;
         }
 
-        // További logika a mozgás távolságának ellenőrzésére, ha szükséges
         List<Thread> currentThreads = this.location.getThreads();
         List<Thread> targetThreads = target.getThreads();
         for (Thread thread : currentThreads) {
@@ -202,11 +174,11 @@ public class Insect {
         }
         Logger.exit(false);
     }
+
     /**
      * Cut the given thread.
      * @param thread the thread to be cut
      * @return true if the thread is cut, false otherwise
-     * @note The insect can cut the thread and remove it from the parent mushroom.
      */
     public boolean cutThread(Thread thread) {
         Logger.enter(this, "cutThread");
@@ -221,12 +193,11 @@ public class Insect {
 
     /**
      * Consume the given spore.
-     * @note The insect can consume the spore and apply its effect.
      */
-    public void consumeSpore(){
+    public void consumeSpore() {
         Logger.enter(this, "consumeSpore");
         List<Spore> sporeList = this.location.getSpores();
-        if (sporeList.isEmpty()){
+        if (sporeList.isEmpty()) {
             Logger.exit(null);
             return;
         }
@@ -239,7 +210,6 @@ public class Insect {
 
     /**
      * Check if the insect can consume the given spore.
-     * @note If the speed is normal and the cut is true, the is not under the effect of any spore.
      */
     public void coolDownCheck() {
         Logger.enter(this, "coolDownCheck");

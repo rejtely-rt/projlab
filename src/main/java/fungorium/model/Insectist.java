@@ -1,0 +1,83 @@
+package fungorium.model;
+
+import java.util.ArrayList;
+import java.util.List;
+import fungorium.tectons.Tecton;
+
+public class Insectist {
+    private final List<Insect> insects;
+
+    /**
+     * Constructor for the Insectist class.
+     * Initializes the list of insects controlled by the Insectist.
+     */
+    public Insectist() {
+        this.insects = new ArrayList<>();
+    }
+
+    /**
+     * Adds an insect to the Insectist's control.
+     * @param insect the insect to be added
+     */
+    public void addInsect(Insect insect) {
+        insects.add(insect);
+    }
+
+    /**
+     * Removes an insect from the Insectist's control.
+     * @param index the index of the insect to be removed
+     */
+    public void removeInsect(int index) {
+        if (index >= 0 && index < insects.size()) {
+            insects.remove(index);
+        } else {
+            System.out.println("Invalid insect index.");
+        }
+    }
+
+    /**
+     * Moves a specific insect to a new location.
+     * @param index the index of the insect to be moved
+     * @param target the target location
+     */
+    public void moveInsect(int index, Tecton target) {
+        if (index >= 0 && index < insects.size()) {
+            insects.get(index).moveTo(target);
+        } else {
+            System.out.println("Invalid insect index.");
+        }
+    }
+
+    /**
+     * Commands a specific insect to cut a thread.
+     * @param index the index of the insect to perform the action
+     * @param thread the thread to be cut
+     */
+    public void cutThread(int index, Thread thread) {
+        if (index >= 0 && index < insects.size()) {
+            insects.get(index).cutThread(thread);
+        } else {
+            System.out.println("Invalid insect index.");
+        }
+    }
+
+    /**
+     * Commands a specific insect to consume a spore.
+     * @param index the index of the insect to perform the action
+     */
+    public void consumeSpore(int index) {
+        if (index >= 0 && index < insects.size()) {
+            insects.get(index).consumeSpore();
+        } else {
+            System.out.println("Invalid insect index.");
+        }
+    }
+
+    /**
+     * Gets the list of insects controlled by the Insectist.
+     * @return the list of insects
+     */
+    public List<Insect> getInsects() {
+        return insects;
+    }
+}
