@@ -2,5 +2,5 @@
 /addt -id T2 -t Tecton
 /addpm -n mycologist1
 /addm -id m1 -lvl 1 -t T1
-/addsp -m m1
+/addsp -m m1 -tp SpeedySpore
 /shoot -m m1 -t T2

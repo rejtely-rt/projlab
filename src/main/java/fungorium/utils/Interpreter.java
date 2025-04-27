@@ -4,6 +4,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+
+//loadhoz kellenek
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+
+
 import fungorium.model.Insect;
 import fungorium.model.Thread;
 import fungorium.spores.CannotCutSpore;
@@ -486,6 +494,7 @@ public class Interpreter {
             }
         });
 
+        /*
         commands.put("load", (x) -> {
             String name = null;
             for (int i = 0; i < x.length - 1; i++) {
@@ -502,7 +511,35 @@ public class Interpreter {
         
             try {
                 // TODO: Implement the loading logic here.
-                System.out.println("Állapot betöltve: " + name);
+                System.out.println("Allapot betöltve: " + name);
+            } catch (Exception e) {
+                System.out.println("Hiba a betöltés közben: " + e.getMessage());
+            }
+        });*/
+
+        commands.put("load", (x) -> {
+            String name = null;
+            for (int i = 0; i < x.length - 1; i++) {
+                if ("-n".equals(x[i])) {
+                    name = x[i + 1];
+                    break;
+                }
+            }
+
+            if (name == null) {
+                System.out.println("Hiba: hiányzik a fájlnév (-n).");
+                return;
+            }
+
+            try {
+                String filepath = "tests/test" + name + "/input.txt";
+                BufferedReader reader = new BufferedReader(new FileReader(filepath));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    processCommand(line); // <- EZ MEGY
+                }
+                reader.close();
+                System.out.println("Allapot betöltve: test" + name);
             } catch (Exception e) {
                 System.out.println("Hiba a betöltés közben: " + e.getMessage());
             }
@@ -925,7 +962,27 @@ public class Interpreter {
         });
     }
 
-    
+    // Segédfüggvény a sorok feldolgozására
+    public static void processCommand(String value) {
+        value = value.toLowerCase();
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length == 0) return;
+
+        int argCount = 0;
+        String command = parts[0].substring(1); // Első karakter levágása
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+
+        int fasz = 0;
+
+        var cmd = commands.get(command);
+        if (cmd != null) {
+            cmd.execute(args);
+        } else {
+            System.out.println("Ismeretlen parancs: " + command);
+        }
+    }
+
+
     public static void create(Object obj) {
         if (obj == null) {
             return;
@@ -937,6 +994,7 @@ public class Interpreter {
         String name = prefix + count;
         objectNames.put(name + "_auto", obj);
     }
+
 
     public static Object getObject(String name) {
         // Check if the name exists in the objectNames map.
