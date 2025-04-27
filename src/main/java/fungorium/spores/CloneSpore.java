@@ -14,10 +14,11 @@ public class CloneSpore extends Spore {
     public void applyEffect(Insect insect) {
 
         // Cloning the insect (creating a new insect instance)
-        Insect clonedInsect = new Insect();
+        /*Insect clonedInsect = new Insect();
         clonedInsect.setLocation(insect.getLocation());
         clonedInsect.setSpeed(insect.getSpeed());
-        clonedInsect.setCut(insect.getCut());
+        clonedInsect.setCut(insect.getCut());*/
+        insect.clone();
 
     }
 }

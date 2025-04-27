@@ -163,15 +163,16 @@ public class Insect {
     /**
      * Consume the given spore.
      */
-    public void consumeSpore() {
+    public boolean consumeSpore() {
         List<Spore> sporeList = this.location.getSpores();
         if (sporeList.isEmpty()) {
-            return;
+            return false; // Nem volt spóra a helyszínen
         }
         Spore spore = sporeList.get(0);
         sporeList.remove(0);
         spore.applyEffect(this);
         this.spores.add(spore);
+        return true; // Sikeres spórafogyasztás
     }
 
     /**
@@ -185,5 +186,17 @@ public class Insect {
                 spore.removeEffect(this);
             }
         }
+    }
+    /**
+     * Clone the insect.
+     * @return a new insect with the same attributes
+     */
+    public Insect clone() {
+        Insect clonedInsect = new Insect();
+        clonedInsect.setLocation(this.location);
+        clonedInsect.setSpeed(this.speed);
+        clonedInsect.setCut(this.cut);
+        clonedInsect.setLife(this.life);
+        return clonedInsect;
     }
 }

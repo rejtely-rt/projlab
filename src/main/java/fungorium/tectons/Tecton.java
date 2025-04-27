@@ -15,12 +15,8 @@ public class Tecton {
     protected Mushroom mushroom = null;
 
     public Tecton() {
+        System.out.println("Tecton konstruktor meghívva.");
         Interpreter.create(this);
-    }
-
-    public Tecton(Mushroom m) {
-        Interpreter.create(this);
-        this.mushroom = m;
     }
 
     /**
@@ -86,7 +82,7 @@ public class Tecton {
      * @return true if the mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom(Mushroom mushroom) {
-        if (mushroom != null) {
+        if (this.mushroom != null) {
             System.out.println("   -> Already has mushroom, can't add a new one.");
             return false;
         }

@@ -1,5 +1,9 @@
 /addt -id T1 -t Tecton
+/addt -id T2 -t Tecton
+/altt -id T1 -addn T2
 /addpi -n insectist1
-/addi -id i1 -t T1
-/addsp -t T1 -type CloneSpore
+/addi -id i1 -t T2
+/addm -id M1 -lvl 1 -t T1
+/addsp -m M1 -tp CloneSpore
+/shoot -m m1 -t T2
 /consume -i i1
