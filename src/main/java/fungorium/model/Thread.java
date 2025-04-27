@@ -1,5 +1,5 @@
 package fungorium.model;
-import fungorium.utils.Logger;
+import fungorium.utils.Interpreter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class Thread {
      * Logs the creation of the thread instance.
      */
     public Thread() {
-        Logger.create(this); 
+        Interpreter.create(this); 
         this.size = 0;
         this.isKept = false;
         this.cutOff = false;
@@ -28,8 +28,6 @@ public class Thread {
      * @return true if the thread is kept, false otherwise.
      */
     public boolean isKept() {
-        Logger.enter(this, "isKept");
-        Logger.exit(isKept);
         return isKept;
     }
 
@@ -39,9 +37,7 @@ public class Thread {
      * @param isKept true if the thread should be kept, false otherwise.
      */
     public void setKept(boolean isKept) {
-        Logger.enter(this, "setKept");
         this.isKept = isKept;
-        Logger.exit(null);
     }
 
     /**
@@ -50,8 +46,6 @@ public class Thread {
      * @return true if the thread is cut off, false otherwise.
      */
     public boolean isCutOff() {
-        Logger.enter(this, "isCutOff");
-        Logger.exit(cutOff);
         return cutOff;
     }
 
@@ -61,9 +55,7 @@ public class Thread {
      * @param cutOff true if the thread should be cut off, false otherwise.
      */
     public void setCutOff(boolean cutOff) {
-        Logger.enter(this, "setCutOff");
         this.cutOff = cutOff;
-        Logger.exit(null);
     }
 
     /**
@@ -72,8 +64,6 @@ public class Thread {
      * @return the {@link Mushroom} that owns this thread.
      */
     public Mushroom getParent() {
-        Logger.enter(this, "getParent");
-        Logger.exit(parent);
         return parent;
     }
 
@@ -87,9 +77,7 @@ public class Thread {
         if (pMushroom == null) {
             throw new IllegalArgumentException("Parent mushroom cannot be null.");
         }
-        Logger.enter(this, "setParent");
         parent = pMushroom;
-        Logger.exit(null);
     }
 
     /**
@@ -100,9 +88,6 @@ public class Thread {
      * @return 5 if the thread is high-level, otherwise 1.
      */
     public int getSize() {
-        Logger.enter(this, "getSize");
-        int size = Logger.questionNumber("Milyen vastag a fonál?");
-        Logger.exit(size);
         return size;
     } 
 
@@ -113,12 +98,10 @@ public class Thread {
      * @throws IllegalArgumentException if the resulting size would be negative.
      */
     public void changeSize(int i) {
-        Logger.enter(this, "changeSize");
         if (size + i < 0) {
             throw new IllegalArgumentException("Resulting size cannot be negative.");
         }
         size += i;
-        Logger.exit(null);
     }
 
     /**
@@ -127,13 +110,11 @@ public class Thread {
      * @param insect The insect to be eaten.
      */
     public void eatInsect(Insect insect) {
-        Logger.enter(this, "eatInsect");
         if (insect.getSpeed() == 0) { // Check if the insect is paralyzed
             insect.setLife(false); // Set the insect's life to false
             insect.setLocation(null); // Remove the insect from its current location
             insects.add(insect); // Add the insect to this thread
         }
-        Logger.exit(null);
     }
 
     /**

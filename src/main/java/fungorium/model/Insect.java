@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import fungorium.utils.Interpreter;
-import fungorium.utils.Logger;
 
 public class Insect {
     /**
@@ -49,21 +48,15 @@ public class Insect {
     }
 
     public void setLocation(Tecton location) {
-        Logger.enter(this, "setLocation");
         this.location = location;
-        Logger.exit("");
     }
 
     public void setSpeed(int speed) {
-        Logger.enter(this, "setSpeed");
         this.speed = speed;
-        Logger.exit("");
     }
 
     public void setCut(boolean cut) {
-        Logger.enter(this, "setCut");
         this.cut = cut;
-        Logger.exit("");
     }
 
     /**
@@ -71,9 +64,6 @@ public class Insect {
      * @return the speed of the insect
      */
     public int getSpeed() {
-        Logger.enter(this, "getSpeed");
-        int speed = Logger.questionNumber("What is the speed of the insect?");
-        Logger.exit(speed);
         return speed;
     }
 
@@ -82,9 +72,6 @@ public class Insect {
      * @return the cut of the insect
      */
     public boolean getCut() {
-        Logger.enter(this, "getCut");
-        boolean cut = Logger.question("Can the insect cut?");
-        Logger.exit(cut);
         return cut;
     }
 
@@ -93,8 +80,6 @@ public class Insect {
      * @return the location of the insect
      */
     public Tecton getLocation() {
-        Logger.enter(this, "getLocation");
-        Logger.exit(location);
         return location;
     }
 
@@ -111,8 +96,6 @@ public class Insect {
      * @return the life of the insect
      */
     public boolean getLife() {
-        Logger.enter(this, "getLife");
-        Logger.exit(life);
         return life;
     }
 
@@ -121,9 +104,7 @@ public class Insect {
      * @param life the new life value
      */
     public void setLife(boolean life) {
-        Logger.enter(this, "setLife");
         this.life = life;
-        Logger.exit("");
     }
 
     /**
@@ -131,9 +112,7 @@ public class Insect {
      * @param value the new speed value
      */
     public void changeSpeed(int value) {
-        Logger.enter(this, "changeSpeed");
         this.speed += value;
-        Logger.exit("");
     }
 
     /**
@@ -141,9 +120,7 @@ public class Insect {
      * @param value the new cut value
      */
     public void changeCut(boolean value) {
-        Logger.enter(this, "changeCut");
         this.cut = value;
-        Logger.exit("");
     }
 
     /**
@@ -152,14 +129,11 @@ public class Insect {
      * @return true if the insect can move to the target location, false otherwise
      */
     public void moveTo(Tecton target) {
-        Logger.enter(this, "moveTo");
         if (this.location == null) {
             this.location = target;
-            Logger.exit(false);
             return;
         }
         if (getSpeed() <= 0) {
-            Logger.exit(false);
             return;
         }
 
@@ -168,11 +142,9 @@ public class Insect {
         for (Thread thread : currentThreads) {
             if (targetThreads.contains(thread)) {
                 this.location = target;
-                Logger.exit(true);
                 return;
             }
         }
-        Logger.exit(false);
     }
 
     /**
@@ -181,13 +153,10 @@ public class Insect {
      * @return true if the thread is cut, false otherwise
      */
     public boolean cutThread(Thread thread) {
-        Logger.enter(this, "cutThread");
         if (!getCut()) {
-            Logger.exit(false);
             return false;
         }
         thread.setCutOff(true);
-        Logger.exit(true);
         return true;
     }
 
@@ -195,24 +164,20 @@ public class Insect {
      * Consume the given spore.
      */
     public void consumeSpore() {
-        Logger.enter(this, "consumeSpore");
         List<Spore> sporeList = this.location.getSpores();
         if (sporeList.isEmpty()) {
-            Logger.exit(null);
             return;
         }
         Spore spore = sporeList.get(0);
         sporeList.remove(0);
         spore.applyEffect(this);
         this.spores.add(spore);
-        Logger.exit(null);
     }
 
     /**
      * Check if the insect can consume the given spore.
      */
     public void coolDownCheck() {
-        Logger.enter(this, "coolDownCheck");
         for (Spore spore : spores) {
             spore.decreaseCooldown();
             int cooldown = spore.getCooldown();
@@ -220,6 +185,5 @@ public class Insect {
                 spore.removeEffect(this);
             }
         }
-        Logger.exit("");
     }
 }

@@ -14,15 +14,11 @@ public class Mushroom {
 
     /**
      * Default constructor.
-     * Logs the creation of the mushroom using the Logger.
+     * Logs the creation of the mushroom using the Interpreter.
      */
-    public Mushroom() {
-        Logger.create(this); 
-    }
-
     public Mushroom(int level) {
         this.level = level;
-        Logger.create(this); 
+        Interpreter.create(this); 
     }
     
     /**
@@ -31,34 +27,25 @@ public class Mushroom {
      * @return 1 if the user answers yes, 2 otherwise.
      */
     public int getLevel() {
-        Logger.enter(this, "getLevel");
-        int level = Logger.questionNumber("Hányas szintű a gomba?");
-        Logger.exit(level);
         return level;
-        
-        
     }
 
     /**
      * Evolves the mushroom to level 2.
-     * Changes the internal state and logs the action.
+     * Changes the internal state.
      */
     public void evolve() {
-        Logger.enter(this, "evolve");
         this.level = 2; // Szint növelése
-        Logger.exit(null);
     }
     
     /**
      * Changes the life value of the mushroom.
-     * Sets the internal life value and logs the action.
+     * Sets the internal life value.
      * 
      * @param i The new life value.
      */
     public void changeLife(int i) {
-        Logger.enter(this, "changeLife");
         this.life = i; // Élettartam beállítása
-        Logger.exit(null);
     }
     
 
@@ -76,7 +63,6 @@ public class Mushroom {
      * Currently only logs the action without actual implementation.
      */
     public void produceSpores() {
-        Logger.enter(this, "produceSpores");
         List<Spore> sporeList = new ArrayList<>();
         Spore cspore = new CannotCutSpore();
         sporeList.add(cspore);
@@ -87,7 +73,6 @@ public class Mushroom {
         Spore slspore = new SlowlySpore();
         sporeList.add(slspore);
         spores.addAll(sporeList);
-        Logger.exit(null);
     }
     
     
@@ -110,9 +95,7 @@ public class Mushroom {
      * @param spore The spore to be added.
      */
     public void addSpore(Spore spore) {
-        Logger.enter(this, "addSpore");
         spores.add(spore);
-        Logger.exit(null);
     }
 
     /**
@@ -123,12 +106,9 @@ public class Mushroom {
      * @return {@code true} if the thread was successfully added; {@code false} otherwise.
      */
     public boolean addThread(Tecton t) {
-        Logger.enter(this, "addThread");
-    
-        List <Tecton> targetTectonNeighbors= t.getNeighbors();
+        List<Tecton> targetTectonNeighbors = t.getNeighbors();
 
-
-        //The tecton is a neighbor
+        // The tecton is a neighbor
         for (Tecton neighbor : targetTectonNeighbors) {
             Mushroom neighborMushroom = neighbor.getMushroom();
             // If Mushroom is found first
@@ -140,13 +120,12 @@ public class Mushroom {
                 boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
                 if (!neighborSuccessfullyAdded) return false;
                 threads.add(newThread);
-                Logger.exit(true);
                 return true;
             }
 
             // The thread is next to the tecton
             List<Thread> neighborThreads = neighbor.getThreads();
-            for (Thread neighborThread: neighborThreads) {
+            for (Thread neighborThread : neighborThreads) {
                 if (neighborThread.getSize() < 5) continue;
                 Mushroom parentMushroom = neighborThread.getParent();
                 if (this.equals(parentMushroom)) {
@@ -157,14 +136,11 @@ public class Mushroom {
                     boolean neighborSuccessfullyAdded = neighbor.addThread(newThread);
                     if (!neighborSuccessfullyAdded) return false;
                     threads.add(newThread);
-                    Logger.exit(true);
                     return true;
                 }
             }
-
         }
-        Logger.exit(false);
-        return false; //Mushroom was not found
+        return false; // Mushroom was not found
     }
 
     /**
@@ -173,9 +149,7 @@ public class Mushroom {
      * @param th The thread to be removed.
      */
     public void removeThread(Thread th) {
-        Logger.enter(this, "removeThread");
         threads.remove(th); 
-        Logger.exit(null);
     }
     
 

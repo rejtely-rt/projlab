@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fungorium.model.Mushroom;
-import fungorium.utils.Logger;
 import fungorium.model.Thread;
 
 public class ThreadAbsorberTecton extends Tecton {
@@ -26,7 +25,6 @@ public class ThreadAbsorberTecton extends Tecton {
      */
     @Override
     public void absorbThread() {
-        Logger.enter(this, "absorbThread");
         // Másolat, hogy elkerüljük ConcurrentModificationException-t
         List<Thread> threadsCopy = new ArrayList<>(threads);
 
@@ -49,6 +47,5 @@ public class ThreadAbsorberTecton extends Tecton {
                 }
             }
         }
-        Logger.exit("");
     }
 }

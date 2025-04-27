@@ -1,7 +1,6 @@
 package fungorium.spores;
 
 import fungorium.model.Insect;
-import fungorium.utils.Logger;
 
 public class CloneSpore extends Spore {
 
@@ -13,7 +12,6 @@ public class CloneSpore extends Spore {
      */
     @Override
     public void applyEffect(Insect insect) {
-        Logger.enter(this, "applyEffect");
 
         // Cloning the insect (creating a new insect instance)
         Insect clonedInsect = new Insect();
@@ -21,6 +19,5 @@ public class CloneSpore extends Spore {
         clonedInsect.setSpeed(insect.getSpeed());
         clonedInsect.setCut(insect.getCut());
 
-        Logger.exit("");
     }
 }

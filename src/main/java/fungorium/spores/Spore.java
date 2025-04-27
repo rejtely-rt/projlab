@@ -1,14 +1,14 @@
 package fungorium.spores;
 
 import fungorium.model.Insect;
-import fungorium.utils.Logger;
+import fungorium.utils.Interpreter;
 
 public abstract class Spore {
 
     private int cooldown; // Cooldown attribútum hozzáadása
 
     public Spore() {
-        Logger.create(this);
+        Interpreter.create(this);
         this.cooldown = 0; // Alapértelmezett érték
     }
 
@@ -18,8 +18,6 @@ public abstract class Spore {
      * @return the cooldown value.
      */
     public int getCooldown() {
-        Logger.enter(this, "getCooldown");
-        Logger.exit(cooldown);
         return cooldown;
     }
 
@@ -27,11 +25,9 @@ public abstract class Spore {
      * Decreases the cooldown period for the spore.
      */
     public void decreaseCooldown() {
-        Logger.enter(this, "decreaseCooldown");
         if (cooldown > 0) {
             cooldown--; // Csökkenti a cooldown értékét
         }
-        Logger.exit(cooldown);
     }
 
     /**
@@ -45,9 +41,7 @@ public abstract class Spore {
      * @param target the insect that the spore is applied to
      */
     public void removeEffect(Insect target) {
-        Logger.enter(this, "removeEffect");
         target.changeSpeed(2);
         target.changeCut(true);
-        Logger.exit("");
     }
 }

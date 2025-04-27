@@ -33,8 +33,8 @@ public abstract class Initialize {
      */
     public void initialize() {
         Logger.reset();
-        m1 = new Mushroom();
-        m2 = new Mushroom();
+        m1 = new Mushroom(1);
+        m2 = new Mushroom(1);
 
         t1 = new Tecton(m1);
         t2 = new NoMushTecton();
