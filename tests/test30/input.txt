@@ -1,0 +1,7 @@
+/addt -id T1 -t Tecton
+/addpi -n insectist1
+/addi -id i1 -t T1
+/addpm -n mycologist1
+/addm -id m1 -lvl 2 -t T1
+/growt -m m1 -tt T1
+/tconsume -i i1 -th th1
