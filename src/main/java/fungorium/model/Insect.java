@@ -170,7 +170,7 @@ public class Insect implements Tickable{
      * @return true if the thread is cut, false otherwise
      */
     public boolean cutThread(Thread thread) {
-        if (!getCut()) {
+        if (!getCut() || !location.getThreads().contains(thread)) {
             return false;
         }
         thread.setCutOff(true);

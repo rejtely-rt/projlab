@@ -67,7 +67,9 @@ public class Insectist {
      */
     public void cutThread(int index, Thread thread) {
         if (index >= 0 && index < insects.size()) {
-            insects.get(index).cutThread(thread);
+            if (!insects.get(index).cutThread(thread)){
+                System.out.println("Insect could not cut the thread (regardless what the next line says)");
+            }
         } else {
             System.out.println("Invalid insect index.");
         }

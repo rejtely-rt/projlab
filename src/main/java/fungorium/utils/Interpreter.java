@@ -625,7 +625,7 @@ public class Interpreter {
                         System.out.println("output.txt differs from expected.txt  (exit code " + exitCode + ")");
                     }
                     reader.close();
-                    System.out.println("Test " + testName + " executed successfully.");
+                    System.out.println("Test " + testName + " executed successfully.\n\n");
                 } catch (Exception e) {
                     System.out.println("Error executing " + testName + ": " + e.getMessage());
                 }

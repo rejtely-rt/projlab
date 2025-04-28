@@ -5,6 +5,7 @@ import java.util.List;
 
 import fungorium.model.Mushroom;
 import fungorium.model.Thread;
+import fungorium.utils.Interpreter;
 
 public class ThreadAbsorberTecton extends Tecton {
     public ThreadAbsorberTecton() {
@@ -29,7 +30,7 @@ public class ThreadAbsorberTecton extends Tecton {
         List<Thread> threadsCopy = new ArrayList<>(threads);
 
         for (Thread th : threadsCopy) {
-            th.changeSize(-1);
+            th.changeSize(-2);
 
             int size = th.getSize();
             if (size == 0) {
@@ -38,13 +39,13 @@ public class ThreadAbsorberTecton extends Tecton {
 
                 // Szál eltávolítása a szomszédos Tecton-okból
                 for (Tecton neighbor : this.getNeighbors()) {
-                    neighbor.removeThread(th);
+                    if (neighbor.getThreads().contains(th)) {
+                        neighbor.removeThread(th);
+                    }
                 }
-
-                // Szál eltávolítása a szülő Mushroom-ból
-                if (this.mushroom != null) {
-                    this.mushroom.removeThread(th);
-                }
+                th.getParent().removeThread(th);
+                th.getParent().threadCollector(this);
+                Interpreter.remove(th);
             }
         }
     }
