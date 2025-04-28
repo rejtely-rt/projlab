@@ -15,9 +15,10 @@ Time passed for all applicable objects.
 Thread successfully grown from mushroom m1 to tecton t3
 Thread cut: th1 by insect: i1
 Listing threads:
-th2_auto - Size: 1, isKept: false, isCutOff: false
+th2_auto - Size: 1, isKept: true, isCutOff: false
 th1_auto - Size: 5, isKept: false, isCutOff: true
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Listing threads:
+th2_auto - Size: 4, isKept: true, isCutOff: false
