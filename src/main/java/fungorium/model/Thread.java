@@ -140,6 +140,6 @@ public class Thread implements Tickable{
 
     @Override
     public void tick() {
-        changeSize(-1);
+        changeSize(1);
     }
 }

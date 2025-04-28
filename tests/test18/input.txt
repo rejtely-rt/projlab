@@ -1,5 +1,5 @@
 /addt -id T1 -t Tecton
 /addpi -n insectist1
-/addi -id i1 -t T1
+/addi -id i1 -t T1 -in insectist1
 /applyeffect -i i1 -e CannotCutSpore
 /cut -i i1 -t th1

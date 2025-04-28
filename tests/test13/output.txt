@@ -11,11 +11,6 @@ i1 consumed the spore.
 List insects:
 ID: i1
   Speed: 2
-  Cut: true
+  Cut: false
   Spores:
-    - CloneSpore
-ID: i2_auto
-  Speed: 2
-  Cut: true
-  Spores:
-    None
+    - CannotCutSpore
