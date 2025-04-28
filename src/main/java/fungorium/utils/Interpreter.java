@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 //loadhoz kellenek
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-
+import java.io.InputStreamReader;
 
 import fungorium.model.Insect;
 import fungorium.model.Thread;
@@ -539,8 +539,30 @@ public class Interpreter {
                     processCommand(line); // <- EZ MEGY
                 }
                 HLogPrintStream.saveLog("tests/" + name + "/output.txt");
+                String outputPath   = System.getProperty("user.dir") + File.separator + "tests" + File.separator + name + File.separator + "output.txt";
+                String expectedPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator + name + File.separator + "expected.txt";
+
+                ProcessBuilder pb = new ProcessBuilder("fc", outputPath, expectedPath);
+                pb.redirectErrorStream(true);
+
+                Process p = pb.start();
+
+                // read the tool's output
+                try (BufferedReader procOut = new BufferedReader(
+                        new InputStreamReader(p.getInputStream()))) {
+                    while ((line = procOut.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
+
+                // wait for it to finish and check exit code
+                int exitCode = p.waitFor();
+                if (exitCode == 0) {
+                    System.out.println("output.txt matches expected.txt");
+                } else {
+                    System.out.println("output.txt differs from expected.txt  (exit code " + exitCode + ")");
+                }
                 reader.close();
-                System.out.println("Allapot betöltve: test" + name);
             } catch (Exception e) {
                 System.out.println("Hiba a betöltés közben: " + e.getMessage());
             }
@@ -555,12 +577,39 @@ public class Interpreter {
                     String filepath = "tests/" + testName + "/input.txt";
                     BufferedReader reader = new BufferedReader(new FileReader(filepath));
                     String line;
+                    HLogPrintStream.resetLog();
                     while ((line = reader.readLine()) != null) {
                         processCommand(line); // Process each command in the test file
                     }
+                    HLogPrintStream.saveLog("tests/" + testName + "/output.txt");
+                    String outputPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator
+                            + testName + File.separator + "output.txt";
+                    String expectedPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator
+                            + testName + File.separator + "expected.txt";
+
+                    ProcessBuilder pb = new ProcessBuilder("fc", outputPath, expectedPath);
+                    pb.redirectErrorStream(true);
+
+                    Process p = pb.start();
+
+                    // read the tool's output
+                    try (BufferedReader procOut = new BufferedReader(
+                            new InputStreamReader(p.getInputStream()))) {
+                        while ((line = procOut.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    }
+
+                    // wait for it to finish and check exit code
+                    int exitCode = p.waitFor();
+                    if (exitCode == 0) {
+                        System.out.println("output.txt matches expected.txt");
+                    } else {
+                        System.out.println("output.txt differs from expected.txt  (exit code " + exitCode + ")");
+                    }
                     reader.close();
                     System.out.println("Test " + testName + " executed successfully.");
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("Error executing " + testName + ": " + e.getMessage());
                 }
             }

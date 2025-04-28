@@ -1,0 +1,7 @@
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+(mycologist1) Mycologist created successfully.
+Mushroom created: m1 with level 2 on tecton t1, added to mycologist: mycologist1
+Thread grown: th1 from t1 to t2
+Tecton t1 broken, new tecton created: t3
