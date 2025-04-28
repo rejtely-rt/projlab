@@ -103,7 +103,8 @@ public class Mushroom implements Tickable {
                     break;
                 }
             }
-        } else if (mushroomLevel == 2) {
+        } 
+        if (mushroomLevel == 2) {
             // Level 2: Check neighbors of neighbors
             for (Tecton neighbor : to.getNeighbors()) {
                 for (Tecton neighborOfNeighbor : neighbor.getNeighbors()) {
@@ -224,7 +225,7 @@ public class Mushroom implements Tickable {
             }
         }
 
-        List<Tecton> allTectons = visited;
+        List<Tecton> allTectons = new ArrayList<>(visited);
 
         // If the mushroom's Tecton is not found, exit
         if (mushroomTecton == null) {

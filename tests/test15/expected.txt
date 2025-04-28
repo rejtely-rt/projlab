@@ -13,20 +13,19 @@ Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
-Thread successfully grown from mushroom m1 to tecton t3
+Error: Failed to grow thread from mushroom m1 to tecton t3
 Fonalak listázása:
-th2_auto - Size: 1
-th1_auto - Size: 5
-Fonal elvágva: th1 rovar által: i3
+th1_auto - Size: -5
+Hiba: Hiányzó paraméter(ek) (-i, -th vagy -in).
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
-Time passed for all applicable objects.
-Fonalak listázása:
-th2_auto - Size: 5
 Time passed for all applicable objects.
 Fonalak listázása:
-th2_auto - Size: 5
+th1_auto - Size: -9
 Time passed for all applicable objects.
 Fonalak listázása:
-th2_auto - Size: 5
+th1_auto - Size: -10
+Time passed for all applicable objects.
+Fonalak listázása:
+th1_auto - Size: -11

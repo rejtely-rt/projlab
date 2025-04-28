@@ -3,18 +3,22 @@
 /addt -id T3 -t Tecton
 /addpi -n insectist1
 /addi -id i3 -t T3 -in insectist1
+/addpi -n insectist1
+/addi -id i3 -t T3 -in insectist1
 /altt -id T1 -addn T2
 /altt -id T2 -addn T3
 /addpm -n mycologist1
 /addm -id m1 -t T1 -my mycologist1
-/growt -m m1 -tt T2
+/growt -m m1 -tt T2 -my mycologist1
 /time
 /time
 /time
 /time
 /time
-/growt -m m1 -tt T3
+/growt -m m1 -tt T3 -my mycologist1
 /lstth
+/cut -i i3 -th th1
+/time
 /cut -i i3 -th th1
 /time
 /time

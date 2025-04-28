@@ -5,8 +5,6 @@ Tecton t1: neighbor t2 added
 (insectist1) Insectist created successfully.
 Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
 Insect created: i1 on tecton t2, added to insectist: insectist1
-Spore added to mushroom m1
-Spore shoot from m1 to t2
 Thread successfully grown from mushroom m1 to tecton t2
-i1 consumed the spore.
-Hiba: Hiányzó paraméter(ek) (-id, -th vagy -my).
+The insect is not paralyzed.
+The Mycologist failed to command the thread to eat the insect.
