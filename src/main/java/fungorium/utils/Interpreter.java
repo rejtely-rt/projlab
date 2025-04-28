@@ -2,6 +2,7 @@ package fungorium.utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -49,6 +50,8 @@ public class Interpreter {
     private static final Map<String, Integer> prefixCounters = new HashMap<>();
     // Map to store already computed unique prefixes for classes.
     private static final Map<Class<?>, String> computedPrefixes = new HashMap<>();
+
+    private static HLogPrintStream hlps = new HLogPrintStream();
     
     static {
         // ez csak minta
@@ -628,9 +631,11 @@ public class Interpreter {
                 String filepath = "tests/" + name + "/input.txt";
                 BufferedReader reader = new BufferedReader(new FileReader(filepath));
                 String line;
+                HLogPrintStream.resetLog();
                 while ((line = reader.readLine()) != null) {
                     processCommand(line); // <- EZ MEGY
                 }
+                HLogPrintStream.saveLog("tests/" + name + "/output.txt");
                 reader.close();
                 System.out.println("Allapot betöltve: test" + name);
             } catch (Exception e) {
@@ -675,6 +680,7 @@ public class Interpreter {
         });
 
         commands.put("lstm", (x) -> {
+            removeAutoDuplicates(objectNames);
             System.out.println("Gombák listázása:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Mushroom) {
@@ -685,6 +691,7 @@ public class Interpreter {
         });
 
         commands.put("lsts", (x) -> {
+            removeAutoDuplicates(objectNames);
             System.out.println("Spórák és a hozzájuk tartozó tektonok listája:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Tecton) {
@@ -701,6 +708,7 @@ public class Interpreter {
         });
 
         commands.put("lsti", (x) -> {
+            removeAutoDuplicates(objectNames);
             System.out.println("Rovarok listázása:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Insect) {
@@ -711,6 +719,7 @@ public class Interpreter {
         });
 
         commands.put("lstth", (x) -> {
+            removeAutoDuplicates(objectNames);
             System.out.println("Fonalak listázása:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Thread) {
@@ -721,6 +730,7 @@ public class Interpreter {
         });
 
         commands.put("lstt", (x) -> {
+            removeAutoDuplicates(objectNames);
             System.out.println("Tektonok listázása:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Tecton) {
@@ -1200,6 +1210,24 @@ public class Interpreter {
         objectNames.clear();
         prefixCounters.clear();
         computedPrefixes.clear();
+    }
+
+    public static void removeAutoDuplicates(Map<String, Object> map) {
+        // 1) Count how many times each value appears
+        Map<Object, Integer> counts = new HashMap<>();
+        for (Object v : map.values()) {
+            counts.put(v, counts.getOrDefault(v, 0) + 1);
+        }
+
+        // 2) Remove entries whose value is duplicated AND whose key ends with "_auto"
+        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> e = it.next();
+            if (counts.get(e.getValue()) > 1
+                    && e.getKey().endsWith("_auto")) {
+                it.remove();
+            }
+        }
     }
 
     public static void executeCommand(String inputString) {
