@@ -13,7 +13,7 @@ Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Thread successfully grown from mushroom m1 to tecton t3
-Rovar mozgatva: i1 -> t2
+Insect moved: i1 -> t2
 Listing threads:
 th2_auto - Size: 1, isKept: true, isCutOff: false
 th1_auto - Size: 5, isKept: false, isCutOff: false
