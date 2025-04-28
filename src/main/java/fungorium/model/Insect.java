@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import fungorium.utils.Interpreter;
+import fungorium.utils.Tickable;
 
-public class Insect {
+public class Insect implements Tickable{
     /**
      * It is the current location of the insect.
      */
@@ -213,4 +214,10 @@ public class Insect {
         clonedInsect.setLife(this.life);
         return clonedInsect;
     }
+
+    @Override
+    public void tick(){
+        coolDownCheck();
+    }
+
 }

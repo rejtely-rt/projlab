@@ -6,7 +6,7 @@ import fungorium.tectons.*;
 import fungorium.spores.*;
 import fungorium.utils.*;;
 
-public class Mushroom {
+public class Mushroom implements Tickable {
     private List<Spore> spores = new ArrayList<>();
     private List<Thread> threads = new ArrayList<>();
     private int level = 1; // Alapértelmezett szint
@@ -275,5 +275,11 @@ public class Mushroom {
      */
     public List<Spore> getSpores() {
         return spores;
+    }
+
+    @Override
+    public void tick() {
+        produceSpores();
+        evolve();
     }
 }

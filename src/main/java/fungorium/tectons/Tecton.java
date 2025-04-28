@@ -258,6 +258,6 @@ public class Tecton implements Tickable {
     @Override
     public void tick() {
         absorbThread();
-        breakTecton();
+        //breakTecton();
     }
 }
