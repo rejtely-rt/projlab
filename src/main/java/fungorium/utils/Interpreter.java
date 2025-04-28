@@ -739,24 +739,6 @@ public class Interpreter {
             }
         });
 
-        commands.put("time", (x) -> {
-            String insectId = null;
-            String objectId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-id":
-                        insectId = x[i + 1];
-                        break;
-                    case "-o":
-                        objectId = x[i + 1];
-                        break;
-                }
-            }
-        
-            // TODO: Implement the logic to check the time of the insect and object.
-        });
-
     commands.put("move", (x) -> {
     String insectId = null;
     String tectonId = null;
