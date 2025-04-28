@@ -3,9 +3,9 @@ package fungorium.utils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
-
-
+import java.util.stream.Collectors;
 //loadhoz kellenek
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -62,6 +62,30 @@ public class Interpreter {
                 System.out.println("/" + cname);
             }
             System.out.println("e | exit | q | quit -- to exit");
+        });
+
+        commands.put("time", (x) -> {
+            String o = null;
+            for (int i = 0; i < x.length - 1; i++) {
+                if (x[i].equals("-o")) {
+                    o = x[i + 1];
+                }
+            }
+            if (o != null) {
+                if (objectNames.keySet().contains(o) && objectNames.get(o) instanceof Tickable){
+                    Tickable toTick = (Tickable)objectNames.get(o);
+                    toTick.tick();
+                    System.out.println("Time passed for all applicable objects.");
+                } else {
+                    System.out.println("Object with name -o [OBJECT] == " + o + "not found");
+                }
+            } else{
+                List<Tickable> uniqueTickables = objectNames.values().stream().filter(v -> v instanceof Tickable).map(v -> (Tickable) v).distinct().collect(Collectors.toList());
+                TimeManager tm = new TimeManager(uniqueTickables);
+                tm.tickAll();
+                System.out.println("Time passed for all applicable objects.");
+
+            }
         });
 
         commands.put("addpm", (x) -> {
