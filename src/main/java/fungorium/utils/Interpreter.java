@@ -250,7 +250,7 @@ public class Interpreter {
                 Object t2Obj = Interpreter.getObject(t2Name);
 
                 if (t1Obj instanceof Tecton && t2Obj instanceof Tecton) {
-                    System.out.println("Fonal létrehozva: " + id + " a tektonok között: " + t1Name + " és " + t2Name);
+                    System.out.println("Thread grown: " + id + " from " + t1Name + " to " + t2Name);
                 } else {
                     System.out.println("Hiba: Az egyik vagy mindkét tekton nem létezik, vagy nem megfelelő típusú.");
                 }
@@ -1081,7 +1081,7 @@ public class Interpreter {
                     Tecton newTecton = original.breakTecton(); 
                     if (newTecton != null) {
                         //Interpreter.putObject(newId, newTecton);
-                        System.out.println("Tekton törve: " + id + " -> új tekton: " + newId);
+                        System.out.println("Tecton " + id + " broken, new tecton created: " + newId);
                     } else {
                         System.out.println("Hiba: A törés nem sikerült.");
                     }
