@@ -2,7 +2,8 @@
 /addt -id T2 -t Tecton
 /altt -id T1 -addn T2
 /addpm -n mycologist1
-/addm -id m1 -t T1 -my mycologist1
-/growt -m 0 -tt T2 -my mycologist1
-/addi -id i3 -t T1
-/move -i i3 -t T2
+/addpi -n insectist1
+/addm -id m1 -t T2 -my mycologist1
+/addi -id i1 -t T1 -in insectist1
+/growt -m m1 -tt T1 -my mycologist1
+/move -i i1 -t T2

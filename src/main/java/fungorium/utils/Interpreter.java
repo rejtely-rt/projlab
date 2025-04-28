@@ -242,18 +242,23 @@ public class Interpreter {
                 switch (type) {
                     case "tecton":
                         tecton = new Tecton();
+                        objectNames.put(id, tecton);
                         break;
                     case "nomushtecton":
                         tecton = new NoMushTecton();
+                        objectNames.put(id, tecton);
                         break;
                     case "singlethreadtecton":
                         tecton = new SingleThreadTecton();
+                        objectNames.put(id, tecton);
                         break;
                     case "threadabsorbertecton":
                         tecton = new ThreadAbsorberTecton();
+                        objectNames.put(id, tecton);
                         break;
                     case "threadkeepertecton":
                         tecton = new ThreadKeeperTecton();
+                        objectNames.put(id, tecton);
                         break;
                     default:
                         System.out.println("Hiba: Ismeretlen tekton típus.");
@@ -810,7 +815,6 @@ public class Interpreter {
                 Mycologist mycologist = (Mycologist) mycologistObj;
     
                 mycologist.addMushroom(tecton); // Növesztés a Mycologist által
-                System.out.println("Gomba növesztve a tektonon: " + tectonId + " a gombász által: " + mycologistId);
             } else {
                 System.out.println("Hiba: Hibás tekton vagy gombász azonosító.");
             }

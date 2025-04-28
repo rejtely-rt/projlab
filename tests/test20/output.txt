@@ -1,11 +1,14 @@
-(T1) Tecton created successfully.
-(T2) Tecton of type ThreadAbsorberTecton created successfully.
-T1 Tecton neighbor T2 added
-Mushroom created successfully with default level on tecton T1
-(m1) Thread (th1) grown to tecton T2.
---- Thread list ---
-th1 (T1 <-> T2)
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+(mycologist1) Mycologist created successfully.
+(insectist1) Insectist created successfully.
+Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
+Thread successfully grown from mushroom m1 to tecton t2
+Fonalak listázása:
+th1_auto - Size: 1
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
---- Thread list ---
+Fonalak listázása:
+th1_auto - Size: 1

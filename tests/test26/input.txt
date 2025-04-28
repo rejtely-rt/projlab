@@ -1,9 +1,10 @@
-/addt -id T1 -t NoMushTecton
-/addt -id T2 -t Tecton
-/addi -id i1 -t T1
-altt -id T1 -addn T2
-/addm -id m1 -t T2
-/growt -m m1 -t T1
-/tconsume -i i1 th th1
-/growm -id m2 -t T1
-/growmt -id i1 -t T1 -th th1
+/addt -id T1 -t nomushtecton
+/addt -id T2 -t tecton
+/altt -id T1 -addn T2
+/addpm -n mycologist1
+/addpi -n insectist1
+/addm -id m1 -t T2 -my mycologist1
+/growt -m m1 -tt T1 -my mycologist1
+/addsp -m m1 -tp SlowySpore
+/shoot -m m1 -t T1
+/growm -t T1 -my mycologist1

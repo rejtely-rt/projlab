@@ -9,4 +9,4 @@
 /shoot -m m1 -t T2
 /growt -m m1 -tt T2 -my mycologist1
 /consume -i i1
-/eat -th th1 -i i1 -my mycologist1
+/eat -th th1 -id i1 -my mycologist1

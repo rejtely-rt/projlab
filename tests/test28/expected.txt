@@ -8,5 +8,7 @@ Insect created: i1 on tecton t1, added to insectist: insectist1
 Spore added to mushroom m1
 Spore shoot from m1 to t1
 i1 consumed the spore.
-Insect is paralyzed, therefore cannot move (regardless what the next line says)
-Rovar mozgatva: i1 -> t2
+Thread successfully grown from mushroom m1 to tecton t1
+Insect eaten by this thread.
+The Mycologist successfully commanded the thread to eat the insect.
+   -> New mushroom created on Tecton by thread.

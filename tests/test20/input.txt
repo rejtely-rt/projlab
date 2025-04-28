@@ -1,8 +1,10 @@
 /addt -id T1 -t Tecton
 /addt -id T2 -t ThreadAbsorberTecton
 /altt -id T1 -addn T2
-/addm -id m1 -t T1
-/growt -m m1 -tt T2
+/addpm -n mycologist1
+/addpi -n insectist1
+/addm -id m1 -t T1 -my mycologist1
+/growt -m m1 -tt T2 -my mycologist1
 /lstth
 /time 
 /time

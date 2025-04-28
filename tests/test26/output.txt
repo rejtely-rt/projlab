@@ -1,7 +1,10 @@
-(T1) Tecton of type NoMushTecton created successfully.
-(T2) Tecton created successfully.
-(i1) Insect created successfully at tecton T1.
-T1 Tecton neighbor T2 added.
-Mushroom created successfully with default level on tecton T2
-(m1) Thread (th1) grown to tecton T1.
-(i1) Mushroom cannot grow on tecton T1 via thread th1.
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+(mycologist1) Mycologist created successfully.
+(insectist1) Insectist created successfully.
+Mushroom created: m1 with level 1 on tecton t2, added to mycologist: mycologist1
+Thread successfully grown from mushroom m1 to tecton t1
+Spore added to mushroom m1
+Spore shoot from m1 to t1
+   -> NoMushTecton cannot accept mushrooms. Operation denied.
