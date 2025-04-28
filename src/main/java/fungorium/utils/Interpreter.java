@@ -822,7 +822,6 @@ public class Interpreter {
     commands.put("growt", (x) -> {
         String mushroomId = null;
         String targetTectonId = null;
-        String mycologistId = null;
     
         // Parse command arguments
         for (int i = 0; i < x.length - 1; i++) {
@@ -833,25 +832,22 @@ public class Interpreter {
                 case "-tt":
                     targetTectonId = x[i + 1];
                     break;
-                case "-my":
-                    mycologistId = x[i + 1];
-                    break;
             }
         }
     
         // Check if required parameters are provided
-        if (mushroomId == null || targetTectonId == null || mycologistId == null) {
-            System.out.println("Error: Missing required parameter(s) (-m, -tt, or -my).");
+        if (mushroomId == null || targetTectonId == null) {
+            System.out.println("Error: Missing required parameter(s) (-m or -tt).");
             return;
         }
     
         // Retrieve objects by ID
-        Object mycologistObj = Interpreter.getObject(mycologistId);
+        Object mushroomObj = Interpreter.getObject(mushroomId);
         Object targetTectonObj = Interpreter.getObject(targetTectonId);
     
         // Validate object types
-        if (!(mycologistObj instanceof Mycologist)) {
-            System.out.println("Error: Invalid mycologist ID: " + mycologistId);
+        if (!(mushroomObj instanceof Mushroom)) {
+            System.out.println("Error: Invalid mushroom ID: " + mushroomId);
             return;
         }
         if (!(targetTectonObj instanceof Tecton)) {
@@ -859,20 +855,23 @@ public class Interpreter {
             return;
         }
     
-        Mycologist mycologist = (Mycologist) mycologistObj;
+        Mushroom mushroom = (Mushroom) mushroomObj;
         Tecton targetTecton = (Tecton) targetTectonObj;
     
-        // Find the mushroom by ID in the mycologist's mushrooms
-        Mushroom mushroom = null;
-        for (Mushroom m : mycologist.getMushrooms()) {
-            if (Interpreter.getObject(mushroomId) == m) {
-                mushroom = m;
-                break;
+        // Find the Mycologist associated with the mushroom
+        Mycologist mycologist = null;
+        for (Object obj : Interpreter.objectNames.values()) {
+            if (obj instanceof Mycologist) {
+                Mycologist potentialMycologist = (Mycologist) obj;
+                if (potentialMycologist.getMushrooms().contains(mushroom)) {
+                    mycologist = potentialMycologist;
+                    break;
+                }
             }
         }
     
-        if (mushroom == null) {
-            System.out.println("Error: Invalid mushroom ID: " + mushroomId);
+        if (mycologist == null) {
+            System.out.println("Error: No Mycologist found for mushroom " + mushroomId);
             return;
         }
     
@@ -1004,7 +1003,6 @@ public class Interpreter {
         commands.put("cut", (x) -> {
             String insectId = null;
             String threadId = null;
-            String insectistId = null;
         
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
@@ -1014,35 +1012,38 @@ public class Interpreter {
                     case "-th":
                         threadId = x[i + 1];
                         break;
-                    case "-in":
-                        insectistId = x[i + 1];
-                        break;
                 }
             }
         
-            if (insectId != null && threadId != null && insectistId != null) {
+            if (insectId != null && threadId != null) {
                 Object insectObj = Interpreter.getObject(insectId);
                 Object threadObj = Interpreter.getObject(threadId);
-                Object insectistObj = Interpreter.getObject(insectistId);
         
-                if (insectObj instanceof Insect && threadObj instanceof Thread && insectistObj instanceof Insectist) {
+                if (insectObj instanceof Insect && threadObj instanceof Thread) {
                     Insect insect = (Insect) insectObj;
                     Thread thread = (Thread) threadObj;
-                    Insectist insectist = (Insectist) insectistObj;
         
-                    // Find the index of the insect in the Insectist's list
-                    int index = insectist.getInsects().indexOf(insect);
-                    if (index != -1) {
-                        insectist.cutThread(index, thread);
-                        System.out.println("Fonal elvágva: " + threadId + " rovar által: " + insectId);
-                    } else {
-                        System.out.println("Hiba: A rovar nem tartozik a megadott rovarászhoz.");
+                    // Keressük meg az Insectist-et, amelyhez a rovar tartozik
+                    for (Object obj : Interpreter.objectNames.values()) {
+                        if (obj instanceof Insectist) {
+                            Insectist insectist = (Insectist) obj;
+                            List<Insect> insects = insectist.getInsects();
+                            if (insects.contains(insect)) {
+                                // Fonal elvágása az Insectist cutThread() metódusával
+                                int index = insects.indexOf(insect);
+                                insectist.cutThread(index, thread);
+                                System.out.println("Fonal elvágva: " + threadId + " rovar által: " + insectId);
+                                return;
+                            }
+                        }
                     }
+        
+                    System.out.println("Hiba: A rovar nem tartozik egyetlen rovarászhoz sem.");
                 } else {
-                    System.out.println("Hiba: Nem található vagy hibás típus az adott rovar, fonal vagy rovarász azonosító.");
+                    System.out.println("Hiba: Hibás rovar vagy fonal azonosító.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó paraméter(ek) (-i, -th vagy -in).");
+                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-i vagy -th).");
             }
         });
 
@@ -1112,6 +1113,22 @@ public class Interpreter {
         prefixCounters.put(prefix, count);
         String name = prefix + count;
         objectNames.put(name + "_auto", obj);
+    }
+
+    public static void remove(Object obj) {
+        if (obj == null) {
+            return;
+        }
+        String nameToRemove = null;
+        for (Map.Entry<String, Object> entry : objectNames.entrySet()) {
+            if (entry.getValue() == obj) {
+                nameToRemove = entry.getKey();
+                break;
+            }
+        }
+        if (nameToRemove != null) {
+            objectNames.remove(nameToRemove);
+        }
     }
 
 

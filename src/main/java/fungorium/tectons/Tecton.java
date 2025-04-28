@@ -219,11 +219,9 @@ public class Tecton implements Tickable {
                         neighbor.removeThread(thread);
                     }
                 }
-    
-                if (this.mushroom != null) {
-                    this.mushroom.removeThread(thread);
-                    this.mushroom.threadCollector(this);
-                }
+                thread.getParent().removeThread(thread);
+                thread.getParent().threadCollector(this);
+                Interpreter.remove(thread);
             }
         }
     }

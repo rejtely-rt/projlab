@@ -18,7 +18,7 @@ public class Thread implements Tickable{
      */
     public Thread() {
         Interpreter.create(this); 
-        this.size = 0;
+        this.size = 1;
         this.isKept = false;
         this.cutOff = false;
     }
@@ -92,15 +92,18 @@ public class Thread implements Tickable{
         return size;
     } 
 
-    /**
-     * Changes the size of the thread by adding the given value.
-     * 
-     * @param i the value to add to the current size.
-     * @throws IllegalArgumentException if the resulting size would be negative.
-     */
-    public void changeSize(int i) {
-        size += i;
+/**
+ * Changes the size of the thread by adding the given value.
+ * Ensures that the size remains between 1 and 5.
+ * 
+ * @param i the value to add to the current size.
+ */
+public void changeSize(int i) {
+    size += i;
+    if (size > 5) {
+        size = 5; // Ensure the size does not exceed 5
     }
+}
 
     /**
      * Returns the list of insects associated with this thread.
@@ -140,6 +143,9 @@ public class Thread implements Tickable{
 
     @Override
     public void tick() {
+        if (this.isCutOff()) {
+            return;
+        }
         changeSize(1);
     }
 }

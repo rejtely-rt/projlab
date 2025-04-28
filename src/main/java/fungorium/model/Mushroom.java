@@ -262,6 +262,7 @@ public class Mushroom implements Tickable {
                 if (tecton.getThreads().contains(thread) && !thread.isKept()) {
                     toRemove.add(thread);
                     tecton.removeThread(thread);
+                    Interpreter.remove(thread);
                 }
             }
         }

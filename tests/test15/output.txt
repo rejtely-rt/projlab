@@ -8,9 +8,25 @@ Tecton t2: neighbor t3 added
 (mycologist1) Mycologist created successfully.
 Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
 Thread successfully grown from mushroom m1 to tecton t2
-Error: Failed to grow thread from mushroom m1 to tecton t3
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Thread successfully grown from mushroom m1 to tecton t3
 Fonalak listázása:
-th1_auto - Size: 0
-Hiba: Hiányzó paraméter(ek) (-i, -th vagy -in).
+th2_auto - Size: 1
+th1_auto - Size: 5
+Fonal elvágva: th1 rovar által: i3
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
 Fonalak listázása:
-th1_auto - Size: 0
+th2_auto - Size: 5
+Time passed for all applicable objects.
+Fonalak listázása:
+th2_auto - Size: 5
+Time passed for all applicable objects.
+Fonalak listázása:
+th2_auto - Size: 5

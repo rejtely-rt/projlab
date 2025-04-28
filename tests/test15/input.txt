@@ -7,11 +7,21 @@
 /altt -id T2 -addn T3
 /addpm -n mycologist1
 /addm -id m1 -t T1 -my mycologist1
-/growt -m m1 -tt T2 -my mycologist1
-/growt -m m1 -tt T3 -my mycologist1
+/growt -m m1 -tt T2
+/time
+/time
+/time
+/time
+/time
+/growt -m m1 -tt T3
 /lstth
-/cut -i3 th2
+/cut -i i3 -th th1
 /time
 /time
+/time
+/time
+/lstth
+/time
+/lstth
 /time
 /lstth
