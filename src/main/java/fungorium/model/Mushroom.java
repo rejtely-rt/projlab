@@ -280,6 +280,6 @@ public class Mushroom implements Tickable {
     @Override
     public void tick() {
         produceSpores();
-        evolve();
+        //evolve();
     }
 }
