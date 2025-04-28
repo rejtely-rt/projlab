@@ -98,9 +98,6 @@ public class Thread {
      * @throws IllegalArgumentException if the resulting size would be negative.
      */
     public void changeSize(int i) {
-        if (size + i < 0) {
-            throw new IllegalArgumentException("Resulting size cannot be negative.");
-        }
         size += i;
     }
 

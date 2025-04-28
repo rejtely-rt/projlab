@@ -23,7 +23,7 @@ import fungorium.spores.SpeedySpore;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
 import fungorium.tectons.NoMushTecton;
-import fungorium.tectons.OneThreadTecton;
+import fungorium.tectons.SingleThreadTecton;
 import fungorium.tectons.Tecton;
 import fungorium.tectons.ThreadAbsorberTecton;
 import fungorium.tectons.ThreadKeeperTecton;
@@ -231,8 +231,8 @@ public class Interpreter {
                     case "nomushtecton":
                         tecton = new NoMushTecton();
                         break;
-                    case "onethreadtecton":
-                        tecton = new OneThreadTecton();
+                    case "singlethreadtecton":
+                        tecton = new SingleThreadTecton();
                         break;
                     case "threadabsorbertecton":
                         tecton = new ThreadAbsorberTecton();

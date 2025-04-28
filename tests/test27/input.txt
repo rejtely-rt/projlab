@@ -1,0 +1,8 @@
+/addt -id T1 -t Tecton
+/addt -id T2 -t Tecton
+altt -id T1 -addn T2
+/addm -id m1 -t T2
+/growt -m m1 -t T1
+/addsp -m m1
+/shoot -m m1 -t T1
+/growm -id m2 -t T1

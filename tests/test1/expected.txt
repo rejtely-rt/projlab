@@ -1,7 +1,7 @@
 (t1) Tecton of type default created successfully.
 (t2) Tecton of type default created successfully.
-Tecton t1_auto: neighbor t2_auto added
+Tecton t1: neighbor t2 added
 (mycologist1) Mycologist created successfully.
-Mushroom created: m1 with level 1 on tecton t1_auto, added to mycologist: mycologist1
+Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
 Spore added to mushroom m1
-Spore shoot from m1 to t2_auto
+Spore shoot from m1 to t2

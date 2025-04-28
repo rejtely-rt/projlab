@@ -2,6 +2,8 @@ package fungorium.tectons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import fungorium.model.Thread;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
@@ -115,13 +117,13 @@ public class Tecton implements Tickable {
      */
     public boolean addThread(Thread thread) {
         threads.add(thread);
-        System.out.println("   -> 0 added to Tecton.");
+        //System.out.println("   -> 0 added to Tecton.");
         return true;
     }
 
     public void removeThread(Thread thread) {
         threads.remove(thread);
-        System.out.println("   -> 0 removed from Tecton.");
+        //System.out.println("   -> 0 removed from Tecton.");
     }
 
     /**

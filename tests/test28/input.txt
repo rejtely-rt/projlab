@@ -1,0 +1,10 @@
+/addt -id T1 -t Tecton
+/addt -id T2 -t Tecton
+altt -id T1 -addn T2
+/addm -id m1 -t T2
+/addi -id i1 -t T1
+/addsp -tp ParalyzeSpore -t T1
+/consume -i i1
+/growt -m m1 -t T1
+/tconsume -i -i1 -th th1
+/growmt -t T1 -th th1
