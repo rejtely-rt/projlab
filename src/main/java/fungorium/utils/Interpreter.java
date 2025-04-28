@@ -29,6 +29,7 @@ import fungorium.tectons.ThreadAbsorberTecton;
 import fungorium.tectons.ThreadKeeperTecton;
 import fungorium.model.Mycologist;
 import fungorium.model.Insectist;
+import fungorium.utils.HLogPrintStream;
 
 @FunctionalInterface
 interface Command {
@@ -646,12 +647,7 @@ public class Interpreter {
                 return;
             }
         
-            try {
-                // TODO: Implement the logic to save the log to a file.
-                System.out.println("Log fájlba mentve: " + name);
-            } catch (Exception e) {
-                System.out.println("Hiba a log mentésekor: " + e.getMessage());
-            }
+            HLogPrintStream.saveLog(name);
         });
 
         commands.put("lstm", (x) -> {
