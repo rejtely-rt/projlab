@@ -18,10 +18,7 @@ Listing threads:
 th2_auto - Size: 1, isKept: true, isCutOff: false
 th1_auto - Size: 5, isKept: false, isCutOff: true
 Time passed for all applicable objects.
-Listing threads:
-th2_auto - Size: 2, isKept: true, isCutOff: false
-th1_auto - Size: 3, isKept: false, isCutOff: true
+Time passed for all applicable objects.
 Time passed for all applicable objects.
 Listing threads:
-th2_auto - Size: 3, isKept: true, isCutOff: false
-th1_auto - Size: 1, isKept: false, isCutOff: true
+th2_auto - Size: 4, isKept: true, isCutOff: false

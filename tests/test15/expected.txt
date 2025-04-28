@@ -1,31 +1,23 @@
 (t1) Tecton of type default created successfully.
 (t2) Tecton of type default created successfully.
 (t3) Tecton of type default created successfully.
-(insectist1) Insectist created successfully.
-Insect created: i3 on tecton t3, added to insectist: insectist1
 Tecton t1: neighbor t2 added
 Tecton t2: neighbor t3 added
+(insectist1) Insectist created successfully.
+Insect created: i3 on tecton t3, added to insectist: insectist1
 (mycologist1) Mycologist created successfully.
-Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
+Mushroom created: m1 with level 2 on tecton t1, added to mycologist: mycologist1
 Thread successfully grown from mushroom m1 to tecton t2
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
 Time passed for all applicable objects.
-Time passed for all applicable objects.
-Error: Failed to grow thread from mushroom m1 to tecton t3
-Fonalak listázása:
-th1_auto - Size: -5
-Hiba: Hiányzó paraméter(ek) (-i, -th vagy -in).
-Time passed for all applicable objects.
-Time passed for all applicable objects.
+Thread successfully grown from mushroom m1 to tecton t3
+Thread cut: th1 by insect: i1
+Listing threads:
+th2_auto - Size: 1, isKept: false, isCutOff: false
+th1_auto - Size: 5, isKept: false, isCutOff: true
 Time passed for all applicable objects.
 Time passed for all applicable objects.
-Fonalak listázása:
-th1_auto - Size: -9
 Time passed for all applicable objects.
-Fonalak listázása:
-th1_auto - Size: -10
-Time passed for all applicable objects.
-Fonalak listázása:
-th1_auto - Size: -11
+Listing threads:

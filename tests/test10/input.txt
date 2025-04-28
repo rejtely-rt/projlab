@@ -16,6 +16,6 @@
 /cut -i i1 -th th1
 /lstth
 /time
-/lstth
+/time
 /time
 /lstth
