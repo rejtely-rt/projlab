@@ -2,7 +2,8 @@
 /addt -id T2 -t Tecton
 /addt -id T3 -t Tecton
 /altt -id t1_auto -addn T2
+/altt -id t2_auto -addn T3
 /addpm -n mycologist1
-/addm -id m1 -lvl 2 -t T1
+/addm -id m1 -lvl 2 -t T1 -my mycologist1
 /addsp -m m1 -tp SpeedySpore
 /shoot -m m1 -t T3

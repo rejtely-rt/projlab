@@ -76,16 +76,52 @@ public class Mushroom {
     }
     
     
-     /**
+    /**
      * Shoots spores at a given Tecton.
      * If successful, removes the shot spores from the internal list.
      * 
      * @param to The target Tecton.
+     * @return {@code true} if the spores were successfully shot; {@code false} otherwise.
      */
-    public void shootSpores(Tecton to) {
-        boolean successfullShoot = to.addSpores(spores, this);
-        if (successfullShoot) {
+    public boolean shootSpores(Tecton to) {
+        // Check if the mushroom has spores to shoot
+        if (spores.isEmpty()) {
+            return false;
+        }
+
+        // Check if the spores were successfully added to the target Tecton
+        boolean successfulShoot = false;
+
+        // Get the level of the mushroom
+        int mushroomLevel = this.getLevel();
+
+        if (mushroomLevel == 1) {
+            // Level 1: Check direct neighbors
+            for (Tecton neighbor : to.getNeighbors()) {
+                if (this.equals(neighbor.getMushroom())) {
+                    successfulShoot = to.addSpores(spores, this);
+                    break;
+                }
+            }
+        } else if (mushroomLevel == 2) {
+            // Level 2: Check neighbors of neighbors
+            for (Tecton neighbor : to.getNeighbors()) {
+                for (Tecton neighborOfNeighbor : neighbor.getNeighbors()) {
+                    if (this.equals(neighborOfNeighbor.getMushroom())) {
+                        successfulShoot = to.addSpores(spores, this);
+                        break;
+                    }
+                }
+                if (successfulShoot) break;
+            }
+        }
+
+        // If the spore shooting was successful, clear the spores from the internal list
+        if (successfulShoot) {
             spores.clear();
+            return true;
+        } else {
+            return false;
         }
     }
 
