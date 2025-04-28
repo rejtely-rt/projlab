@@ -5,12 +5,18 @@
 /altt -id T2 -addn T3
 /addpm -n mycologist1
 /addpi -n insectist1
-/addm -id m1 -lvl 2 -t T1
-/addi -id i1 -t T1
+/addm -id m1 -lvl 2 -t T1 -my mycologist1
+/addi -id i1 -t T1 -in insectist1
 /growt -m m1 -tt T2
-/growt -m m1 -t T2 -tt T3
 /time
 /time
 /time
+/time
+/growt -m m1 -tt T3
 /move -i i1 -t T2
-/cut -i i1 -t th2
+/lstth
+/cut -i i1 -th th1_auto
+/time
+/time
+/time
+/lstth

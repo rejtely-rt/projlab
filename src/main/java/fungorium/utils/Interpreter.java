@@ -2,7 +2,17 @@ package fungorium.utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
+//loadhoz kellenek
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import fungorium.model.Insect;
 import fungorium.model.Thread;
@@ -14,10 +24,13 @@ import fungorium.spores.SpeedySpore;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
 import fungorium.tectons.NoMushTecton;
-import fungorium.tectons.OneThreadTecton;
+import fungorium.tectons.SingleThreadTecton;
 import fungorium.tectons.Tecton;
 import fungorium.tectons.ThreadAbsorberTecton;
 import fungorium.tectons.ThreadKeeperTecton;
+import fungorium.model.Mycologist;
+import fungorium.model.Insectist;
+import fungorium.utils.HLogPrintStream;
 
 @FunctionalInterface
 interface Command {
@@ -37,6 +50,8 @@ public class Interpreter {
     private static final Map<String, Integer> prefixCounters = new HashMap<>();
     // Map to store already computed unique prefixes for classes.
     private static final Map<Class<?>, String> computedPrefixes = new HashMap<>();
+
+    private static HLogPrintStream hlps = new HLogPrintStream();
     
     static {
         // ez csak minta
@@ -53,6 +68,30 @@ public class Interpreter {
             System.out.println("e | exit | q | quit -- to exit");
         });
 
+        commands.put("time", (x) -> {
+            String o = null;
+            for (int i = 0; i < x.length - 1; i++) {
+                if (x[i].equals("-o")) {
+                    o = x[i + 1];
+                }
+            }
+            if (o != null) {
+                if (objectNames.keySet().contains(o) && objectNames.get(o) instanceof Tickable){
+                    Tickable toTick = (Tickable)objectNames.get(o);
+                    toTick.tick();
+                    System.out.println("Time passed for all applicable objects.");
+                } else {
+                    System.out.println("Object with name -o [OBJECT] == " + o + "not found");
+                }
+            } else{
+                List<Tickable> uniqueTickables = objectNames.values().stream().filter(v -> v instanceof Tickable).map(v -> (Tickable) v).distinct().collect(Collectors.toList());
+                TimeManager tm = new TimeManager(uniqueTickables);
+                tm.tickAll();
+                System.out.println("Time passed for all applicable objects.");
+
+            }
+        });
+
         commands.put("addpm", (x) -> {
             String name = null;
             for (int i = 0; i < x.length - 1; i++) {
@@ -61,12 +100,11 @@ public class Interpreter {
                 }
             }
             if (name != null) {
-                // TODO: Mycologist osztály meg nincsen
-                //Mycologist mycologist = new Mycologist(name);
-                //Interpreter.create(mycologist);
-                System.out.println("Gombász létrehozva: " + name);
+                Mycologist mycologist = new Mycologist();
+                Interpreter.objectNames.put(name, mycologist);
+                System.out.println("(" + name + ") Mycologist created successfully.");
             } else {
-                System.out.println("Hiba: Hiányzó -n [NAME] paraméter.");
+                System.out.println("Error: Missing -n [NAME] parameter.");
             }
         });
 
@@ -78,20 +116,20 @@ public class Interpreter {
                 }
             }
             if (name != null) {
-                // TODO: Instectist osztály meg nincsen
-                //Instectist insectist = new Instectist(name);
-                //Interpreter.create(insectist);
-                System.out.println("Rovarász létrehozva: " + name);
+                Insectist insectist = new Insectist();
+                Interpreter.objectNames.put(name, insectist);
+                System.out.println("(" + name + ") Insectist created successfully.");
             } else {
-                System.out.println("Hiba: Hiányzó -n [NAME] paraméter.");
+                System.out.println("Error: Missing -n [NAME] parameter.");
             }
         });
 
         commands.put("addm", (x) -> {
             String id = null;
             String tectonName = null;
-            int level = 1; // alapértelmezett szint
-
+            String mycologistName = null;
+            int level = 1; // default level
+        
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
@@ -101,38 +139,53 @@ public class Interpreter {
                         try {
                             level = Integer.parseInt(x[i + 1]);
                             if (level < 1 || level > 2) {
-                                System.out.println("Hiba: A szintnek 1-2 között kell lennie.");
+                                System.out.println("Error: Level must be between 1 and 2.");
                                 return;
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Hiba: A megadott szint nem szám.");
+                            System.out.println("Error: The specified level is not a number.");
+                            return;
                         }
                         break;
                     case "-t":
                         tectonName = x[i + 1];
                         break;
+                    case "-my":
+                        mycologistName = x[i + 1];
+                        break;
                 }
             }
-
-            if (id != null && tectonName != null) {
+        
+            if (id != null && tectonName != null && mycologistName != null) {
                 Object tectonObj = Interpreter.getObject(tectonName);
-                if (tectonObj instanceof Tecton) {
+                Object mycologistObj = Interpreter.getObject(mycologistName);
+        
+                if (tectonObj instanceof Tecton && mycologistObj instanceof Mycologist) {
+                    Tecton tecton = (Tecton) tectonObj;
+                    Mycologist mycologist = (Mycologist) mycologistObj;
+        
                     Mushroom mushroom = new Mushroom(level);
-                    ((Tecton)tectonObj).addMushroom(mushroom);
-                    Interpreter.create(mushroom);
-                    System.out.println("Gomba létrehozva: " + id + ", szint: " + level);
+                    boolean success = tecton.addMushroom(mushroom);
+                    if (success) {
+                        mycologist.addMushroom(mushroom); // Add to the mycologist's list
+                        Interpreter.objectNames.put(id, mushroom); // Save the identifier
+                        System.out.println("Mushroom created: " + id + " with level " + level + " on tecton " + tectonName + ", added to mycologist: " + mycologistName);
+                    } else {
+                        System.out.println("Error: Failed to add mushroom to tecton.");
+                    }
                 } else {
-                    System.out.println("Hiba: Nem található a megadott tekton, vagy nem tekton típus.");
+                    System.out.println("Error: Invalid tecton or mycologist identifier.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id vagy -t.");
+                System.out.println("Error: Missing required parameter(s) (-id, -t, or -my).");
             }
         });
 
         commands.put("addi", (x) -> {
             String id = null;
             String tectonName = null;
-
+            String insectistName = null;
+        
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
@@ -141,21 +194,31 @@ public class Interpreter {
                     case "-t":
                         tectonName = x[i + 1];
                         break;
+                    case "-in":
+                        insectistName = x[i + 1];
+                        break;
                 }
             }
-
-            if (id != null && tectonName != null) {
+        
+            if (id != null && tectonName != null && insectistName != null) {
                 Object tectonObj = Interpreter.getObject(tectonName);
-                if (tectonObj instanceof Tecton) {
+                Object insectistObj = Interpreter.getObject(insectistName);
+        
+                if (tectonObj instanceof Tecton && insectistObj instanceof Insectist) {
+                    Tecton tecton = (Tecton) tectonObj;
+                    Insectist insectist = (Insectist) insectistObj;
+        
                     Insect insect = new Insect();
-                    insect.setLocation((Tecton) tectonObj);
-                    Interpreter.create(insect);
-                    System.out.println("Rovar létrehozva: " + id);
+                    insect.setLocation(tecton);
+                    insectist.addInsect(insect);
+        
+                    Interpreter.objectNames.put(id, insect); // Azonosító mentése
+                    System.out.println("Insect created: "+id+" on tecton " + tectonName + ", added to insectist: " + insectistName);
                 } else {
-                    System.out.println("Hiba: Nem található a megadott tekton, vagy nem tekton típus.");
+                    System.out.println("Error: Invalid tecton or insectist identifier.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id vagy -t.");
+                System.out.println("Error: Missing required parameter(s) -id, -t or -in.");
             }
         });
 
@@ -177,30 +240,34 @@ public class Interpreter {
             if (id != null && type != null) {
                 Tecton tecton = null;
                 switch (type) {
-                    case "Tecton":
+                    case "tecton":
                         tecton = new Tecton();
+                        objectNames.put(id, tecton);
                         break;
-                    case "NoMushTecton":
+                    case "nomushtecton":
                         tecton = new NoMushTecton();
+                        objectNames.put(id, tecton);
                         break;
-                    case "OneThreadTecton":
-                        tecton = new OneThreadTecton();
+                    case "singlethreadtecton":
+                        tecton = new SingleThreadTecton();
+                        objectNames.put(id, tecton);
                         break;
-                    case "ThreadAbsorberTecton":
+                    case "threadabsorbertecton":
                         tecton = new ThreadAbsorberTecton();
+                        objectNames.put(id, tecton);
                         break;
-                    case "ThreadKeeperTecton":
+                    case "threadkeepertecton":
                         tecton = new ThreadKeeperTecton();
+                        objectNames.put(id, tecton);
                         break;
                     default:
-                        System.out.println("Hiba: Ismeretlen tekton típus.");
+                        System.out.println("Error: Unknown tecton type.");
                         return;
                 }
 
-                Interpreter.create(tecton);
-                System.out.println("Tekton létrehozva: " + id + " típussal: " + type);
+                System.out.println("("+id+") Tecton of type default created successfully.");
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id vagy -t.");
+                System.out.println("Error: Missing required parameter(s) -id or -t.");
             }
         });
 
@@ -228,14 +295,12 @@ public class Interpreter {
                 Object t2Obj = Interpreter.getObject(t2Name);
 
                 if (t1Obj instanceof Tecton && t2Obj instanceof Tecton) {
-                    Thread thread = new Thread();
-                    Interpreter.create(thread);
-                    System.out.println("Fonal létrehozva: " + id + " a tektonok között: " + t1Name + " és " + t2Name);
+                    System.out.println("Thread grown: " + id + " from " + t1Name + " to " + t2Name);
                 } else {
-                    System.out.println("Hiba: Az egyik vagy mindkét tekton nem létezik, vagy nem megfelelő típusú.");
+                    System.out.println("Error: One or both tectons do not exist or are of invalid type.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id, -t1 vagy -t2.");
+                System.out.println("Error: Missing required parameter(s) -id, -t1 or -t2.");
             }
         });
 
@@ -259,34 +324,33 @@ public class Interpreter {
                 if (mushroomObj instanceof Mushroom) {
                     Spore spore = null;
                     switch (sporeType) {
-                        case "SpeedySpore":
+                        case "speedyspore":
                             spore = new SpeedySpore();
                             break;
-                        case "SlowySpore":
+                        case "slowyspore":
                             spore = new SlowlySpore();
                             break;
-                        case "ParalyzeSpore":
+                        case "paralyzespore":
                             spore = new ParalyzeSpore();
                             break;
-                        case "CannotCutSpore":
+                        case "cannotcutspore":
                             spore = new CannotCutSpore();
                             break;
-                        case "CloneSpore":
+                        case "clonespore":
                             spore = new CloneSpore();
                             break;
                         default:
-                            System.out.println("Hiba: Ismeretlen spóra típus: " + sporeType);
+                            System.out.println("Error: Unknown spore type: " + sporeType);
                             return;
                     }
 
                     ((Mushroom) mushroomObj).addSpore(spore);
-                    Interpreter.create(spore);
-                    System.out.println("Spóra hozzáadva a gombához: " + mushroomName + ", típus: " + sporeType);
+                    System.out.println("Spore added to mushroom " + mushroomName);
                 } else {
-                    System.out.println("Hiba: A megadott azonosító nem egy gomba.");
+                    System.out.println("Error: The given identifier is not a mushroom.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -m vagy -tp.");
+                System.out.println("Error: Missing required parameter(s) -m or -tp.");
             }
         });
 
@@ -303,9 +367,9 @@ public class Interpreter {
                 Object playerObj = Interpreter.getObject(playerName);
                 // TODO: Mycologist osztály meg nincsen
                 // Egy gombász pontszámainak lekérdezése a játékban
-                System.out.println("TODO: Egy gombász pontszámainak lekérdezése a játékban");
+                System.out.println("TODO: Querying the score of a mycologist in the game.");
             } else {
-                System.out.println("Hiba: Hiányzó -n paraméter.");
+                System.out.println("Error: Missing -n parameter.");
             }
         });
 
@@ -322,16 +386,16 @@ public class Interpreter {
                 Object playerObj = Interpreter.getObject(playerName);
                 // TODO: Instectist osztály meg nincsen
                 //  Egy gombász pontszámainak lekérdezése a játékban. Ez a gombászhoz tartozó összes gomba számát jelenti.
-                System.out.println("TODO:  Egy gombász pontszámainak lekérdezése a játékban. Ez a gombászhoz tartozó összes gomba számát jelenti.\n");
+                System.out.println("TODO: Querying the score of an insectist in the game.");
             } else {
-                System.out.println("Hiba: Hiányzó -n paraméter.");
+                System.out.println("Error: Missing -n parameter.");
             }
         });
 
         commands.put("win", (x) -> { 
             // TODO: Mycologist , Instectist class not implemented
             // A parancs hatására véget ér a játék és mindkét fajta játékosnál a legtöbb pontot szerzett lesz a nyertes. Kiírja minden játékoshoz tartozó pontszámot. 
-            System.out.println("TODO: A parancs hatására véget ér a játék és mindkét fajta játékosnál a legtöbb pontot szerzett lesz a nyertes. Kiírja minden játékoshoz tartozó pontszámot.");
+            System.out.println("TODO: The game ends and the player with the highest score wins.");
         });
 
         commands.put("altm", (x) -> {
@@ -347,11 +411,11 @@ public class Interpreter {
                         try {
                             level = Integer.parseInt(x[i + 1]);
                             if (level < 1 || level > 2) {
-                                System.out.println("Hiba: A szintnek 1-2 között kell lennie.");
+                                System.out.println("Error: Level must be between 1 and 2.");
                                 return;
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Hiba: A megadott szint nem szám.");
+                            System.out.println("Error: The specified level is not a number.");
                             return;
                         }
                         break;
@@ -359,7 +423,7 @@ public class Interpreter {
             }
         
             if (id == null || level == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter(ek) (-id vagy -lvl).");
+                System.out.println("Error: Missing required parameter(s) (-id or -lvl).");
                 return;
             }
         
@@ -369,14 +433,14 @@ public class Interpreter {
                 if (level == 2 && mushroom.getLevel() == 1) {
                     mushroom.evolve();
                 } else if (level == 1 && mushroom.getLevel() == 2) {
-                    System.out.println("Hiba: A gomba már 2-es szinten van.");
+                    System.out.println("Error: The mushroom is already at level 2.");
                     return;
                 } else {
                     return;
                 }
-                System.out.println("Gomba módosítva: " + id + ", új szint: " + level);
+                System.out.println("Mushroom modified: " + id + ", new level: " + level);
             } else {
-                System.out.println("Hiba: Nem található gomba azonosítóval: " + id);
+                System.out.println("Error: No mushroom found with identifier: " + id);
             }
         });
 
@@ -392,18 +456,17 @@ public class Interpreter {
             }
         
             if (id == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter -id.");
+                System.out.println("Error: Missing required parameter -id.");
                 return;
             }
         
             Object obj = Interpreter.getObject(id);
             if (obj instanceof Insect) {
                 Insect insect = (Insect) obj;
-                // TODO: Nincs mit modositani documentacio szerint, cxsak valami state-et ami nem letezik.
-                // igy ertelme se lenne ennek a commandnak
+                // TODO: No state to modify according to documentation
                 return;
             } else {
-                System.out.println("Hiba: Nem található rovar azonosítóval: " + id);
+                System.out.println("Error: No insect found with identifier: " + id);
             }
         });
 
@@ -411,7 +474,7 @@ public class Interpreter {
             String id = null;
             String addNeighbor = null;
             String removeNeighbor = null;
-        
+
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
@@ -425,68 +488,50 @@ public class Interpreter {
                         break;
                 }
             }
-        
+
             if (id == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter: -id");
+                System.out.println("Error: Missing required parameter: -id");
                 return;
             }
-        
+
             Object tectonObj = Interpreter.getObject(id);
             if (!(tectonObj instanceof Tecton)) {
-                System.out.println("Hiba: Nem található tekton azonosítóval: " + id);
+                System.out.println("Error: No tecton found with identifier: " + id);
                 return;
             }
-        
+
             Tecton tecton = (Tecton) tectonObj;
-        
+
             if (addNeighbor != null) {
                 Object neighborObj = Interpreter.getObject(addNeighbor);
                 if (neighborObj instanceof Tecton) {
-                    tecton.addNeighbour((Tecton) neighborObj);
-                    System.out.println("Hozzáadva szomszéd: " + addNeighbor + " a tektonhoz: " + id);
+                    Tecton neighbor = (Tecton) neighborObj;
+                    tecton.addNeighbour(neighbor);
+                    neighbor.addNeighbour(tecton); // Ensure mutual addition
+                    System.out.println("Tecton " + id + ": neighbor " + addNeighbor + " added");
                 } else {
-                    System.out.println("Hiba: Nem található szomszéd tekton azonosítóval: " + addNeighbor);
+                    System.out.println("Error: No neighbor tecton found with identifier: " + addNeighbor);
                 }
             }
-        
+
             if (removeNeighbor != null) {
                 Object neighborObj = Interpreter.getObject(removeNeighbor);
                 if (neighborObj instanceof Tecton) {
-                    tecton.removeNeighbour((Tecton) neighborObj);
-                    System.out.println("Eltávolítva szomszéd: " + removeNeighbor + " a tektonból: " + id);
+                    Tecton neighbor = (Tecton) neighborObj;
+                    tecton.removeNeighbour(neighbor);
+                    neighbor.removeNeighbour(tecton); // Ensure mutual removal
+                    System.out.println("Neighbor removed: " + removeNeighbor + " from tecton: " + id);
                 } else {
-                    System.out.println("Hiba: Nem található szomszéd tekton azonosítóval: " + removeNeighbor);
+                    System.out.println("Error: No neighbor tecton found with identifier: " + removeNeighbor);
                 }
             }
-        
+
             if (addNeighbor == null && removeNeighbor == null) {
-                System.out.println("Figyelem: Nem történt változtatás, mert nem adtál meg -addn vagy -remn paramétert.");
+                System.out.println("Warning: No changes made, as no -addn or -remn parameter was provided.");
             }
         });
 
-        commands.put("save", (x) -> {
-            String name = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                if ("-n".equals(x[i])) {
-                    name = x[i + 1];
-                }
-            }
-        
-            if (name == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter: -n");
-                return;
-            }
-        
-            try {
-                // TODO: Implement the saving logic here.
-                System.out.println("Játék sikeresen elmentve: " + name);
-            } catch (Exception e) {
-                System.out.println("Hiba a mentés során: " + e.getMessage());
-            }
-        });
-
-        commands.put("load", (x) -> {
+        commands.put("exec", (x) -> {
             String name = null;
             for (int i = 0; i < x.length - 1; i++) {
                 if ("-n".equals(x[i])) {
@@ -494,43 +539,96 @@ public class Interpreter {
                     break;
                 }
             }
-        
+
             if (name == null) {
-                System.out.println("Hiba: hiányzik a fájlnév (-n).");
+                System.out.println("Error: Missing filename (-n).");
                 return;
             }
-        
+
             try {
-                // TODO: Implement the loading logic here.
-                System.out.println("Állapot betöltve: " + name);
+                reset();
+                String filepath = "tests/" + name + "/input.txt";
+                BufferedReader reader = new BufferedReader(new FileReader(filepath));
+                String line;
+                HLogPrintStream.resetLog();
+                while ((line = reader.readLine()) != null) {
+                    processCommand(line); // <- EZ MEGY
+                }
+                HLogPrintStream.saveLog("tests/" + name + "/output.txt");
+                String outputPath   = System.getProperty("user.dir") + File.separator + "tests" + File.separator + name + File.separator + "output.txt";
+                String expectedPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator + name + File.separator + "expected.txt";
+
+                ProcessBuilder pb = new ProcessBuilder("fc", outputPath, expectedPath);
+                pb.redirectErrorStream(true);
+
+                Process p = pb.start();
+
+                // read the tool's output
+                try (BufferedReader procOut = new BufferedReader(
+                        new InputStreamReader(p.getInputStream()))) {
+                    while ((line = procOut.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
+
+                // wait for it to finish and check exit code
+                int exitCode = p.waitFor();
+                if (exitCode == 0) {
+                    System.out.println("output.txt matches expected.txt");
+                } else {
+                    System.out.println("output.txt differs from expected.txt  (exit code " + exitCode + ")");
+                }
+                reader.close();
             } catch (Exception e) {
-                System.out.println("Hiba a betöltés közben: " + e.getMessage());
+                System.out.println("Error during loading: " + e.getMessage());
             }
         });
 
-        commands.put("exec", (x) -> {
-            String path = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                if ("-p".equals(x[i])) {
-                    path = x[i + 1];
+        commands.put("execall", (x) -> {
+            for (int i = 1; i <= 30; i++) {
+                String testName = "test" + i;
+                System.out.println("Executing: " + testName);
+                try {
+                    reset(); // Reset state before each test
+                    String filepath = "tests/" + testName + "/input.txt";
+                    BufferedReader reader = new BufferedReader(new FileReader(filepath));
+                    String line;
+                    HLogPrintStream.resetLog();
+                    while ((line = reader.readLine()) != null) {
+                        processCommand(line); // Process each command in the test file
+                    }
+                    HLogPrintStream.saveLog("tests/" + testName + "/output.txt");
+                    String outputPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator
+                            + testName + File.separator + "output.txt";
+                    String expectedPath = System.getProperty("user.dir") + File.separator + "tests" + File.separator
+                            + testName + File.separator + "expected.txt";
+
+                    ProcessBuilder pb = new ProcessBuilder("fc", outputPath, expectedPath);
+                    pb.redirectErrorStream(true);
+
+                    Process p = pb.start();
+
+                    // read the tool's output
+                    try (BufferedReader procOut = new BufferedReader(
+                            new InputStreamReader(p.getInputStream()))) {
+                        while ((line = procOut.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    }
+
+                    // wait for it to finish and check exit code
+                    int exitCode = p.waitFor();
+                    if (exitCode == 0) {
+                        System.out.println("output.txt matches expected.txt");
+                    } else {
+                        System.out.println("output.txt differs from expected.txt  (exit code " + exitCode + ")");
+                    }
+                    reader.close();
+                    System.out.println("Test " + testName + " executed successfully.\n\n");
+                } catch (Exception e) {
+                    System.out.println("Error executing " + testName + ": " + e.getMessage());
                 }
             }
-        
-            if (path == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter: -p");
-                return;
-            }
-        
-            try {
-                // TODO: Implement the script execution logic here.
-                System.out.println("Script sikeresen lefutott: " + path);
-            } catch (Exception e) {
-                System.out.println("Hiba a script futtatása közben: " + e.getMessage());
-            }
-        });
-        commands.put("execall", (x) -> {
-            // TODO: Implement the logic to execute all scripts in the directory.
         });
 
         commands.put("hlog", (x) -> {
@@ -542,54 +640,81 @@ public class Interpreter {
                 }
             }
             if (name == null) {
-                System.out.println("Hiba: hiányzó kötelező paraméter: -n");
+                System.out.println("Error: Missing required parameter: -n");
                 return;
             }
         
-            try {
-                // TODO: Implement the logic to save the log to a file.
-                System.out.println("Log fájlba mentve: " + name);
-            } catch (Exception e) {
-                System.out.println("Hiba a log mentésekor: " + e.getMessage());
-            }
+            HLogPrintStream.saveLog(name);
         });
 
         commands.put("lstm", (x) -> {
-            System.out.println("Gombák listázása:");
+            removeAutoDuplicates(objectNames);
+            System.out.println("Listing mushrooms:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Mushroom) {
                     Mushroom mushroom = (Mushroom) entry.getValue();
-                    System.out.println(entry.getKey() + " - Szint: " + mushroom.getLevel());
+                    System.out.println(entry.getKey() + " - Level: " + mushroom.getLevel());
+                }
+            }
+        });
+
+        commands.put("lsts", (x) -> {
+            removeAutoDuplicates(objectNames);
+            System.out.println("Listing spores and their associated tectons:");
+            for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
+                if (entry.getValue() instanceof Tecton) {
+                    Tecton tecton = (Tecton) entry.getValue();
+                    List<Spore> spores = tecton.getSpores(); // Assuming Tecton class has a getSpores() method
+                    if (!spores.isEmpty()) {
+                        System.out.println("Tecton: " + entry.getKey());
+                        for (Spore spore : spores) {
+                            System.out.println("  - Spore: " + spore.getClass().getSimpleName());
+                        }
+                    }
                 }
             }
         });
 
         commands.put("lsti", (x) -> {
-            System.out.println("Rovarok listázása:");
+            removeAutoDuplicates(objectNames);
+            System.out.println("List insects:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Insect) {
                     Insect insect = (Insect) entry.getValue();
-                    System.out.println(entry.getKey());
+                    System.out.println("ID: " + entry.getKey());
+                    System.out.println("  Speed: " + insect.getSpeed());
+                    System.out.println("  Cut: " + insect.getCut());
+                    System.out.println("  Spores:");
+                    List<Spore> spores = insect.getSpores(); // Assuming Insect class has getSpores() method
+                    if (spores.isEmpty()) {
+                        System.out.println("    None");
+                    } else {
+                        for (Spore spore : spores) {
+                            System.out.println("    - " + spore.getClass().getSimpleName());
+                        }
+                    }
                 }
             }
         });
 
         commands.put("lstth", (x) -> {
-            System.out.println("Fonalak listázása:");
+            removeAutoDuplicates(objectNames);
+            System.out.println("Listing threads:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Thread) {
                     Thread thread = (Thread) entry.getValue();
-                    System.out.println(entry.getKey() + " - Size: " + thread.getSize());
+                    System.out.println(entry.getKey() + " - Size: " + thread.getSize() + ", isKept: " + thread.isKept() + ", isCutOff: " + thread.isCutOff());
                 }
             }
         });
 
         commands.put("lstt", (x) -> {
-            System.out.println("Tektonok listázása:");
+            removeAutoDuplicates(objectNames);
+            System.out.println("Listing tectons:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Tecton) {
                     Tecton tecton = (Tecton) entry.getValue();
-                    System.out.println(entry.getKey() + " - Szomszédok száma: " + tecton.getNeighbors().size());
+                    System.out.println(entry.getKey() + " - Number of neighbors: " + tecton.getNeighbors().size());
                 }
             }
         });
@@ -604,78 +729,257 @@ public class Interpreter {
             }
         
             if (id == null) {
-                System.out.println("Hiba: meg kell adni egy rovart az -id kapcsolóval.");
+                System.out.println("Error: An insect must be specified with the -id switch.");
                 return;
             }
         
             Object insectObj = Interpreter.getObject(id);
             if (insectObj instanceof Insect) {
                 Insect original = (Insect) insectObj;
-                //Insect clone = original.cloneInsect(); 
-                //Interpreter.create(clone);
-                System.out.println("Rovar klónozva: " + id);
+                Insect clone = original.clone();
+                System.out.println("Insect cloned: " + id);
             } else {
-                System.out.println("Hiba: Nem található ilyen rovar.");
+                System.out.println("Error: No such insect found.");
             }
         });
 
-        commands.put("time", (x) -> {
+    commands.put("move", (x) -> {
+    String insectId = null;
+    String tectonId = null;
+
+    for (int i = 0; i < x.length - 1; i++) {
+        switch (x[i]) {
+            case "-i":
+                insectId = x[i + 1];
+                break;
+            case "-t":
+                tectonId = x[i + 1];
+                break;
+        }
+    }
+
+    if (insectId != null && tectonId != null) {
+        Object insectObj = Interpreter.getObject(insectId);
+        Object tectonObj = Interpreter.getObject(tectonId);
+
+        if (insectObj instanceof Insect && tectonObj instanceof Tecton) {
+            Insect insect = (Insect) insectObj;
+            Tecton tecton = (Tecton) tectonObj;
+
+            // Keressük meg az Insectist-et, amelyhez a rovar tartozik
+            for (Object obj : Interpreter.objectNames.values()) {
+                if (obj instanceof Insectist) {
+                    Insectist insectist = (Insectist) obj;
+                    List<Insect> insects = insectist.getInsects();
+                    if (insects.contains(insect)) {
+                        // Mozgatás az Insectist moveInsect() metódusával
+                        int index = insects.indexOf(insect);
+                        insectist.moveInsect(index, tecton);
+                        System.out.println("Insect moved: " + insectId + " -> " + tectonId);
+                        return;
+                    }
+                }
+            }
+            System.out.println("Error: The insect does not belong to any insectist.");
+        } else {
+            System.out.println("Error: Invalid insect or tecton ID.");
+        }
+        } else {
+            System.out.println("Error: Missing required parameter(s) (-i or -t).");
+        }
+    });
+
+    commands.put("growm", (x) -> {
+        String tectonId = null;
+        String mycologistId = null;
+    
+        for (int i = 0; i < x.length - 1; i++) {
+            switch (x[i]) {
+                case "-t":
+                    tectonId = x[i + 1];
+                    break;
+                case "-my":
+                    mycologistId = x[i + 1];
+                    break;
+            }
+        }
+    
+        if (tectonId != null && mycologistId != null) {
+            Object tectonObj = Interpreter.getObject(tectonId);
+            Object mycologistObj = Interpreter.getObject(mycologistId);
+    
+            if (tectonObj instanceof Tecton && mycologistObj instanceof Mycologist) {
+                Tecton tecton = (Tecton) tectonObj;
+                Mycologist mycologist = (Mycologist) mycologistObj;
+    
+                boolean success = mycologist.addMushroom(tecton); // Grow mushroom by the Mycologist
+                if (success) {
+                    System.out.println("Mushroom grown on tecton " + tectonId + " by mycologist " + mycologistId);
+                } else {
+                    System.out.println("Error: Failed to grow mushroom on tecton " + tectonId);
+                }
+            } else {
+                System.out.println("Error: Invalid tecton or mycologist ID.");
+            }
+        } else {
+            System.out.println("Error: Missing required parameter(s) (-t or -my).");
+        }
+    });
+
+    commands.put("growt", (x) -> {
+        String mushroomId = null;
+        String targetTectonId = null;
+    
+        // Parse command arguments
+        for (int i = 0; i < x.length - 1; i++) {
+            switch (x[i]) {
+                case "-m":
+                    mushroomId = x[i + 1];
+                    break;
+                case "-tt":
+                    targetTectonId = x[i + 1];
+                    break;
+            }
+        }
+    
+        // Check if required parameters are provided
+        if (mushroomId == null || targetTectonId == null) {
+            System.out.println("Error: Missing required parameter(s) (-m or -tt).");
+            return;
+        }
+    
+        // Retrieve objects by ID
+        Object mushroomObj = Interpreter.getObject(mushroomId);
+        Object targetTectonObj = Interpreter.getObject(targetTectonId);
+    
+        // Validate object types
+        if (!(mushroomObj instanceof Mushroom)) {
+            System.out.println("Error: Invalid mushroom ID: " + mushroomId);
+            return;
+        }
+        if (!(targetTectonObj instanceof Tecton)) {
+            System.out.println("Error: Invalid target tecton ID: " + targetTectonId);
+            return;
+        }
+    
+        Mushroom mushroom = (Mushroom) mushroomObj;
+        Tecton targetTecton = (Tecton) targetTectonObj;
+    
+        // Find the Mycologist associated with the mushroom
+        Mycologist mycologist = null;
+        for (Object obj : Interpreter.objectNames.values()) {
+            if (obj instanceof Mycologist) {
+                Mycologist potentialMycologist = (Mycologist) obj;
+                if (potentialMycologist.getMushrooms().contains(mushroom)) {
+                    mycologist = potentialMycologist;
+                    break;
+                }
+            }
+        }
+    
+        if (mycologist == null) {
+            System.out.println("Error: No Mycologist found for mushroom " + mushroomId);
+            return;
+        }
+    
+        // Attempt to add a thread from the mushroom to the target tecton
+        boolean success = mushroom.addThread(targetTecton);
+        if (success) {
+            System.out.println("Thread successfully grown from mushroom " + mushroomId + " to tecton " + targetTectonId);
+        } else {
+            System.out.println("Error: Failed to grow thread from mushroom " + mushroomId + " to tecton " + targetTectonId);
+        }
+    });
+
+        commands.put("shoot", (x) -> {
+            String mushroomId = null;
+            String tectonId = null;
+        
+            // Parse command arguments
+            for (int i = 0; i < x.length - 1; i++) {
+                switch (x[i]) {
+                    case "-m":
+                        mushroomId = x[i + 1];
+                        break;
+                    case "-t":
+                        tectonId = x[i + 1];
+                        break;
+                }
+            }
+        
+            // Check if required parameters are provided
+            if (mushroomId == null || tectonId == null) {
+                System.out.println("Error: Missing required parameter(s) (-m or -t).");
+                return;
+            }
+        
+            // Retrieve objects by ID
+            Object mushroomObj = Interpreter.getObject(mushroomId);
+            Object tectonObj = Interpreter.getObject(tectonId);
+        
+            // Validate object types
+            if (!(mushroomObj instanceof Mushroom)) {
+                System.out.println("Error: Invalid mushroom ID: " + mushroomId);
+                return;
+            }
+            if (!(tectonObj instanceof Tecton)) {
+                System.out.println("Error: Invalid tecton ID: " + tectonId);
+                return;
+            }
+        
+            // Cast objects to their respective types
+            Mushroom mushroom = (Mushroom) mushroomObj;
+            Tecton tecton = (Tecton) tectonObj;
+        
+            // Call the shootSpores method
+            boolean successfulShoot = mushroom.shootSpores(tecton);
+            if (successfulShoot) {
+                System.out.println("Spore shoot from " + mushroomId + " to " + tectonId);
+            } else {
+                System.out.println("Error: Failed to shoot spores from " + mushroomId + " to " + tectonId);
+            }
+        });
+
+        commands.put("consume", (x) -> {
             String insectId = null;
-            String objectId = null;
+
+            for (int i = 0; i < x.length - 1; i++) {
+                if ("-i".equals(x[i])) {
+                    insectId = x[i + 1];
+                    break;
+                }
+            }
+
+            if (insectId != null) {
+                Object insectObj = Interpreter.getObject(insectId);
+                if (insectObj instanceof Insect) {
+                    Insect insect = (Insect) insectObj;
+                    boolean success = insect.consumeSpore();
+                    if (success) {
+                        System.out.println(insectId + " consumed the spore.");
+                    } else {
+                        System.out.println("Error: No spore at the location.");
+                    }
+                } else {
+                    System.out.println("Error: The given ID does not correspond to an insect or does not exist: " + insectId);
+                }
+            } else {
+                System.out.println("Error: Missing -i parameter.");
+            }
+        });
+
+        commands.put("eat", (x) -> {
+            String insectId = null;
+            String threadId = null;
+            String mycologistId = null;
         
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
                         insectId = x[i + 1];
                         break;
-                    case "-o":
-                        objectId = x[i + 1];
-                        break;
-                }
-            }
-        
-            // TODO: Implement the logic to check the time of the insect and object.
-        });
-
-        commands.put("move", (x) -> {
-            String insectId = null;
-            String tectonId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-i":
-                        insectId = x[i + 1];
-                        break;
-                    case "-t":
-                        tectonId = x[i + 1];
-                        break;
-                }
-            }
-        
-            if (insectId != null && tectonId != null) {
-                Object insectObj = Interpreter.getObject(insectId);
-                Object tectonObj = Interpreter.getObject(tectonId);
-        
-                if (insectObj instanceof Insect && tectonObj instanceof Tecton) {
-                    Insect insect = (Insect) insectObj;
-                    Tecton tecton = (Tecton) tectonObj;
-                    insect.setLocation(tecton);
-                } else {
-                    System.out.println("Hiba: Hibás rovar vagy tekton azonosító.");
-                }
-            } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-i vagy -t).");
-            }
-        });
-
-        commands.put("growm", (x) -> {
-            String tectonId = null;
-            String mycologistId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-t":
-                        tectonId = x[i + 1];
+                    case "-th":
+                        threadId = x[i + 1];
                         break;
                     case "-my":
                         mycologistId = x[i + 1];
@@ -683,176 +987,23 @@ public class Interpreter {
                 }
             }
         
-            if (tectonId != null && mycologistId != null) {
-                Object tectonObj = Interpreter.getObject(tectonId);
+            if (insectId != null && threadId != null && mycologistId != null) {
+                Object insectObj = Interpreter.getObject(insectId);
+                Object threadObj = Interpreter.getObject(threadId);
                 Object mycologistObj = Interpreter.getObject(mycologistId);
         
-                // TODO: Mycologist osztály meg nincsen
-                // Egy gomba növesztése játékos által.
-            } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-t vagy -my).");
-            }
-        });
-
-        commands.put("growmt", (x) -> {
-            String tectonId = null;
-            String threadId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-t":
-                        tectonId = x[i + 1];
-                        break;
-                    case "-th":
-                        threadId = x[i + 1];
-                        break;
-                }
-            }
-        
-            if (tectonId != null && threadId != null) {
-                Object tectonObj = Interpreter.getObject(tectonId);
-                Object threadObj = Interpreter.getObject(threadId);
-        
-                if (tectonObj instanceof Tecton && threadObj instanceof Thread) {
-                    // TODO: Ha egy rovart már elfogyasztott egy fonál, akkor gombát növeszthet azon a tektonon, amelyen a rovar előtte tartozkodott..????
-                } else {
-                    System.out.println("Hiba: Hibás tekton vagy fonal azonosító.");
-                }
-            } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-t vagy -th).");
-            }
-        });
-
-        commands.put("growt", (x) -> {
-            String mushroomId = null;
-            String targetTectonId = null;
-            String fromTectonId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-m":
-                        mushroomId = x[i + 1];
-                        break;
-                    case "-tt":
-                        targetTectonId = x[i + 1];
-                        break;
-                    case "-t":
-                        fromTectonId = x[i + 1];
-                        break;
-                }
-            }
-        
-            if (mushroomId != null && targetTectonId != null) {
-                Object mushroomObj = Interpreter.getObject(mushroomId);
-                Object targetTectonObj = Interpreter.getObject(targetTectonId);
-                Object fromTectonObj = fromTectonId != null ? Interpreter.getObject(fromTectonId) : null;
-        
-                if (mushroomObj instanceof Mushroom && targetTectonObj instanceof Tecton) {
-                    Mushroom mushroom = (Mushroom) mushroomObj;
-                    Tecton targetTecton = (Tecton) targetTectonObj;
-        
-                    Tecton fromTecton = (Tecton) fromTectonObj;
-                    Thread thread = new Thread();
-                    thread.setParent(mushroom);
-                    if (fromTecton != null) {
-                        fromTecton.addThread(thread);
-                    }
-                    targetTecton.addThread(thread);
-                    System.out.println("Fonal növesztve " + mushroomId + " gombától " + (fromTectonId != null ? " " + fromTectonId : " közvetlenül") + " a " + targetTectonId + " tektonra.");
-                } else {
-                    System.out.println("Hiba: Hibás -m (gomba) vagy -tt (céltekton) azonosító.");
-                }
-            } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-m vagy -tt).");
-            }
-        });
-
-        commands.put("shoot", (x) -> {
-            String mushroomId = null;
-            String tectonId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-m":
-                        mushroomId = x[i + 1];
-                        break;
-                    case "-t":
-                        tectonId = x[i + 1];
-                        break;
-                }
-            }
-        
-            if (mushroomId != null && tectonId != null) {
-                Object mushroomObj = Interpreter.getObject(mushroomId);
-                Object tectonObj = Interpreter.getObject(tectonId);
-        
-                if (mushroomObj instanceof Mushroom && tectonObj instanceof Tecton) {
-                    Mushroom mushroom = (Mushroom) mushroomObj;
-                    Tecton tecton = (Tecton) tectonObj;
-                    mushroom.shootSpores(tecton);
-
-                    System.out.println("Spóra kilőve: " + mushroomId + " -> " + tectonId);
-                } else {
-                    System.out.println("Hiba: Hibás -m (gomba) vagy -t (tekton) azonosító.");
-                }
-            } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) (-m vagy -t).");
-            }
-        });
-
-        commands.put("consume", (x) -> {
-            String insectId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                if ("-i".equals(x[i])) {
-                    insectId = x[i + 1];
-                    break;
-                }
-            }
-        
-            if (insectId != null) {
-                Object insectObj = Interpreter.getObject(insectId);
-                if (insectObj instanceof Insect) {
-                    Insect insect = (Insect) insectObj;
-                    insect.consumeSpore();
-                    System.out.println("Rovar megette a spórát: " + insectId);
-                } else {
-                    System.out.println("Hiba: Nem található vagy nem rovar az adott azonosító: " + insectId);
-                }
-            } else {
-                System.out.println("Hiba: Hiányzik az -i paraméter.");
-            }
-        });
-
-        commands.put("tconsume", (x) -> {
-            String insectId = null;
-            String threadId = null;
-        
-            for (int i = 0; i < x.length - 1; i++) {
-                switch (x[i]) {
-                    case "-id":
-                        insectId = x[i + 1];
-                        break;
-                    case "-th":
-                        threadId = x[i + 1];
-                        break;
-                }
-            }
-        
-            if (insectId != null && threadId != null) {
-                Object insectObj = Interpreter.getObject(insectId);
-                Object threadObj = Interpreter.getObject(threadId);
-                if (insectObj instanceof Insect && threadObj instanceof Thread) {
+                if (insectObj instanceof Insect && threadObj instanceof Thread && mycologistObj instanceof Mycologist) {
                     Insect insect = (Insect) insectObj;
                     Thread thread = (Thread) threadObj;
-                    // TODO: Itt hiányzik még ez a fajta fonal típus
-                    // A megadott fonal elfogyasztja a bénított rovart (aki előzőleg egy bénító spórát evett meg). A rovar ebben a pillanatban meghal, és hozzákapcsolódik a fonalhoz, mint tárolt rovartetem.
-                    System.out.println("Fonal elfogyasztotta a rovart: " + insectId);
+                    Mycologist mycologist = (Mycologist) mycologistObj;
+        
+                    // Call the Mycologist's eatInsect method
+                    mycologist.eatInsect(thread, insect);
                 } else {
-                    System.out.println("Hiba: Nem található vagy hibás típus az adott rovar/fonal azonosító.");
+                    System.out.println("Error: Invalid insect, thread, or mycologist identifier.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó paraméter(ek) (-id vagy -th).");
+                System.out.println("Error: Missing parameter(s) (-id, -th, or -my).");
             }
         });
 
@@ -874,16 +1025,32 @@ public class Interpreter {
             if (insectId != null && threadId != null) {
                 Object insectObj = Interpreter.getObject(insectId);
                 Object threadObj = Interpreter.getObject(threadId);
+        
                 if (insectObj instanceof Insect && threadObj instanceof Thread) {
                     Insect insect = (Insect) insectObj;
                     Thread thread = (Thread) threadObj;
-                    insect.cutThread(thread);
-                    System.out.println("Fonal elvágva: " + threadId + " rovar által: " + insectId);
+        
+                    // Keressük meg az Insectist-et, amelyhez a rovar tartozik
+                    for (Object obj : Interpreter.objectNames.values()) {
+                        if (obj instanceof Insectist) {
+                            Insectist insectist = (Insectist) obj;
+                            List<Insect> insects = insectist.getInsects();
+                            if (insects.contains(insect)) {
+                                // Fonal elvágása az Insectist cutThread() metódusával
+                                int index = insects.indexOf(insect);
+                                insectist.cutThread(index, thread);
+                                System.out.println("Thread cut: " + threadId + " by insect: " + insectId);
+                                return;
+                            }
+                        }
+                    }
+        
+                    System.out.println("Error: The insect does not belong to any insectist.");
                 } else {
-                    System.out.println("Hiba: Nem található vagy hibás típus az adott rovar/fonal azonosító.");
+                    System.out.println("Error: Invalid insect or thread identifier.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó paraméter(ek) (-i vagy -th).");
+                System.out.println("Error: Missing required parameter(s) (-i or -th).");
             }
         });
 
@@ -909,20 +1076,40 @@ public class Interpreter {
                     Tecton newTecton = original.breakTecton(); 
                     if (newTecton != null) {
                         //Interpreter.putObject(newId, newTecton);
-                        System.out.println("Tekton törve: " + id + " -> új tekton: " + newId);
+                        System.out.println("Tecton " + id + " broken, new tecton created: " + newId);
                     } else {
-                        System.out.println("Hiba: A törés nem sikerült.");
+                        System.out.println("Error: Break failed.");
                     }
                 } else {
-                    System.out.println("Hiba: Nem található vagy nem tekton típusú az adott azonosító.");
+                    System.out.println("Error: No tecton found with identifier: " + id);
                 }
             } else {
-                System.out.println("Hiba: Hiányzó paraméter(ek) (-id vagy -newid).");
+                System.out.println("Error: Missing parameter(s) (-id or -newid).");
             }
         });
     }
 
-    
+    // Segédfüggvény a sorok feldolgozására
+    public static void processCommand(String value) {
+        value = value.toLowerCase();
+        String[] parts = value.trim().split("\\s+");
+        if (parts.length == 0) return;
+
+        int argCount = 0;
+        String command = parts[0].substring(1); // Első karakter levágása
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+
+        int fasz = 0;
+
+        var cmd = commands.get(command);
+        if (cmd != null) {
+            cmd.execute(args);
+        } else {
+            System.out.println("Unknown command: " + command);
+        }
+    }
+
+
     public static void create(Object obj) {
         if (obj == null) {
             return;
@@ -934,6 +1121,23 @@ public class Interpreter {
         String name = prefix + count;
         objectNames.put(name + "_auto", obj);
     }
+
+    public static void remove(Object obj) {
+        if (obj == null) {
+            return;
+        }
+        String nameToRemove = null;
+        for (Map.Entry<String, Object> entry : objectNames.entrySet()) {
+            if (entry.getValue() == obj) {
+                nameToRemove = entry.getKey();
+                break;
+            }
+        }
+        if (nameToRemove != null) {
+            objectNames.remove(nameToRemove);
+        }
+    }
+
 
     public static Object getObject(String name) {
         // Check if the name exists in the objectNames map.
@@ -987,6 +1191,24 @@ public class Interpreter {
         objectNames.clear();
         prefixCounters.clear();
         computedPrefixes.clear();
+    }
+
+    public static void removeAutoDuplicates(Map<String, Object> map) {
+        // 1) Count how many times each value appears
+        Map<Object, Integer> counts = new HashMap<>();
+        for (Object v : map.values()) {
+            counts.put(v, counts.getOrDefault(v, 0) + 1);
+        }
+
+        // 2) Remove entries whose value is duplicated AND whose key ends with "_auto"
+        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> e = it.next();
+            if (counts.get(e.getValue()) > 1
+                    && e.getKey().endsWith("_auto")) {
+                it.remove();
+            }
+        }
     }
 
     public static void executeCommand(String inputString) {

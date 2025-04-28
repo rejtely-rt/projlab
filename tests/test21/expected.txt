@@ -1,0 +1,9 @@
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+(mycologist1) Mycologist created successfully.
+(insectist1) Insectist created successfully.
+Mushroom created: m1 with level 1 on tecton t2, added to mycologist: mycologist1
+Insect created: i1 on tecton t1, added to insectist: insectist1
+Thread successfully grown from mushroom m1 to tecton t1
+Insect moved: i1 -> t2

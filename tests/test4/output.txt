@@ -1,6 +1,6 @@
-(T1) Tecton of type default created successfully.
-(T2) Tecton of type default created successfully.
-Tecton T1: neighbor T2 added
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
 (mycologist1) Mycologist created successfully.
-Mushroom created: m1 with level 1 on tecton T1
-(m1) input invalid
+Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
+Error: Failed to shoot spores from m1 to t2

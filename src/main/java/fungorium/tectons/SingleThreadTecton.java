@@ -1,14 +1,13 @@
 package fungorium.tectons;
 
-import fungorium.utils.Logger;
 import fungorium.model.Mushroom;
 import fungorium.model.Thread;;
 
-public class OneThreadTecton extends Tecton {
-    public OneThreadTecton() {
+public class SingleThreadTecton extends Tecton {
+    public SingleThreadTecton() {
     }   
     
-    public OneThreadTecton(Mushroom m) {
+    public SingleThreadTecton(Mushroom m) {
         this.mushroom = m;
     }
 
@@ -23,13 +22,10 @@ public class OneThreadTecton extends Tecton {
      */
     @Override
     public boolean addThread(Thread thread) {
-        Logger.enter(this, "addThread");
         if (threads.size() == 1) {
-            Logger.exit(false);
             return false;
         }
         boolean returnValue = super.addThread(thread);
-        Logger.exit(returnValue);
         return returnValue;
     }
 }

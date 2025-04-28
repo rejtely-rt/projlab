@@ -1,8 +1,6 @@
 package fungorium.spores;
 
 import fungorium.model.Insect;
-import fungorium.utils.Interpreter;
-import fungorium.utils.Logger;
 
 public class CannotCutSpore extends Spore {
 

@@ -1,0 +1,14 @@
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+(t3) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+Tecton t2: neighbor t3 added
+(mycologist1) Mycologist created successfully.
+Mushroom created: m1 with level 2 on tecton t1, added to mycologist: mycologist1
+Thread successfully grown from mushroom m1 to tecton t2
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Time passed for all applicable objects.
+Error: Failed to grow thread from mushroom m1 to tecton t3
+Time passed for all applicable objects.
+Thread successfully grown from mushroom m1 to tecton t3

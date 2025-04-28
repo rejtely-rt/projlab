@@ -1,20 +1,24 @@
 package fungorium.model;
-import fungorium.utils.Logger;
+import fungorium.utils.Interpreter;
+import fungorium.utils.Tickable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Thread {
+public class Thread implements Tickable{
 
     private Mushroom parent;
     private int size;
     private boolean isKept;
     private boolean cutOff;
+    private List<Insect> insects = new ArrayList<>(); // List to store eaten insects
 
     /**
      * Default constructor.
      * Logs the creation of the thread instance.
      */
     public Thread() {
-        Logger.create(this); 
-        this.size = 0;
+        Interpreter.create(this); 
+        this.size = 1;
         this.isKept = false;
         this.cutOff = false;
     }
@@ -25,8 +29,6 @@ public class Thread {
      * @return true if the thread is kept, false otherwise.
      */
     public boolean isKept() {
-        Logger.enter(this, "isKept");
-        Logger.exit(isKept);
         return isKept;
     }
 
@@ -36,9 +38,7 @@ public class Thread {
      * @param isKept true if the thread should be kept, false otherwise.
      */
     public void setKept(boolean isKept) {
-        Logger.enter(this, "setKept");
         this.isKept = isKept;
-        Logger.exit(null);
     }
 
     /**
@@ -47,8 +47,6 @@ public class Thread {
      * @return true if the thread is cut off, false otherwise.
      */
     public boolean isCutOff() {
-        Logger.enter(this, "isCutOff");
-        Logger.exit(cutOff);
         return cutOff;
     }
 
@@ -58,9 +56,7 @@ public class Thread {
      * @param cutOff true if the thread should be cut off, false otherwise.
      */
     public void setCutOff(boolean cutOff) {
-        Logger.enter(this, "setCutOff");
         this.cutOff = cutOff;
-        Logger.exit(null);
     }
 
     /**
@@ -69,8 +65,6 @@ public class Thread {
      * @return the {@link Mushroom} that owns this thread.
      */
     public Mushroom getParent() {
-        Logger.enter(this, "getParent");
-        Logger.exit(parent);
         return parent;
     }
 
@@ -84,9 +78,7 @@ public class Thread {
         if (pMushroom == null) {
             throw new IllegalArgumentException("Parent mushroom cannot be null.");
         }
-        Logger.enter(this, "setParent");
         parent = pMushroom;
-        Logger.exit(null);
     }
 
     /**
@@ -97,37 +89,63 @@ public class Thread {
      * @return 5 if the thread is high-level, otherwise 1.
      */
     public int getSize() {
-        Logger.enter(this, "getSize");
-        int size = Logger.questionNumber("Milyen vastag a fonál?");
-        Logger.exit(size);
         return size;
     } 
 
+/**
+ * Changes the size of the thread by adding the given value.
+ * Ensures that the size remains between 1 and 5.
+ * 
+ * @param i the value to add to the current size.
+ */
+public void changeSize(int i) {
+    size += i;
+    if (size > 5) {
+        size = 5; // Ensure the size does not exceed 5
+    }
+}
+
     /**
-     * Changes the size of the thread by adding the given value.
+     * Returns the list of insects associated with this thread.
      * 
-     * @param i the value to add to the current size.
-     * @throws IllegalArgumentException if the resulting size would be negative.
+     * @return the list of insects.
      */
-    public void changeSize(int i) {
-        Logger.enter(this, "changeSize");
-        if (size + i < 0) {
-            throw new IllegalArgumentException("Resulting size cannot be negative.");
-        }
-        size += i;
-        Logger.exit(null);
+    public List<Insect> getInsects() {
+        return insects;
     }
 
     /**
-     * Eats a paralyzed insect, causing it to die.
-     * 
+     * Attempts to eat a paralyzed insect if this thread is connected to the Tecton
+     * where the insect is located.
+     *
      * @param insect The insect to be eaten.
+     * @return true if the insect was successfully eaten, false otherwise.
      */
-    public void eatInsect(Insect insect) {
-        Logger.enter(this, "eatInsect");
-        if (insect.getSpeed() == 0) { // Check if the insect is paralyzed
-            insect.setLife(false); // Set the insect's life to false
+    public boolean eatInsect(Insect insect) {
+        if (insect.getSpeed() != 0) {
+            System.out.println("The insect is not paralyzed.");
+            return false;
         }
-        Logger.exit(null);
+
+        // Check if this thread is connected to the insect's Tecton
+        if (!insect.getLocation().getThreads().contains(this)) {
+            System.out.println("This thread is not connected to the Tecton where the insect is located.");
+            return false;
+        }
+
+        // Eat the insect
+        insect.setLife(false); // Set the insect's life to false
+        insect.setLocation(null); // Remove the insect from its current location
+        this.insects.add(insect); // Add the insect to this thread
+        System.out.println("Insect eaten by this thread.");
+        return true;
+    }
+
+    @Override
+    public void tick() {
+        if (this.isCutOff()) {
+            return;
+        }
+        changeSize(1);
     }
 }

@@ -4,7 +4,6 @@
 /altt -id T1 -addn T2
 /altt -id T2 -addn T3
 /addpm -n mycologist1
-/addm -id m1 -lvl 2 -t T1
-# Fonál növesztés T1 → T2
-/growt -m m1 -tt T2
-/growt -m m1 -t T2 -tt T3
+/addm -id m1 -lvl 2 -t T1 -my mycologist1
+/growt -m m1 -tt T2 -my mycologist1
+/growt -m m1 -tt T3 -my mycologist1

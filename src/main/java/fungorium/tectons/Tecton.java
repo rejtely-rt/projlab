@@ -2,13 +2,16 @@ package fungorium.tectons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import fungorium.model.Thread;
 import fungorium.spores.Spore;
 import fungorium.model.Mushroom;
 import fungorium.utils.Interpreter;
-import fungorium.utils.Logger;
+import fungorium.utils.Tickable;
+import fungorium.model.Insect;
 
-public class Tecton {
+public class Tecton implements Tickable {
 
     protected List<Tecton> neighbors = new ArrayList<>();
     protected List<Thread> threads = new ArrayList<>();
@@ -17,11 +20,6 @@ public class Tecton {
 
     public Tecton() {
         Interpreter.create(this);
-    }
-
-    public Tecton(Mushroom m) {
-        Logger.create(this);
-        this.mushroom = m;
     }
 
     /**
@@ -39,20 +37,16 @@ public class Tecton {
      * @param t the Tecton to be removed from the list of neighbors
      */
     public void removeNeighbour(Tecton t) {
-        Logger.enter(this, "removeNeighbour");
         neighbors.remove(t);
-        Logger.exit("");
     }
+
     /**
      * Retrieves the list of neighboring Tecton objects.
      *
      * @return a list of Tecton objects that are neighbors to the current Tecton.
      */
     public List<Tecton> getNeighbors() {
-        Logger.enter(this, "getNeighbors");
-        List<Tecton> result = new ArrayList<>(neighbors);
-        Logger.exit(result); 
-        return result;
+        return new ArrayList<>(neighbors);
     }
 
     /**
@@ -64,25 +58,28 @@ public class Tecton {
      * @return true if a new mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom() {
+        if(threads.stream().anyMatch(thread -> !thread.getInsects().isEmpty())) {
+            Mushroom m = new Mushroom(1);
+            this.mushroom = m;
+            //System.out.println("   -> New mushroom created on Tecton by thread.");
+            return true;
+        }
         if (mushroom != null) {
-            System.out.println("   -> Already has mushroom, can't add a new one.");
-            Logger.exit(false);
+            //System.out.println("   -> Already has mushroom, can't add a new one.");
             return false;
         }
         if (spores.size() == 0) {
-            System.out.println("   -> No spores, can't grow mushroom.");
-            Logger.exit(false);
+            //System.out.println("   -> No spores, can't grow mushroom.");
             return false;
         }
         if (threads.size() == 0) {
-            System.out.println("   -> No threads, can't grow mushroom.");
-            Logger.exit(false);
+            //System.out.println("   -> No threads, can't grow mushroom.");
             return false;
         }
-        Mushroom m = new Mushroom();
+        Mushroom m = new Mushroom(1);
         this.mushroom = m;
 
-        System.out.println("   -> New mushroom created on Tecton.");
+        //System.out.println("   -> New mushroom created on Tecton.");
         return true;
     }
     
@@ -94,25 +91,21 @@ public class Tecton {
      * @return true if the mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom(Mushroom mushroom) {
-        Logger.enter(this, "addMushroom");
-        if (mushroom != null) {
-            System.out.println("   -> Already has mushroom, can't add a new one.");
-            Logger.exit(false);
+        if (this.mushroom != null) {
+            //System.out.println("   -> Already has mushroom, can't add a new one.");
             return false;
         }
         this.mushroom = mushroom;
-        System.out.println("   -> New mushroom created on Tecton.");
-        Logger.exit(true);
+        //System.out.println("   -> New mushroom created on Tecton.");
         return true;
     }
+
     /**
      * Retrieves the Mushroom object associated with this Tecton.
      *
      * @return the Mushroom object associated with this Tecton.
      */
     public Mushroom getMushroom() {
-        Logger.enter(this, "getMushroom");
-        Logger.exit(mushroom);
         return mushroom;
     }
 
@@ -123,18 +116,14 @@ public class Tecton {
      * @return true if the thread was successfully added
      */
     public boolean addThread(Thread thread) {
-        Logger.enter(this, "addThread");
         threads.add(thread);
-        System.out.println("   -> 0 added to Tecton.");
-        Logger.exit(true);
+        //System.out.println("   -> 0 added to Tecton.");
         return true;
     }
 
     public void removeThread(Thread thread) {
-        Logger.enter(this, "removeThread");
         threads.remove(thread);
-        System.out.println("   -> 0 removed from Tecton.");
-        Logger.exit("");
+        //System.out.println("   -> 0 removed from Tecton.");
     }
 
     /**
@@ -144,10 +133,7 @@ public class Tecton {
      * @return a list of threads.
      */
     public List<Thread> getThreads() {
-        Logger.enter(this, "getThreads");
-        List<Thread> result = new ArrayList<>(threads);
-        Logger.exit(result);
-        return result;
+        return new ArrayList<>(threads);
     }
     
     //for testing, because the ThreadCollector is not implemented
@@ -157,10 +143,9 @@ public class Tecton {
     //--------------------------------------------
 
     public void forceAddSpores(List<Spore> spores) { //JUST FOR INITIALIZATION
-        Logger.enter(this, "forceAddSpores");
         this.spores.addAll(spores);
-        Logger.exit(true);
     }
+
     /**
      * Adds spores to the current Tecton if the given mushroom is found in the neighboring Tectons.
      * If the mushroom's level is 2, it also checks the neighbors of the neighboring Tectons.
@@ -168,41 +153,35 @@ public class Tecton {
      * @param spores the list of spores to be added
      * @param mushroom the mushroom to be checked in the neighboring Tectons
      * @return true if the spores were added, false otherwise
-     */
+     */// LEVEL 1: közvetlen szomszédnál keresünk gombát
     public boolean addSpores(List<Spore> spores, Mushroom mushroom) {
-        Logger.enter(this, "addSpores");
-    
         int mushLevel = mushroom.getLevel();
     
         if (mushLevel == 1) {
-            // LEVEL 1: közvetlen szomszédnál keresünk gombát
+// LEVEL 1: közvetlen szomszédnál keresünk gombát
             for (Tecton neighbor : neighbors) {
                 if (mushroom.equals(neighbor.getMushroom())) {
                     this.spores.addAll(spores);
-                    Logger.exit(true);
                     return true;
                 }
             }
         }
     
         if (mushLevel == 2) {
-            // LEVEL 2: szomszéd szomszédjánál keresünk gombát
+// LEVEL 2: szomszéd szomszédjánál keresünk gombát
             for (Tecton neighbor : neighbors) {
                 List<Tecton> neighborsOfNeighbor = neighbor.getNeighbors();
                 for (Tecton n2 : neighborsOfNeighbor) {
                     if (mushroom.equals(n2.getMushroom())) {
                         this.spores.addAll(spores);
-                        Logger.exit(true);
                         return true;
                     }
                 }
             }
         }
     
-        Logger.exit(false);
         return false;
     }    
-    
 
     /**
      * Retrieves the list of spores associated with this Tecton.
@@ -210,8 +189,6 @@ public class Tecton {
      * @return a list of Spore objects.
      */
     public List<Spore> getSpores() {
-        Logger.enter(this, "getSpores");
-        Logger.exit(spores);
         return spores;
     }
 
@@ -221,45 +198,32 @@ public class Tecton {
      * @param s the spore to be removed
      */
     public void removeSpore(Spore s) {
-        Logger.enter(this, "removeSpore");
         spores.remove(s);
-        Logger.exit("");
     }
 
     public void absorbThread() {
-        Logger.enter(this, "absorbThread");
-        // Másolat a szálak listájáról, hogy elkerüljük a ConcurrentModificationException-t
         List<Thread> threadsCopy = new ArrayList<>(threads);
     
         for (Thread thread : threadsCopy) {
-            // Ellenőrizzük, hogy a szál el van-e vágva
             if (!thread.isCutOff()) {
                 continue;
             }
     
-            // Csökkentjük a szál méretét
             thread.changeSize(-1);
     
-            // Ha a szál mérete 0, eltávolítjuk
             if (thread.getSize() == 0) {
-                // Eltávolítás a jelenlegi Tecton-ból
                 this.removeThread(thread);
     
-                // Eltávolítás a szomszédos Tecton-okból
                 for (Tecton neighbor : this.getNeighbors()) {
                     if (neighbor.getThreads().contains(thread)) {
                         neighbor.removeThread(thread);
                     }
                 }
-    
-                // Eltávolítás a szülő Mushroom-ból
-                if (this.mushroom != null) {
-                    this.mushroom.removeThread(thread);
-                    this.mushroom.threadCollector(this);
-                }
+                thread.getParent().removeThread(thread);
+                thread.getParent().threadCollector(this);
+                Interpreter.remove(thread);
             }
         }
-        Logger.exit("");
     }
 
     /**
@@ -271,7 +235,6 @@ public class Tecton {
      * @return the newly created Tecton
      */
     public Tecton breakTecton() {
-        Logger.enter(this, "breakTecton");
         List<Thread> threads = new ArrayList<>(this.threads);
         for (Thread thread : threads) {
             Mushroom m1 = thread.getParent();
@@ -279,21 +242,22 @@ public class Tecton {
             this.removeThread(thread);
             m1.threadCollector(this);
         }
-        // Új Tecton létrehozása
         Tecton t2 = new Tecton();
     
-        // Minden szomszédot hozzáadunk az újhoz
         for (Tecton neighbor : neighbors) {
             t2.addNeighbour(neighbor);         
             neighbor.addNeighbour(t2);     
         }
     
-        // A két tekton egymás szomszédja lesz
         this.addNeighbour(t2);
         t2.addNeighbour(this);
 
-    
-        Logger.exit(t2);
         return t2;
+    }
+
+    @Override
+    public void tick() {
+        absorbThread();
+        //breakTecton();
     }
 }

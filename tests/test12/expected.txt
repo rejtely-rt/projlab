@@ -1,0 +1,16 @@
+(t1) Tecton of type default created successfully.
+(t2) Tecton of type default created successfully.
+Tecton t1: neighbor t2 added
+(mycologist1) Mycologist created successfully.
+Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
+Spore added to mushroom m1
+Spore shoot from m1 to t2
+(insectist1) Insectist created successfully.
+Insect created: i1 on tecton t2, added to insectist: insectist1
+i1 consumed the spore.
+List insects:
+ID: i1
+  Speed: 3
+  Cut: true
+  Spores:
+    - SpeedySpore
