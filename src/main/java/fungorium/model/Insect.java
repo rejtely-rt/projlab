@@ -127,7 +127,7 @@ public class Insect implements Tickable{
      * @param value the new speed value
      */
     public void changeSpeed(int value) {
-        this.speed += value;
+        this.speed = value;
     }
 
     /**

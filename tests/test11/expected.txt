@@ -1,0 +1,4 @@
+(t1) Tecton of type default created successfully.
+(insectist1) Insectist created successfully.
+(i1) Insect created successfully at tecton t1
+Error: No spore at the location.

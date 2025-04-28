@@ -118,7 +118,7 @@ public class Interpreter {
             if (name != null) {
                 Insectist insectist = new Insectist();
                 Interpreter.objectNames.put(name, insectist);
-                System.out.println("Rovarász létrehozva: " + name);
+                System.out.println("(" + name + ") Insectist created successfully.");
             } else {
                 System.out.println("Hiba: Hiányzó -n [NAME] paraméter.");
             }
@@ -184,7 +184,8 @@ public class Interpreter {
         commands.put("addi", (x) -> {
             String id = null;
             String tectonName = null;
-
+            String insectistName = null;
+        
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
@@ -193,20 +194,31 @@ public class Interpreter {
                     case "-t":
                         tectonName = x[i + 1];
                         break;
+                    case "-in":
+                        insectistName = x[i + 1];
+                        break;
                 }
             }
-
-            if (id != null && tectonName != null) {
+        
+            if (id != null && tectonName != null && insectistName != null) {
                 Object tectonObj = Interpreter.getObject(tectonName);
-                if (tectonObj instanceof Tecton) {
+                Object insectistObj = Interpreter.getObject(insectistName);
+        
+                if (tectonObj instanceof Tecton && insectistObj instanceof Insectist) {
+                    Tecton tecton = (Tecton) tectonObj;
+                    Insectist insectist = (Insectist) insectistObj;
+        
                     Insect insect = new Insect();
-                    insect.setLocation((Tecton) tectonObj);
-                    System.out.println("Rovar létrehozva: " + id);
+                    insect.setLocation(tecton);
+                    insectist.addInsect(insect);
+        
+                    Interpreter.objectNames.put(id, insect); // Azonosító mentése
+                    System.out.println("Insect created: "+id+" on tecton " + tectonName + ", added to insectist: " + insectistName);
                 } else {
-                    System.out.println("Hiba: Nem található a megadott tekton, vagy nem tekton típus.");
+                    System.out.println("Hiba: Nem található a megadott tekton vagy rovarász, vagy nem megfelelő típusú.");
                 }
             } else {
-                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id vagy -t.");
+                System.out.println("Hiba: Hiányzó kötelező paraméter(ek) -id, -t vagy -in.");
             }
         });
 
@@ -661,11 +673,22 @@ public class Interpreter {
 
         commands.put("lsti", (x) -> {
             removeAutoDuplicates(objectNames);
-            System.out.println("Rovarok listázása:");
+            System.out.println("List insects:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Insect) {
                     Insect insect = (Insect) entry.getValue();
-                    System.out.println(entry.getKey());
+                    System.out.println("ID: " + entry.getKey());
+                    System.out.println("  Speed: " + insect.getSpeed());
+                    System.out.println("  Cut: " + insect.getCut());
+                    System.out.println("  Spores:");
+                    List<Spore> spores = insect.getSpores(); // Feltételezve, hogy van getSpores() metódus az Insect osztályban
+                    if (spores.isEmpty()) {
+                        System.out.println("    None");
+                    } else {
+                        for (Spore spore : spores) {
+                            System.out.println("    - " + spore.getClass().getSimpleName());
+                        }
+                    }
                 }
             }
         });
@@ -945,9 +968,9 @@ public class Interpreter {
                     Insect insect = (Insect) insectObj;
                     boolean success = insect.consumeSpore();
                     if (success) {
-                        System.out.println(insectId + " megette a spórát.");
+                        System.out.println(insectId + " consumed the spore.");
                     } else {
-                        System.out.println("Hiba: Nincs spóra a helyszínen.");
+                        System.out.println("Error: No spore at the location.");
                     }
                 } else {
                     System.out.println("Hiba: Nem található vagy nem rovar az adott azonosító: " + insectId);

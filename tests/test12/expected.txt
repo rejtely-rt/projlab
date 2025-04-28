@@ -10,12 +10,7 @@ Insect created: i1 on tecton t2, added to insectist: insectist1
 i1 consumed the spore.
 List insects:
 ID: i1
-  Speed: 2
+  Speed: 3
   Cut: true
   Spores:
-    - CloneSpore
-ID: i2_auto
-  Speed: 2
-  Cut: true
-  Spores:
-    None
+    - SpeedySpore
