@@ -61,7 +61,7 @@ public class Tecton implements Tickable {
         if(threads.stream().anyMatch(thread -> !thread.getInsects().isEmpty())) {
             Mushroom m = new Mushroom(1);
             this.mushroom = m;
-            System.out.println("   -> New mushroom created on Tecton.");
+            System.out.println("   -> New mushroom created on Tecton by thread.");
             return true;
         }
         if (mushroom != null) {
@@ -96,7 +96,7 @@ public class Tecton implements Tickable {
             return false;
         }
         this.mushroom = mushroom;
-        System.out.println("   -> New mushroom created on Tecton.");
+        //System.out.println("   -> New mushroom created on Tecton.");
         return true;
     }
 

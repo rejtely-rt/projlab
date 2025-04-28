@@ -1,17 +1,19 @@
 package fungorium;
 
+import fungorium.utils.HLogPrintStream;
 import fungorium.utils.Interpreter;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
+        System.setOut(new HLogPrintStream());
+    
         Scanner scanner = new Scanner(System.in);
         String inputString;
         while (true) {
             System.out.print("> ");
-
+            
             // Bemenet beolvasása
             inputString = scanner.nextLine().trim().toLowerCase();
 

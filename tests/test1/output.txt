@@ -1,7 +1,0 @@
-(T1) Tecton of type default created successfully.
-(T2) Tecton of type default created successfully.
-Tecton T1: neighbor T2 added
-(mycologist1) Mycologist created successfully.
-Mushroom created: m1 with level 1 on tecton T1
-Spore added to mushroom m1
-Spore shot from m1 to T2

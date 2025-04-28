@@ -2,5 +2,5 @@
 /addt -id T2 -t Tecton
 /altt -id T1 -addn T2
 /addpm -n mycologist1
-/addm -id m1 -lvl 1 -t T1
+/addm -id m1 -lvl 1 -t T1 -my mycologist1
 /shoot -m m1 -t T2
