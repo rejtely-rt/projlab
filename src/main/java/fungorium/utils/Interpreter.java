@@ -29,6 +29,7 @@ import fungorium.tectons.ThreadAbsorberTecton;
 import fungorium.tectons.ThreadKeeperTecton;
 import fungorium.model.Mycologist;
 import fungorium.model.Insectist;
+import fungorium.utils.HLogPrintStream;
 
 @FunctionalInterface
 interface Command {
@@ -274,7 +275,7 @@ public class Interpreter {
                 Object t2Obj = Interpreter.getObject(t2Name);
 
                 if (t1Obj instanceof Tecton && t2Obj instanceof Tecton) {
-                    System.out.println("Fonal létrehozva: " + id + " a tektonok között: " + t1Name + " és " + t2Name);
+                    System.out.println("Thread grown: " + id + " from " + t1Name + " to " + t2Name);
                 } else {
                     System.out.println("Hiba: Az egyik vagy mindkét tekton nem létezik, vagy nem megfelelő típusú.");
                 }
@@ -670,12 +671,7 @@ public class Interpreter {
                 return;
             }
         
-            try {
-                // TODO: Implement the logic to save the log to a file.
-                System.out.println("Log fájlba mentve: " + name);
-            } catch (Exception e) {
-                System.out.println("Hiba a log mentésekor: " + e.getMessage());
-            }
+            HLogPrintStream.saveLog(name);
         });
 
         commands.put("lstm", (x) -> {
@@ -1105,7 +1101,7 @@ public class Interpreter {
                     Tecton newTecton = original.breakTecton(); 
                     if (newTecton != null) {
                         //Interpreter.putObject(newId, newTecton);
-                        System.out.println("Tekton törve: " + id + " -> új tekton: " + newId);
+                        System.out.println("Tecton " + id + " broken, new tecton created: " + newId);
                     } else {
                         System.out.println("Hiba: A törés nem sikerült.");
                     }
