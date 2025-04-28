@@ -1,9 +1,10 @@
 package fungorium.model;
 import fungorium.utils.Interpreter;
+import fungorium.utils.Tickable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Thread {
+public class Thread implements Tickable{
 
     private Mushroom parent;
     private int size;
@@ -135,5 +136,10 @@ public class Thread {
         this.insects.add(insect); // Add the insect to this thread
         System.out.println("Insect eaten by this thread.");
         return true;
+    }
+
+    @Override
+    public void tick() {
+        changeSize(-1);
     }
 }
