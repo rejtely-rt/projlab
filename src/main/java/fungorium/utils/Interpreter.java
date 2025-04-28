@@ -695,11 +695,11 @@ public class Interpreter {
 
         commands.put("lstth", (x) -> {
             removeAutoDuplicates(objectNames);
-            System.out.println("Fonalak listázása:");
+            System.out.println("Listing threads:");
             for (Map.Entry<String, Object> entry : Interpreter.objectNames.entrySet()) {
                 if (entry.getValue() instanceof Thread) {
                     Thread thread = (Thread) entry.getValue();
-                    System.out.println(entry.getKey() + " - Size: " + thread.getSize());
+                    System.out.println(entry.getKey() + " - Size: " + thread.getSize() + ", isKept: " + thread.isKept() + ", isCutOff: " + thread.isCutOff());
                 }
             }
         });
@@ -1032,7 +1032,7 @@ public class Interpreter {
                                 // Fonal elvágása az Insectist cutThread() metódusával
                                 int index = insects.indexOf(insect);
                                 insectist.cutThread(index, thread);
-                                System.out.println("Fonal elvágva: " + threadId + " rovar által: " + insectId);
+                                System.out.println("Thread cut: " + threadId + " by insect: " + insectId);
                                 return;
                             }
                         }
