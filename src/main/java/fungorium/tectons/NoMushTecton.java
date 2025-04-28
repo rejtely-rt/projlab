@@ -6,7 +6,7 @@ public class NoMushTecton extends Tecton {
     }
     
     public NoMushTecton(Mushroom m) {
-        System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
+        //System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
     }
 
     /**
@@ -16,7 +16,7 @@ public class NoMushTecton extends Tecton {
      */
     @Override
     public boolean addMushroom() {
-        System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
+        //System.out.println("   -> NoMushTecton cannot accept mushrooms. Operation denied.");
         return false;
     }
 }

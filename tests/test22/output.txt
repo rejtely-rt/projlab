@@ -6,4 +6,4 @@ Tecton t1: neighbor t2 added
 Mushroom created: m1 with level 1 on tecton t2, added to mycologist: mycologist1
 Insect created: i1 on tecton t1, added to insectist: insectist1
 Insect did not find a thread, therefore cannot move (regardless what the next line says)
-Rovar mozgatva: i1 -> t2
+Insect moved: i1 -> t2

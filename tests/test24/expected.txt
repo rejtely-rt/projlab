@@ -8,4 +8,4 @@ Thread successfully grown from mushroom m1 to tecton t1
 Spore added to mushroom m1
 Spore shoot from m1 to t1
 Mushroom created: m1 with level 1 on tecton t1, added to mycologist: mycologist1
-   -> Already has mushroom, can't add a new one.
+Error: Failed to grow mushroom on tecton t1

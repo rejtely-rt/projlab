@@ -40,12 +40,14 @@ public class Mycologist {
      * If successful, the mushroom is added to the Mycologist's control, and a point is awarded.
      * @param tecton the Tecton where the mushroom should be added
      */
-    public void addMushroom(Tecton tecton) {
+    public boolean addMushroom(Tecton tecton) {
         if (tecton.addMushroom()) { // Calls the Tecton's addMushroom method
             Mushroom newMushroom = tecton.getMushroom(); // Retrieve the newly created mushroom
             mushrooms.add(newMushroom); // Add it to the Mycologist's list
             addPoint(); // Award a point for successful mushroom creation
+            return true; // Return true if the mushroom was successfully added
         }
+        return false; // Return false if the mushroom could not be added
     }
 
     /**

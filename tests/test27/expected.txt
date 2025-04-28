@@ -7,4 +7,4 @@ Mushroom created: m1 with level 1 on tecton t2, added to mycologist: mycologist1
 Thread successfully grown from mushroom m1 to tecton t1
 Spore added to mushroom m1
 Spore shoot from m1 to t1
-   -> New mushroom created on Tecton.
+Mushroom grown on tecton t1 by mycologist mycologist1

@@ -9,4 +9,4 @@ Spore added to mushroom m1
 Spore shoot from m1 to t1
 i1 consumed the spore.
 Insect is paralyzed, therefore cannot move (regardless what the next line says)
-Rovar mozgatva: i1 -> t2
+Insect moved: i1 -> t2
