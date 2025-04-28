@@ -1,9 +1,0 @@
-(T1) Tecton of type default created successfully.
-(T2) Tecton of type default created successfully.
-(T3) Tecton of type default created successfully.
-Tecton T1: neighbor T2 added
-Tecton T2: neighbor T3 added
-(mycologist1) Mycologist created successfully.
-Mushroom created: m1 with level 2 on tecton T1
-Thread grown: th1 from m1 to T2
-(m1) input invalid

@@ -7,6 +7,4 @@
 /addm -id m1 -lvl 2 -t T1
 /growt -m m1 -tt T2
 /time
-/time
-/time
 /growt -m m1 -t T2 -tt T3

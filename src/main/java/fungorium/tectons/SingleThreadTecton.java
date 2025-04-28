@@ -3,11 +3,11 @@ package fungorium.tectons;
 import fungorium.model.Mushroom;
 import fungorium.model.Thread;;
 
-public class OneThreadTecton extends Tecton {
-    public OneThreadTecton() {
+public class SingleThreadTecton extends Tecton {
+    public SingleThreadTecton() {
     }   
     
-    public OneThreadTecton(Mushroom m) {
+    public SingleThreadTecton(Mushroom m) {
         this.mushroom = m;
     }
 
