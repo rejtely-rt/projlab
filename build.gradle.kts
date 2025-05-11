@@ -8,11 +8,18 @@ repositories {
     mavenCentral()
 }
 
+val javafxVersion = "21"
+
+dependencies {
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+}
+
 javafx {
     version = "21"
-    modules = listOf("javafx.controls")
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
-    mainClass.set("fungorium.HelloApp")
+    mainClass.set("fungorium.gui.FungoriumApp")
 }

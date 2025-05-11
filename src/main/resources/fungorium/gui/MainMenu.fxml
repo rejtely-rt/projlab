@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="layout" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="fungorium.gui.MainMenuController"
+      alignment="CENTER" spacing="20" prefWidth="400" prefHeight="400">
+    <Label text="Fungorium" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+</VBox>
