@@ -1,17 +1,18 @@
+
 plugins {
     application
+    id("org.openjfx.javafxplugin") version "0.0.14"
 }
 
 repositories {
     mavenCentral()
 }
 
-application {
-    mainClass.set("fungorium.Main")
+javafx {
+    version = "21"
+    modules = listOf("javafx.controls")
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = "fungorium.Main"
-    }
+application {
+    mainClass.set("fungorium.HelloApp")
 }
