@@ -9,9 +9,6 @@ import fungorium.utils.*;;
 public class Mushroom implements Tickable {
     private List<Spore> spores = new ArrayList<>();
 
-    private double x;
-
-    private double y;
     private List<Thread> threads = new ArrayList<>();
     private int level = 1; // Alapértelmezett szint
     private int life;      // Élettartam
@@ -23,22 +20,6 @@ public class Mushroom implements Tickable {
     public Mushroom(int level) {
         this.level = level;
         Interpreter.create(this); 
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setX(double value) {
-        this.x = value;
-    }
-
-    public void setY(double value) {
-        this.y = value;
     }
 
     /**
