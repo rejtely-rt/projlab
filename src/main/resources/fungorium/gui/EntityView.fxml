@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 
 <VBox xmlns="http://javafx.com/javafx"
@@ -8,8 +9,10 @@
       fx:controller="fungorium.gui.EntityController"
       alignment="CENTER" spacing="20" prefWidth="800" prefHeight="600">
 
-    <Label text="Ez lesz a játék" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label text="Welcome to Fungorium" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
 
     <Pane fx:id="canvas" prefWidth="600" prefHeight="400" style="-fx-background-color: #eef;" />
+    <HBox fx:id="playerBox" spacing="20" alignment="CENTER"
+          prefHeight="120" />
 
 </VBox>

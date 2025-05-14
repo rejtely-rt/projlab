@@ -17,13 +17,24 @@ public class Mycologist {
      */
     private int score;
 
+    private String name;
+
     /**
      * Constructor for the Mycologist class.
      * Initializes the list of mushrooms controlled by the Mycologist.
      */
-    public Mycologist() {
+    public Mycologist(String value) {
         this.mushrooms = new ArrayList<>();
         this.score = 0;
+        this.name = value;
+    }
+
+    public void setName(String value)  {
+        this.name = value;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -127,6 +138,8 @@ public class Mycologist {
     public int getScore() {
         return score;
     }
+
+    public void setScore(int value) { this.score = value; }
     
     /**
      * Gets the list of mushrooms controlled by the Mycologist.

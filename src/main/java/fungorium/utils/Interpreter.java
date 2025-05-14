@@ -100,7 +100,7 @@ public class Interpreter {
                 }
             }
             if (name != null) {
-                Mycologist mycologist = new Mycologist();
+                Mycologist mycologist = new Mycologist("Default");
                 Interpreter.objectNames.put(name, mycologist);
                 System.out.println("(" + name + ") Mycologist created successfully.");
             } else {
@@ -116,7 +116,7 @@ public class Interpreter {
                 }
             }
             if (name != null) {
-                Insectist insectist = new Insectist();
+                Insectist insectist = new Insectist("Default");
                 Interpreter.objectNames.put(name, insectist);
                 System.out.println("(" + name + ") Insectist created successfully.");
             } else {

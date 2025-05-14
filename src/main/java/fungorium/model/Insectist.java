@@ -11,6 +11,8 @@ public class Insectist {
      */
     private final List<Insect> insects;
 
+    private String name;
+
     /**
      * Score of the Insectist.
      * This variable keeps track of the number of spores consumed by the Insectist's insects.
@@ -19,12 +21,24 @@ public class Insectist {
     private int score;
 
 
+    public void setScore(int value)  {
+        this.score = value;
+    }
+
+    public void setName(String value)  {
+        this.name = value;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
     /**
      * Constructor for the Insectist class.
      * Initializes the list of insects controlled by the Insectist.
      */
-    public Insectist() {
-        this.insects = new ArrayList<>();
+    public Insectist(String value) {
+        this.insects = new ArrayList<>(); this.name = value;
     }
 
     /**

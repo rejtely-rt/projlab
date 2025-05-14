@@ -9,6 +9,11 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import fungorium.model.Insectist;
+import fungorium.model.Mushroom;
+import fungorium.model.Mycologist;
+
+
 public class NameEntryFlow {
 
     private static int insectistCount = 1;
@@ -123,9 +128,11 @@ public class NameEntryFlow {
         alert.showAndWait();
 
         try {
-            FungoriumApp.showGameView();
+            // csak neveket továbbítunk — példányosítás később
+            FungoriumApp.startGameFromNames(insectistNames, mycologistNames);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
 }
