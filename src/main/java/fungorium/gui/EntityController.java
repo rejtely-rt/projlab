@@ -1,5 +1,6 @@
 package fungorium.gui;
 
+import fungorium.model.Thread;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 import fungorium.model.*;
 import fungorium.tectons.*;
+import fungorium.spores.*;
+
 
 //TODO: ezt keresd
 
@@ -73,6 +76,12 @@ public class EntityController {
 
         // Rovarok lerakása
         placeStartingInsects(mapGroup);
+
+        // Spórák lerakása
+        placeStartingSpores(mapGroup);
+
+        // Szálak lerakása
+        placeStaringThreads(mapGroup);
 
         // GUI frissítés
         updatePlayerBox();
@@ -147,12 +156,9 @@ public class EntityController {
     private void placeStartingInsects(Group macGroup) {
         if(insectists == null || insectists.isEmpty()) return;
 
-        //nem kell filter a NoMushTecton miatt mert barmelyik tectonra rakhatunk
-        List<TectonViewModel> shuffledTectons = tectons.stream()
-                .collect(Collectors.toList());
+        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
         Collections.shuffle(shuffledTectons);
 
-        //helyezzunk le minden jatekoshoz 2 rovarat a gombahoz hasonloan
         for(Insectist player: insectists) {
             for(int i = 0; i < 4; i++) { // Adjust the number of insects per player as needed
                 player.getInsects().add(new Insect());
@@ -164,7 +170,7 @@ public class EntityController {
                 Insect insectModel = insects.get(i);
 
                 InsectViewModel insectVM = new InsectViewModel(insectModel, 0, 0);
-                tecton.addEntity(insectVM); // Hozzáadjuk a Tecton entitásaihoz
+                tecton.addEntity(insectVM);
 
                 double[] offset = calculateOffset(tecton.getEntities().size() - 1);
                 insectVM.xProperty().bind(tecton.xProperty().add(offset[0]));
@@ -175,6 +181,69 @@ public class EntityController {
             }
             player.setScore(player.getInsects().size());
         }
+    }
+
+    public void placeStartingSpores(Group macGroup) {
+
+        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
+        Collections.shuffle(shuffledTectons);
+
+        //helyezzunk le ennyi sporat random tektonokra
+        for(int i = 0; i < 7; i++) {
+            TectonViewModel tecton = shuffledTectons.remove(0);
+            Spore sporeModel = createRandomSpore();
+            SporeViewModel sporeVM = new SporeViewModel(sporeModel, 0, 0);
+            tecton.addEntity(sporeVM);
+
+            double[] offset = calculateSporeOffset(tecton.getEntities().size() - 1);
+            sporeVM.xProperty().bind(tecton.xProperty().add(offset[0]));
+            sporeVM.yProperty().bind(tecton.yProperty().add(offset[1]));
+
+            Node sporeNode = createSporeNode(sporeVM);
+            macGroup.getChildren().add(sporeNode);
+        }
+    }
+
+
+    public void placeStaringThreads(Group macGroup) {
+        if (tectons.size() < 2) return;
+
+        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
+        Collections.shuffle(shuffledTectons);
+
+        if (shuffledTectons.size() < 2) return;
+
+        Random random = new Random();
+
+        for (int i = 0; i < 6; i++) { // Create 6 threads
+            TectonViewModel tecton1 = tectons.get(random.nextInt(tectons.size()));
+            TectonViewModel tecton2 = tectons.get(random.nextInt(tectons.size()));
+
+            while (tecton1 == tecton2) {
+                tecton2 = tectons.get(random.nextInt(tectons.size()));
+            }
+
+            Thread threadModel = new Thread(); // Create a new thread model
+            ThreadViewModel threadVM = new ThreadViewModel(threadModel, 0, 0);
+
+            // Bind the thread's position to the midpoint of the two Tectons
+            threadVM.xProperty().bind(tecton1.xProperty().add(tecton2.xProperty()).divide(2));
+            threadVM.yProperty().bind(tecton1.yProperty().add(tecton2.yProperty()).divide(2));
+
+            Node threadNode = createThreadNode(threadVM);
+            macGroup.getChildren().add(threadNode);
+        }
+    }
+
+    public Spore createRandomSpore() {
+        List<Supplier<Spore>> sporeTypes = List.of(
+                CannotCutSpore::new,
+                CloneSpore::new,
+                ParalyzeSpore::new,
+                SpeedySpore::new,
+                SlowlySpore::new
+        );
+        return sporeTypes.get(new Random().nextInt(sporeTypes.size())).get();
     }
 
     public void updatePlayerBox() {
@@ -228,6 +297,14 @@ public class EntityController {
         double radius = 24; // Az eltolás mértéke
         double angle = Math.toRadians(index * 360.0 / 6); // Körkörös elhelyezés
         double offsetX = radius * Math.cos(angle);
+        double offsetY = radius * Math.sin(angle);
+        return new double[]{offsetX, offsetY};
+    }
+
+    private double[] calculateSporeOffset(int index) {
+        double radius = 24; // Az eltolás mértéke
+        double angle = Math.toRadians(index * 360.0 / 6 - 90); // Körkörös elhelyezés, felülről indulva
+        double offsetX = -radius * Math.cos(angle);
         double offsetY = radius * Math.sin(angle);
         return new double[]{offsetX, offsetY};
     }
@@ -309,6 +386,48 @@ public class EntityController {
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
         });
+
+        return group;
+    }
+
+    public Node createSporeNode(SporeViewModel vm) {
+        Polygon circle = new Polygon();
+        double radius = 5; // sugár
+        for (int i = 0; i < 360; i += 10) {
+            double angle = Math.toRadians(i);
+            double x = radius * Math.cos(angle);
+            double y = radius * Math.sin(angle);
+            circle.getPoints().addAll(x, y);
+        }
+        circle.setFill(Color.YELLOW);
+        circle.setStroke(Color.DARKGRAY);
+
+        Group group = new Group(circle);
+        group.layoutXProperty().bind(vm.xProperty());
+        group.layoutYProperty().bind(vm.yProperty());
+
+        group.setOnMouseEntered((MouseEvent e) -> {
+            Tooltip tooltip = new Tooltip("This spore is of type: " + vm.getModel().getClass().getSimpleName());
+            Tooltip.install(group, tooltip);
+        });
+
+        return group;
+    }
+
+    public Node createThreadNode(ThreadViewModel vm) {
+        Polygon line = new Polygon();
+        double length = 15; // hossz
+        line.getPoints().addAll(
+                -length / 2, 0.0,
+                length / 2, 0.0
+        );
+        line.setFill(Color.BROWN);
+        line.setStrokeWidth(5.0);
+        line.setStroke(Color.DARKMAGENTA);
+
+        Group group = new Group(line);
+        group.layoutXProperty().bind(vm.xProperty());
+        group.layoutYProperty().bind(vm.yProperty());
 
         return group;
     }
