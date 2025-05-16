@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="fungorium.gui.TestSelectorController">
+    <Label text="Válassz tesztet:"/>
+    <ListView fx:id="testList" prefWidth="300" prefHeight="400"/>
+    <Button text="Futtatás" fx:id="runButton"/>
+</VBox>

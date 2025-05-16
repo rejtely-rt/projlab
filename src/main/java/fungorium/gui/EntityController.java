@@ -6,9 +6,12 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -18,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Stage;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -57,26 +61,60 @@ public class EntityController {
         entities.clear();
         occupiedPosition = 0;
         System.out.println("Refreshing controller with objects: " + objects);
+
+        // Először a tectonokat add hozzá, hogy legyenek TectonViewModeljeid
+        Map<Tecton, TectonViewModel> tectonVMs = new HashMap<>();
         for (Map.Entry<String, Object> entry : objects.entrySet()) {
-            Object obj = entry.getValue();
-            Class<?> clazz = obj.getClass();
-            if (clazz == Insect.class) {
-                addEntity(new InsectViewModel((Insect) obj, 0, 0));
-            } else if (clazz == Tecton.class) {
+            if (entry.getValue() instanceof Tecton tecton) {
                 double[] position = getTectonPosition(5, 8, 70, 60);
-                addEntity(new TectonViewModel((Tecton) obj, position[0], position[1]));
-            } else if (clazz == Thread.class) {
-                addEntity(new ThreadViewModel((Thread) obj, 0, 0));
-            } else if (clazz == Spore.class) {
-                addEntity(new SporeViewModel((Spore) obj, 0, 0));
-            } else if (clazz == Mushroom.class) {
-                addEntity(new MushroomViewModel((Mushroom) obj, 0, 0));
+                TectonViewModel vm = new TectonViewModel(tecton, position[0], position[1]);
+                tectonVMs.put(tecton, vm);
+                addEntity(vm);
             }
-            // } else if (clazz == Insectist.class) {
-            //     addInsectist((Insectist) obj);
-            // } else if (clazz == Mycologist.class) {
-            //     addMycologist((Mycologist) obj);
-            // }
+        }
+
+        // Insectek – csak egyszer végigmenni rajtuk!
+        for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            if (entry.getValue() instanceof Insect insect) {
+                Tecton tecton = insect.getLocation();
+                TectonViewModel tVM = tectonVMs.get(tecton);
+                if (tVM != null) {
+                    double[] offset = {0, 0}; // vagy calculateOffset(index), ha több is lehet egy tectonon
+                    double x = tVM.getX() + offset[0];
+                    double y = tVM.getY() + offset[1];
+                    addEntity(new InsectViewModel(insect, x, y));
+                }
+            }
+        }
+
+        // Ezután minden Tectonhoz tartozó Mushroom és Spore
+        for (Tecton tecton : tectonVMs.keySet()) {
+            TectonViewModel tVM = tectonVMs.get(tecton);
+
+            // Gomba
+            Mushroom mushroom = tecton.getMushroom();
+            if (mushroom != null) {
+                double[] offset = {0, 0};
+                double x = tVM.getX() + offset[0];
+                double y = tVM.getY() + offset[1];
+                addEntity(new MushroomViewModel(mushroom, x, y));
+            }
+
+            // Spórák
+            List<Spore> spores = tecton.getSpores();
+            for (int i = 0; i < spores.size(); i++) {
+                double[] offset = calculateSporeOffset(i);
+                double x = tVM.getX() + offset[0];
+                double y = tVM.getY() + offset[1];
+                addEntity(new SporeViewModel(spores.get(i), x, y));
+            }
+        }
+
+        // Thread-eket külön kezeled, ha kell
+        for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            if (entry.getValue() instanceof Thread thread) {
+                addEntity(new ThreadViewModel(thread, 0, 0));
+            }
         }
     }
     
@@ -383,5 +421,29 @@ public class EntityController {
 
     public void refreshViewModels() {
         // későbbi frissítéshez
+    }
+
+    @FXML
+    private void onTestButtonClicked() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fungorium/gui/TestSelector.fxml"));
+        Parent root = loader.load();
+
+        // Átadjuk az aktuális EntityController példányt a TestSelectorController-nek
+        TestSelectorController selectorController = loader.getController();
+        selectorController.setEntityController(this);
+
+        Stage stage = new Stage();
+        stage.setTitle("Teszt kiválasztása");
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+
+    // Ezt a metódust hívja majd a TestSelectorController, ha kiválasztottak egy tesztet
+    public void runSelectedTest(String testFolder) {
+        try {
+            fungorium.gui.FungoriumApp.runTestFile("tests/" + testFolder + "/input.txt", this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

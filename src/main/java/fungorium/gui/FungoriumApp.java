@@ -1,6 +1,8 @@
 package fungorium.gui;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,7 +11,12 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -62,7 +69,7 @@ public class FungoriumApp extends Application {
         primaryStage.setTitle("Fungorium - The Game");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        initializeGameObjects();
+        //initializeGameObjects();
     }
 
 
@@ -72,6 +79,26 @@ public class FungoriumApp extends Application {
         }
     }
     
+    public static void runTestFile(String filename, EntityController controller) throws IOException {
+        List<String> commands = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.trim().startsWith("//")) {
+                    commands.add(line.trim());
+                }
+            }
+        }
+        runTestFileAnimated(commands, controller, 0);
+    }
+
+    private static void runTestFileAnimated(List<String> commands, EntityController controller, int index) {
+        if (index >= commands.size()) return;
+        Interpreter.executeCommand(commands.get(index));
+        PauseTransition pause = new PauseTransition(Duration.millis(400));
+        pause.setOnFinished(e -> runTestFileAnimated(commands, controller, index + 1));
+        pause.play();
+    }
     
     public static void main(String[] args) {
         launch();

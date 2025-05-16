@@ -1163,6 +1163,10 @@ public class Interpreter {
         return null;
     }
 
+    public static Map<String, Object> getObjects() {
+        return objectNames;
+    }
+
     private static String getUniquePrefix(Class<?> clazz) {
         if (computedPrefixes.containsKey(clazz)) {
             return computedPrefixes.get(clazz);
