@@ -1,6 +1,10 @@
 package fungorium.gui;
 
 import fungorium.model.Thread;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -8,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -26,29 +31,112 @@ import fungorium.spores.*;
 //TODO: ezt keresd
 
 public class EntityController {
-
+    
     @FXML
     private Pane canvas;
-
+    
     @FXML
     private HBox playerBox;
+    
+    private int occupiedPosition = 0;
 
     private List<Insectist> insectists = new ArrayList<>();
     private List<Mycologist> mycologists = new ArrayList<>();
-    List<TectonViewModel> tectons = new ArrayList<>();
-
+    
+    private ObservableList<EntityViewModel> entities = FXCollections.observableArrayList();
+    
+    public ObservableList<EntityViewModel> getEntities() {
+        return entities;
+    }
+    
+    public void addEntity(EntityViewModel entity) {
+        entities.add(entity);
+    }
+    
+    public void refreshController(Map<String, Object> objects) {
+        entities.clear();
+        occupiedPosition = 0;
+        System.out.println("Refreshing controller with objects: " + objects);
+        for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            Object obj = entry.getValue();
+            Class<?> clazz = obj.getClass();
+            if (clazz == Insect.class) {
+                addEntity(new InsectViewModel((Insect) obj, 0, 0));
+            } else if (clazz == Tecton.class) {
+                double[] position = getTectonPosition(5, 8, 70, 60);
+                addEntity(new TectonViewModel((Tecton) obj, position[0], position[1]));
+            } else if (clazz == Thread.class) {
+                addEntity(new ThreadViewModel((Thread) obj, 0, 0));
+            } else if (clazz == Spore.class) {
+                addEntity(new SporeViewModel((Spore) obj, 0, 0));
+            } else if (clazz == Mushroom.class) {
+                addEntity(new MushroomViewModel((Mushroom) obj, 0, 0));
+            }
+            // } else if (clazz == Insectist.class) {
+            //     addInsectist((Insectist) obj);
+            // } else if (clazz == Mycologist.class) {
+            //     addMycologist((Mycologist) obj);
+            // }
+        }
+    }
+    
     @FXML
     public void initialize() {
         System.out.println("EntityController loaded.");
         // csak canvas layout binding vagy alapbeállítások
         double totalMapWidth = 70 * 4 + 70 / 2; // Példaértékek
         double totalMapHeight = 60 * 4;
-
+        
         Group mapGroup = new Group();
         canvas.getChildren().add(mapGroup);
 
         mapGroup.layoutXProperty().bind(canvas.widthProperty().divide(2).subtract(totalMapWidth / 2));
         mapGroup.layoutYProperty().bind(canvas.heightProperty().divide(2).subtract(totalMapHeight / 2));
+
+        entities.addListener((ListChangeListener<EntityViewModel>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (EntityViewModel vm : change.getAddedSubList()) {
+                        Node view = createViewFor(vm);
+                        canvas.getChildren().add(view);
+                    }
+                }
+                if (change.wasRemoved()) {
+                    // You could track Node<->VM mapping to remove the correct nodes.
+                    // For brevity, we simply clear all and re-add:
+                    canvas.getChildren().clear();
+                    for (EntityViewModel vm : entities) {
+                        canvas.getChildren().add(createViewFor(vm));
+                    }
+                }
+            }
+        });
+    }
+
+    private Node createViewFor(EntityViewModel vm) {
+        Node node = null;
+        if (vm instanceof InsectViewModel) {
+            InsectViewModel insectVM = (InsectViewModel) vm;
+            for (Insectist insectist : insectists) {
+                if (insectist.getInsects().contains(insectVM.getModel())) {
+                    node = createInsectNode(insectVM, insectist);
+                }
+            }
+        } else if (vm instanceof MushroomViewModel) {
+            MushroomViewModel mushVM = (MushroomViewModel) vm;
+            for (Mycologist mycologist : mycologists) {
+                if (mycologist.getMushrooms().contains(mushVM.getModel())) {
+                    node = createMushroomNode(mushVM, mycologist);
+                }
+            }
+        } else if (vm instanceof TectonViewModel) {
+            node = createTectonNode((TectonViewModel)vm);
+        } else if (vm instanceof ThreadViewModel) {
+            node = createThreadNode((ThreadViewModel)vm);
+        } else if (vm instanceof SporeViewModel) {
+            node = createSporeNode((SporeViewModel)vm);
+        }
+        return node;
     }
 
     public void setPlayers(List<Insectist> insectists, List<Mycologist> mycologists) {
@@ -68,182 +156,25 @@ public class EntityController {
         mapGroup.layoutXProperty().bind(canvas.widthProperty().divide(2).subtract(totalMapWidth / 2));
         mapGroup.layoutYProperty().bind(canvas.heightProperty().divide(2).subtract(totalMapHeight / 2));
 
-        // Tektonok generálása
-        tectons = generateTectonGrid(mapGroup, rows, cols, hexWidth, hexHeight);
-
-        // Gombák lerakása
-        placeStartingMushrooms(mapGroup);
-
-        // Rovarok lerakása
-        placeStartingInsects(mapGroup);
-
-        // Spórák lerakása
-        placeStartingSpores(mapGroup);
-
-        // Szálak lerakása
-        placeStaringThreads(mapGroup);
-
         // GUI frissítés
         updatePlayerBox();
     }
 
-    private List<TectonViewModel> generateTectonGrid(Group mapGroup, int rows, int cols, double hexWidth, double hexHeight) {
-        List<TectonViewModel> tectons = new ArrayList<>();
 
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                double spacing = 10; // Távolság a hatszögek között
-                double offsetX = (row % 2 == 0) ? 0 : (hexWidth + spacing) / 2;
-                double x = col * (hexWidth + spacing) + offsetX;
-                double y = row * (hexHeight + spacing);
-                Tecton model = createRandomTecton();
-                TectonViewModel vm = new TectonViewModel(model, x, y);
-                tectons.add(vm);
-                Node hexNode = createTectonNode(vm);
-                mapGroup.getChildren().add(hexNode);
-            }
-        }
+    public double[] getTectonPosition(int rows, int cols, double hexWidth, double hexHeight) {
+        // Calculate row and column based on position
+        int row = occupiedPosition / cols + 1;
+        int col = occupiedPosition % cols + 1;
 
-        return tectons;
-    }
+        // Calculate x and y coordinates with hexagonal offset
+        double spacing = 10.0; // Spacing between hexagons, adjustable as needed
+        double offsetX = (row % 2 == 0) ? 0 : (hexWidth + spacing) / 2; // Offset for odd rows
+        double x = col * (hexWidth + spacing) + offsetX;
+        double y = row * (hexHeight + spacing);
 
+        occupiedPosition++;
 
-    private Tecton createRandomTecton() {
-        List<Supplier<Tecton>> tectonTypes = List.of(
-                NoMushTecton::new,
-                SingleThreadTecton::new,
-                ThreadAbsorberTecton::new,
-                ThreadKeeperTecton::new,
-                Tecton::new
-        );
-        return tectonTypes.get(new Random().nextInt(tectonTypes.size())).get();
-    }
-
-    private void placeStartingMushrooms(Group mapGroup) {
-        if (mycologists == null || mycologists.isEmpty()) return;
-
-        List<TectonViewModel> shuffledTectons = tectons.stream()
-                .filter(t -> !(t.getModel() instanceof NoMushTecton))
-                .collect(Collectors.toList());
-        Collections.shuffle(shuffledTectons);
-
-        for (Mycologist player : mycologists) {
-            for (int i = 0; i < 4; i++) { // Adjust the number of mushrooms per player as needed
-                player.getMushrooms().add(new Mushroom(1));
-            }
-
-            List<Mushroom> mushrooms = player.getMushrooms();
-            for (int i = 0; i < Math.min(mushrooms.size(), shuffledTectons.size()); i++) {
-                TectonViewModel tecton = shuffledTectons.remove(0);
-                Mushroom mushModel = mushrooms.get(i);
-                tecton.getModel().addMushroom(mushModel);
-
-                MushroomViewModel mushVM = new MushroomViewModel(mushModel, 0, 0);
-                tecton.addEntity(mushVM); // Add the mushroom to the Tecton's entities
-
-                // Bind the mushroom's position directly to the Tecton's center
-                mushVM.xProperty().bind(tecton.xProperty());
-                mushVM.yProperty().bind(tecton.yProperty());
-
-                Node mushNode = createMushroomNode(mushVM, player);
-                mapGroup.getChildren().add(mushNode);
-            }
-
-            player.setScore(player.getMushrooms().size());
-        }
-    }
-
-    private void placeStartingInsects(Group macGroup) {
-        if(insectists == null || insectists.isEmpty()) return;
-
-        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
-        Collections.shuffle(shuffledTectons);
-
-        for(Insectist player: insectists) {
-            for(int i = 0; i < 4; i++) { // Adjust the number of insects per player as needed
-                player.getInsects().add(new Insect());
-            }
-
-            List<Insect> insects = player.getInsects();
-            for (int i = 0; i < Math.min(insects.size(), shuffledTectons.size()); i++) {
-                TectonViewModel tecton = shuffledTectons.remove(0);
-                Insect insectModel = insects.get(i);
-
-                InsectViewModel insectVM = new InsectViewModel(insectModel, 0, 0);
-                tecton.addEntity(insectVM);
-
-                double[] offset = calculateOffset(tecton.getEntities().size() - 1);
-                insectVM.xProperty().bind(tecton.xProperty().add(offset[0]));
-                insectVM.yProperty().bind(tecton.yProperty().add(offset[1]));
-
-                Node insectNode = createInsectNode(insectVM, player);
-                macGroup.getChildren().add(insectNode);
-            }
-            player.setScore(player.getInsects().size());
-        }
-    }
-
-    public void placeStartingSpores(Group macGroup) {
-
-        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
-        Collections.shuffle(shuffledTectons);
-
-        //helyezzunk le ennyi sporat random tektonokra
-        for(int i = 0; i < 7; i++) {
-            TectonViewModel tecton = shuffledTectons.remove(0);
-            Spore sporeModel = createRandomSpore();
-            SporeViewModel sporeVM = new SporeViewModel(sporeModel, 0, 0);
-            tecton.addEntity(sporeVM);
-
-            double[] offset = calculateSporeOffset(tecton.getEntities().size() - 1);
-            sporeVM.xProperty().bind(tecton.xProperty().add(offset[0]));
-            sporeVM.yProperty().bind(tecton.yProperty().add(offset[1]));
-
-            Node sporeNode = createSporeNode(sporeVM);
-            macGroup.getChildren().add(sporeNode);
-        }
-    }
-
-
-    public void placeStaringThreads(Group macGroup) {
-        if (tectons.size() < 2) return;
-
-        List<TectonViewModel> shuffledTectons = new ArrayList<>(tectons);
-        Collections.shuffle(shuffledTectons);
-
-        if (shuffledTectons.size() < 2) return;
-
-        Random random = new Random();
-
-        for (int i = 0; i < 6; i++) { // Create 6 threads
-            TectonViewModel tecton1 = tectons.get(random.nextInt(tectons.size()));
-            TectonViewModel tecton2 = tectons.get(random.nextInt(tectons.size()));
-
-            while (tecton1 == tecton2) {
-                tecton2 = tectons.get(random.nextInt(tectons.size()));
-            }
-
-            Thread threadModel = new Thread(); // Create a new thread model
-            ThreadViewModel threadVM = new ThreadViewModel(threadModel, 0, 0);
-
-            // Bind the thread's position to the midpoint of the two Tectons
-            threadVM.xProperty().bind(tecton1.xProperty().add(tecton2.xProperty()).divide(2));
-            threadVM.yProperty().bind(tecton1.yProperty().add(tecton2.yProperty()).divide(2));
-
-            Node threadNode = createThreadNode(threadVM);
-            macGroup.getChildren().add(threadNode);
-        }
-    }
-
-    public Spore createRandomSpore() {
-        List<Supplier<Spore>> sporeTypes = List.of(
-                CannotCutSpore::new,
-                CloneSpore::new,
-                ParalyzeSpore::new,
-                SpeedySpore::new,
-                SlowlySpore::new
-        );
-        return sporeTypes.get(new Random().nextInt(sporeTypes.size())).get();
+        return new double[] { x, y };
     }
 
     public void updatePlayerBox() {
@@ -385,6 +316,24 @@ public class EntityController {
 
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+
+            InsectViewModel selectedInsect = vm;
+
+            // Create a one‑shot handler:
+            EventHandler<MouseEvent> oneShot = new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent te) {
+                    // Find the Node under the pointer:
+                    Node picked = te.getPickResult().getIntersectedNode();
+                    System.out.println("Selected insect: " + selectedInsect.getModel().getClass().getSimpleName());
+                    System.out.println("Picked node: " + picked);
+                    // Uninstall this handler so it only runs once:
+                    group.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
+                    // Consume to prevent underlying handlers if you like:
+                    te.consume();
+                }
+            };
+            group.getScene().addEventHandler(MouseEvent.MOUSE_CLICKED, oneShot);
         });
 
         return group;

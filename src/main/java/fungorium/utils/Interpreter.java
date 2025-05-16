@@ -14,6 +14,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import fungorium.gui.EntityController;
+import fungorium.gui.EntityViewModel;
+import fungorium.gui.InsectViewModel;
+import fungorium.gui.MushroomViewModel;
+import fungorium.gui.SporeViewModel;
+import fungorium.gui.TectonViewModel;
+import fungorium.gui.ThreadViewModel;
 import fungorium.model.Insect;
 import fungorium.model.Thread;
 import fungorium.spores.CannotCutSpore;
@@ -52,6 +59,12 @@ public class Interpreter {
     private static final Map<Class<?>, String> computedPrefixes = new HashMap<>();
 
     private static HLogPrintStream hlps = new HLogPrintStream();
+
+    private static EntityController controller;
+
+    public static void setController(EntityController controller) {
+        Interpreter.controller = controller;
+    }
     
     static {
         // ez csak minta
@@ -1212,6 +1225,8 @@ public class Interpreter {
     }
 
     public static void executeCommand(String inputString) {
+        inputString = inputString.trim().toLowerCase();
+        System.out.println("Executing command: " + inputString);
         inputString = inputString.replace("/", "");
         String[] args = inputString.split(" ");
         if (commands.containsKey(args[0])) {
@@ -1219,5 +1234,7 @@ public class Interpreter {
         } else {
             System.out.println("Command not found.");
         }
+        removeAutoDuplicates(objectNames);
+        controller.refreshController(objectNames);
     }
 }

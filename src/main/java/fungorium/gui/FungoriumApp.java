@@ -4,11 +4,17 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Scanner;
 
 import fungorium.model.*;
+import fungorium.utils.Interpreter;
 
 public class FungoriumApp extends Application {
     private static Stage primaryStage;
@@ -50,11 +56,23 @@ public class FungoriumApp extends Application {
         EntityController controller = loader.getController();
         controller.setPlayers(insectists, mycologists);
 
+        Interpreter.setController(controller);
+
+        
         primaryStage.setTitle("Fungorium - The Game");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        initializeGameObjects();
     }
 
+
+    private static void initializeGameObjects() {
+        for (int i = 1; i <= 30; i++) {
+            Interpreter.executeCommand("/addt -id T" + i + " -t Tecton");
+        }
+    }
+    
+    
     public static void main(String[] args) {
         launch();
     }

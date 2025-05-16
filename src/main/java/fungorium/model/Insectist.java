@@ -3,13 +3,14 @@ package fungorium.model;
 import java.util.ArrayList;
 import java.util.List;
 import fungorium.tectons.Tecton;
+import fungorium.utils.Interpreter;
 
 public class Insectist {
     /**
      * List of insects controlled by the Insectist.
      * This list contains all the insects that the Insectist can command and control.
      */
-    private final List<Insect> insects;
+    private List<Insect> insects;
 
     private String name;
 
@@ -38,6 +39,7 @@ public class Insectist {
      * Initializes the list of insects controlled by the Insectist.
      */
     public Insectist(String value) {
+        Interpreter.create(this);
         this.insects = new ArrayList<>(); this.name = value;
     }
 

@@ -3,13 +3,15 @@ package fungorium.model;
 import java.util.ArrayList;
 import java.util.List;
 import fungorium.tectons.Tecton;
+import fungorium.utils.Interpreter;
 
 public class Mycologist {
+    
     /**
      * List of mushrooms controlled by the Mycologist.
      * This list contains all the mushrooms that the Mycologist can command and control.
      */
-    private final List<Mushroom> mushrooms;
+    private List<Mushroom> mushrooms;
     /**
      * Score of the Mycologist.
      * This variable keeps track of the number of spores consumed by the Mycologist's mushrooms.
@@ -24,6 +26,7 @@ public class Mycologist {
      * Initializes the list of mushrooms controlled by the Mycologist.
      */
     public Mycologist(String value) {
+        Interpreter.create(this);
         this.mushrooms = new ArrayList<>();
         this.score = 0;
         this.name = value;
