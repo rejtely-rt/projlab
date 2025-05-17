@@ -1,4 +1,3 @@
 /addt -id T1 -t Tecton
-/addpi -n insectist1
 /addi -id i1 -t T1 -in insectist1
 /consume -i i1

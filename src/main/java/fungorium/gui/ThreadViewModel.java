@@ -2,32 +2,28 @@ package fungorium.gui;
 
 import fungorium.model.Thread;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-
 public class ThreadViewModel implements EntityViewModel {
     private final Thread model;
-    private final DoubleProperty x = new SimpleDoubleProperty();
-    private final DoubleProperty y = new SimpleDoubleProperty();
+    private final TectonViewModel from;
+    private final TectonViewModel to;
+    private final MushroomViewModel mushroom;
 
-    public ThreadViewModel(Thread model, double startX, double startY) {
+    public ThreadViewModel(Thread model, TectonViewModel from, TectonViewModel to, MushroomViewModel mushroom) {
         this.model = model;
-        this.x.set(startX);
-        this.y.set(startY);
-        refreshFromModel();
+        this.from = from;
+        this.to = to;
+        this.mushroom = mushroom;
     }
 
-    public double getX() { return x.get(); }
-    public double getY() { return y.get(); }
-    public DoubleProperty xProperty() { return x; }
-    public DoubleProperty yProperty() { return y; }
-
-    public Thread getModel() {
-        return model;
-    }
+    public TectonViewModel getFrom() { return from; }
+    public TectonViewModel getTo() { return to; }
+    public MushroomViewModel getMushroom() { return mushroom; }
+    public Thread getModel() { return model; }
 
     @Override
-    public void refreshFromModel() {
-        // Implement any necessary updates from the model here
-    }
+    public double getX() { return mushroom.getX(); }
+    @Override
+    public double getY() { return mushroom.getY(); }
+    @Override
+    public void refreshFromModel() {}
 }

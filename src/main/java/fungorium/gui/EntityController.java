@@ -110,10 +110,41 @@ public class EntityController {
             }
         }
 
-        // Thread-eket külön kezeled, ha kell
-        for (Map.Entry<String, Object> entry : objects.entrySet()) {
-            if (entry.getValue() instanceof Thread thread) {
-                addEntity(new ThreadViewModel(thread, 0, 0));
+        // Ezután:
+        // Thread-ek kirajzolása tectonok alapján
+        Set<Thread> drawnThreads = new HashSet<>();
+        for (Tecton tecton : tectonVMs.keySet()) {
+            for (Thread thread : tecton.getThreads()) {
+                if (drawnThreads.contains(thread)) continue;
+
+                // Keresd meg a két tectont, amelyek tartalmazzák ezt a thread-et
+                Tecton from = null, to = null;
+                for (Tecton other : tectonVMs.keySet()) {
+                    if (other.getThreads().contains(thread)) {
+                        if (from == null) from = other;
+                        else if (to == null && other != from) { to = other; break; }
+                    }
+                }
+
+                // A gombát a thread.getParent() adja
+                Mushroom mushroom = thread.getParent();
+
+                TectonViewModel fromVM = tectonVMs.get(from);
+                TectonViewModel toVM = tectonVMs.get(to);
+
+                // Keresd ki a MushroomViewModel-t az entities-ből:
+                MushroomViewModel mushVM = null;
+                for (EntityViewModel evm : entities) {
+                    if (evm instanceof MushroomViewModel mvm && mvm.getModel() == mushroom) {
+                        mushVM = mvm;
+                        break;
+                    }
+                }
+
+                if (fromVM != null && toVM != null && mushVM != null) {
+                    addEntity(new ThreadViewModel(thread, fromVM, toVM, mushVM));
+                    drawnThreads.add(thread);
+                }
             }
         }
 
@@ -410,21 +441,16 @@ public class EntityController {
     }
 
     public Node createThreadNode(ThreadViewModel vm) {
-        Polygon line = new Polygon();
-        double length = 15; // hossz
-        line.getPoints().addAll(
-                -length / 2, 0.0,
-                length / 2, 0.0
-        );
-        line.setFill(Color.BROWN);
+        javafx.scene.shape.Line line = new javafx.scene.shape.Line();
+        // A vonal kezdőpontja a gomba pozíciója
+        line.startXProperty().bind(vm.getMushroom().xProperty());
+        line.startYProperty().bind(vm.getMushroom().yProperty());
+        // A végpontja a cél tecton közepe
+        line.endXProperty().bind(vm.getTo().xProperty());
+        line.endYProperty().bind(vm.getTo().yProperty());
         line.setStrokeWidth(5.0);
         line.setStroke(Color.DARKMAGENTA);
-
-        Group group = new Group(line);
-        group.layoutXProperty().bind(vm.xProperty());
-        group.layoutYProperty().bind(vm.yProperty());
-
-        return group;
+        return line;
     }
 
     public void refreshViewModels() {
