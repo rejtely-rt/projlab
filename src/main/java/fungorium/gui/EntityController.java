@@ -116,6 +116,11 @@ public class EntityController {
                 addEntity(new ThreadViewModel(thread, 0, 0));
             }
         }
+
+        System.out.println("Mycologists: " + mycologists);
+        for (Mycologist m : mycologists) {
+            System.out.println(m.getName() + " mushrooms: " + m.getMushrooms());
+        }
     }
     
     @FXML
@@ -136,15 +141,18 @@ public class EntityController {
                 if (change.wasAdded()) {
                     for (EntityViewModel vm : change.getAddedSubList()) {
                         Node view = createViewFor(vm);
-                        canvas.getChildren().add(view);
+                        if (view != null) {
+                            canvas.getChildren().add(view);
+                        }
                     }
                 }
                 if (change.wasRemoved()) {
-                    // You could track Node<->VM mapping to remove the correct nodes.
-                    // For brevity, we simply clear all and re-add:
                     canvas.getChildren().clear();
                     for (EntityViewModel vm : entities) {
-                        canvas.getChildren().add(createViewFor(vm));
+                        Node view = createViewFor(vm);
+                        if (view != null) {
+                            canvas.getChildren().add(view);
+                        }
                     }
                 }
             }

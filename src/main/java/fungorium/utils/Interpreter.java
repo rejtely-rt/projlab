@@ -61,6 +61,8 @@ public class Interpreter {
     private static HLogPrintStream hlps = new HLogPrintStream();
 
     private static EntityController controller;
+    private static final Map<String, Mycologist> mycologistByName = new HashMap<>();
+
 
     public static void setController(EntityController controller) {
         Interpreter.controller = controller;
@@ -171,12 +173,12 @@ public class Interpreter {
         
             if (id != null && tectonName != null && mycologistName != null) {
                 Object tectonObj = Interpreter.getObject(tectonName);
-                Object mycologistObj = Interpreter.getObject(mycologistName);
-        
-                if (tectonObj instanceof Tecton && mycologistObj instanceof Mycologist) {
+                // Itt keresd név alapján a mycologistet a mycologistByName mapből:
+                Mycologist mycologist = mycologistByName.get(mycologistName);
+
+                if (tectonObj instanceof Tecton && mycologist != null) {
                     Tecton tecton = (Tecton) tectonObj;
-                    Mycologist mycologist = (Mycologist) mycologistObj;
-        
+
                     Mushroom mushroom = new Mushroom(level);
                     boolean success = tecton.addMushroom(mushroom);
                     if (success) {
@@ -187,7 +189,12 @@ public class Interpreter {
                         System.out.println("Error: Failed to add mushroom to tecton.");
                     }
                 } else {
-                    System.out.println("Error: Invalid tecton or mycologist identifier.");
+                    if (!(tectonObj instanceof Tecton)) {
+                        System.out.println("Error: Invalid tecton identifier: " + tectonName);
+                    }
+                    if (mycologist == null) {
+                        System.out.println("Error: No mycologist found with name: " + mycologistName + ". (Did you create it in the menu?)");
+                    }
                 }
             } else {
                 System.out.println("Error: Missing required parameter(s) (-id, -t, or -my).");
@@ -1240,5 +1247,12 @@ public class Interpreter {
         }
         removeAutoDuplicates(objectNames);
         controller.refreshController(objectNames);
+    }
+
+    public static void setMycologists(List<Mycologist> mycologists) {
+        mycologistByName.clear();
+        for (Mycologist m : mycologists) {
+            mycologistByName.put(m.getName(), m);
+        }
     }
 }
