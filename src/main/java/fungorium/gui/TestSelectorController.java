@@ -40,7 +40,7 @@ public class TestSelectorController {
             String selected = testList.getSelectionModel().getSelectedItem();
             if (selected != null && entityController != null) {
                 entityController.runSelectedTest(selected);
-                ((Stage)runButton.getScene().getWindow()).close();
+                
             }
         });
     }

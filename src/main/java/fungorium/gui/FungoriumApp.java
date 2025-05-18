@@ -11,8 +11,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import fungorium.model.*;
+import fungorium.spores.*;
+import fungorium.tectons.*;
 import fungorium.utils.Interpreter;
 
 public class FungoriumApp extends Application {
@@ -57,24 +63,104 @@ public class FungoriumApp extends Application {
 
         Interpreter.setController(controller);
         Interpreter.setMycologists(mycologists); // <-- EZT ADD HOZZÁ
-
         primaryStage.setTitle("Fungorium - The Game");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        //initializeGameObjects();
+        initializeGameObjects(insectists, mycologists);
     }
 
 
-    private static void initializeGameObjects() {
-        for (int i = 1; i <= 30; i++) {
-            Interpreter.executeCommand("/addt -id T" + i + " -t Tecton");
+        private static void initializeGameObjects(List<Insectist> insectists, List<Mycologist> mycologists) {
+        Random rand = new Random();
+    
+        // 1. Tectonok létrehozása különböző típusokkal
+        int tectonCount = 10 + rand.nextInt(3); // 10-12 tecton
+        List<Tecton> tectons = new ArrayList<>();
+        for (int i = 0; i < tectonCount; i++) {
+            int type = rand.nextInt(4);
+            Tecton t;
+            switch (type) {
+                case 0 -> t = new NoMushTecton();
+                case 1 -> t = new SingleThreadTecton();
+                case 2 -> t = new ThreadAbsorberTecton();
+                case 3 -> t = new ThreadKeeperTecton();
+                default -> t = new Tecton();
+            }
+            tectons.add(t);
         }
-    }
-
-    public static void initializeForTest() {
-        for (int i = 1; i <= 10; i++) {
-            Interpreter.executeCommand("/addt -id T" + i + " -t Tecton");
+    
+        // 2. Tectonok összekötése (szomszédok random, de mindenki legalább 1-2 szomszéd)
+        for (int i = 0; i < tectonCount; i++) {
+            Tecton t1 = tectons.get(i);
+            int neighbors = 1 + rand.nextInt(2); // 1 vagy 2 szomszéd
+            for (int n = 0; n < neighbors; n++) {
+                int j = rand.nextInt(tectonCount);
+                if (j != i) {
+                    Tecton t2 = tectons.get(j);
+                    if (!t1.getNeighbors().contains(t2)) {
+                        t1.addNeighbour(t2);
+                        t2.addNeighbour(t1);
+                    }
+                }
+            }
         }
+    
+        // 3. Minden mycologist kap egy gombát egy random tectonra
+        for (Mycologist myc : mycologists) {
+            Tecton t = tectons.get(rand.nextInt(tectons.size()));
+            myc.addMushroom(t);
+        }
+    
+        // 4. Minden insectist kap egy rovart egy random tectonra
+        for (Insectist ins : insectists) {
+            Tecton t = tectons.get(rand.nextInt(tectons.size()));
+            Insect insect = new Insect(ins);
+            insect.setLocation(t);
+            ins.getInsects().add(insect);
+        }
+    
+        // 5. Véletlenszerűen további gombák
+        int extraMushrooms = rand.nextInt(tectonCount / 2);
+        for (int i = 0; i < extraMushrooms; i++) {
+            Mycologist myc = mycologists.get(rand.nextInt(mycologists.size()));
+            Tecton t = tectons.get(rand.nextInt(tectons.size()));
+            if (t.getMushroom() == null) {
+                myc.addMushroom(t);
+            }
+        }
+    
+        // 6. Véletlenszerűen további rovarok
+        int extraInsects = rand.nextInt(tectonCount / 2);
+        for (int i = 0; i < extraInsects; i++) {
+            Insectist ins = insectists.get(rand.nextInt(insectists.size()));
+            Tecton t = tectons.get(rand.nextInt(tectons.size()));
+            Insect insect = new Insect(ins);
+            insect.setLocation(t);
+            ins.getInsects().add(insect);
+        }
+    
+        // 7. Minden gomba termeljen random típusú spórákat induláskor
+        for (Mycologist myc : mycologists) {
+            for (Mushroom m : myc.getMushrooms()) {
+                int sporeCount = 1 + rand.nextInt(2); // 1-2 spóra
+                for (int s = 0; s < sporeCount; s++) {
+                    Spore spore;
+                    switch (rand.nextInt(5)) {
+                        case 0 -> spore = new CannotCutSpore();
+                        case 1 -> spore = new CloneSpore();
+                        case 2 -> spore = new ParalyzeSpore();
+                        case 3 -> spore = new SlowlySpore();
+                        case 4 -> spore = new SpeedySpore();
+                        default -> spore = new SlowlySpore();
+                    }
+                    m.addSpore(spore); // vagy ahogy a modelledben kell
+                }
+            }
+        }
+    
+        Interpreter.getController().refreshController(Interpreter.getObjects());
+        System.out.println("Game initialized with random objects.");
+        System.out.println(Interpreter.getObjects());
     }
     
     public static void runTestFile(String filename, EntityController controller) throws IOException {

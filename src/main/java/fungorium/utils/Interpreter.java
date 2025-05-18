@@ -71,6 +71,10 @@ public class Interpreter {
     public static void setController(EntityController controller) {
         Interpreter.controller = controller;
     }
+
+    public static EntityController getController() {
+        return controller;
+    }
     
     static {
         // ez csak minta

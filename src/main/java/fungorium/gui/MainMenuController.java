@@ -45,7 +45,6 @@ public class MainMenuController {
                     List.of("insectist1"),
                     List.of("mycologist1")
                 );
-                FungoriumApp.initializeForTest();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
