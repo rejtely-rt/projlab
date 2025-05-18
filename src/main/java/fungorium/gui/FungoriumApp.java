@@ -62,7 +62,8 @@ public class FungoriumApp extends Application {
         controller.setPlayers(insectists, mycologists);
 
         Interpreter.setController(controller);
-        Interpreter.setMycologists(mycologists); // <-- EZT ADD HOZZÁ
+        Interpreter.setMycologists(mycologists);
+        Interpreter.setInsectists(insectists);
         primaryStage.setTitle("Fungorium - The Game");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

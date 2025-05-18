@@ -66,6 +66,7 @@ public class Interpreter {
 
     private static EntityController controller;
     private static final Map<String, Mycologist> mycologistByName = new HashMap<>();
+    private static final Map<String, Insectist> insectistByName = new HashMap<>();
 
 
     public static void setController(EntityController controller) {
@@ -227,7 +228,7 @@ public class Interpreter {
             String id = null;
             String tectonName = null;
             String insectistName = null;
-        
+
             for (int i = 0; i < x.length - 1; i++) {
                 switch (x[i]) {
                     case "-id":
@@ -241,19 +242,17 @@ public class Interpreter {
                         break;
                 }
             }
-        
+
             if (id != null && tectonName != null && insectistName != null) {
                 Object tectonObj = Interpreter.getObject(tectonName);
-                Object insectistObj = Interpreter.getObject(insectistName);
-        
-                if (tectonObj instanceof Tecton && insectistObj instanceof Insectist) {
+                Insectist insectist = insectistByName.get(insectistName);
+
+                if (tectonObj instanceof Tecton && insectist != null) {
                     Tecton tecton = (Tecton) tectonObj;
-                    Insectist insectist = (Insectist) insectistObj;
-        
                     Insect insect = new Insect();
                     insect.setLocation(tecton);
                     insectist.addInsect(insect);
-        
+
                     Interpreter.objectNames.put(id, insect); // Azonosító mentése
                     System.out.println("Insect created: "+id+" on tecton " + tectonName + ", added to insectist: " + insectistName);
                     EntityController.instance.appendInfo("Insect created: "+id+" on tecton " + tectonName + ", added to insectist: " + insectistName);
@@ -1360,6 +1359,13 @@ public class Interpreter {
         mycologistByName.clear();
         for (Mycologist m : mycologists) {
             mycologistByName.put(m.getName(), m);
+        }
+    }
+
+    public static void setInsectists(List<Insectist> insectists) {
+        insectistByName.clear();
+        for (Insectist i : insectists) {
+            insectistByName.put(i.getName(), i);
         }
     }
 }

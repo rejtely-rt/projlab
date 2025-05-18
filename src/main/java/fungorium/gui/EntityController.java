@@ -78,6 +78,9 @@ public class EntityController {
     private boolean growMushroomMode = false;
 
     private InsectViewModel selectedInsect = null;
+    private boolean moveInsectMode = false;
+    private boolean cutThreadMode = false;
+    private boolean consumeSporeMode = false;
     
 
     private List<Insectist> insectists = new ArrayList<>();
@@ -249,11 +252,32 @@ public class EntityController {
             int prevActorIndex = currentActorIndex;
             currentActorIndex = (currentActorIndex + 1) % turnOrder.size();
             currentActor = turnOrder.get(currentActorIndex);
-            hideAllActionButtons();
             updateActionButtonsForTurn();
             updateTurnLabel();
             if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
                 Interpreter.executeCommand("/time");
+            }
+        });
+
+        moveInsectButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                moveInsectMode = true;
+                appendInfo("Válassz egy tectont, ahova mozgatod a rovart!");
+            }
+        });
+
+        cutThreadButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                cutThreadMode = true;
+                appendInfo("Válassz egy fonalat, amit elvágsz!");
+            }
+        });
+
+        consumeSporeButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String cmd = "/consume -i " + insectName;
+                fungorium.utils.Interpreter.executeCommand(cmd);
             }
         });
     }
@@ -406,26 +430,24 @@ public class EntityController {
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
-
                 sporeShootMode = false;
-                hideAllActionButtons();
             } else if (growThreadMode && selectedMushroom != null) {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growt -m " + mushroomName + " -tt " + tectonName;
-                System.out.println("Parancs: " + cmd);
                 fungorium.utils.Interpreter.executeCommand(cmd);
-
                 growThreadMode = false;
-                hideAllActionButtons();
             } else if (growMushroomMode) {
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growm -t " + tectonName + " -my " + currentMycologistName;
-                appendInfo("Parancs: " + cmd);
                 fungorium.utils.Interpreter.executeCommand(cmd);
-
                 growMushroomMode = false;
-                hideAllActionButtons();
+            } else if (moveInsectMode && selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/move -i " + insectName + " -t " + tectonName;
+                fungorium.utils.Interpreter.executeCommand(cmd);
+                moveInsectMode = false;
             } else {
                 System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
             }
@@ -528,6 +550,17 @@ public class EntityController {
         line.endYProperty().bind(vm.getTo().yProperty());
         line.setStrokeWidth(5.0);
         line.setStroke(Color.DARKMAGENTA);
+
+        line.setOnMouseClicked(e -> {
+            if (cutThreadMode && selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String threadName = getObjectNameFor(vm.getModel());
+                String cmd = "/cut -i " + insectName + " -th " + threadName;
+                fungorium.utils.Interpreter.executeCommand(cmd);
+                cutThreadMode = false;
+            }
+        });
+
         return line;
     }
 
@@ -581,13 +614,6 @@ public class EntityController {
         growMushroomButton.setVisible(false);
     }
 
-    private void hideAllActionButtons() {
-        sporeButton.setVisible(false);
-        growThreadButton.setVisible(false);
-        growMushroomButton.setVisible(false);
-        // A többi gomb rejtése
-        
-    }
 
     public void appendInfo(String message) {
         Label label = new Label(message);
@@ -629,9 +655,22 @@ public class EntityController {
 
     private void updateActionButtonsForTurn() {
         if (currentActor instanceof Mycologist) {
+            // Csak a gombász gombjai látszanak
             growMushroomButton.setVisible(true);
-        } else {
+            sporeButton.setVisible(false);
+            growThreadButton.setVisible(false);
+            moveInsectButton.setVisible(false);
+            cutThreadButton.setVisible(false);
+            consumeSporeButton.setVisible(false);
+        } else if (currentActor instanceof Insectist) {
+            // Csak a rovarász gombjai látszanak (alapból rejtve, csak rovarra kattintva jelennek meg)
             growMushroomButton.setVisible(false);
+            sporeButton.setVisible(false);
+            growThreadButton.setVisible(false);
+            // Ezek csak rovarra kattintva lesznek láthatók:
+            moveInsectButton.setVisible(false);
+            cutThreadButton.setVisible(false);
+            consumeSporeButton.setVisible(false);
         }
     }
 }
