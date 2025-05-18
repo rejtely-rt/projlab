@@ -17,10 +17,12 @@
     <!-- Fő tartalom: bal oldali infópanel, középen pálya, jobb oldali akciógombok -->
     <HBox spacing="20" alignment="CENTER">
         <!-- Infópanel -->
-        <VBox fx:id="infoPanel" spacing="10" alignment="TOP_LEFT" prefWidth="180" style="-fx-background-color: #f8f8f8; -fx-border-color: #bbb;">
-            <Label text="Infópanel" style="-fx-font-weight: bold;" alignment="CENTER"/>
-            <!-- Ide kerülnek dinamikusan a kiválasztott objektum adatai -->
-        </VBox>
+        <ScrollPane fx:id="infoScrollPane" prefWidth="180" fitToWidth="true" fitToHeight="true" style="-fx-background-color: #f8f8f8; -fx-border-color: #bbb;">
+            <VBox fx:id="infoPanel" spacing="10" alignment="TOP_LEFT" prefWidth="160" prefHeight="40">
+                <Label text="Infópanel" style="-fx-font-weight: bold;" alignment="CENTER"/>
+                <!-- Ide kerülnek dinamikusan a kiválasztott objektum adatai -->
+            </VBox>
+        </ScrollPane>
 
         <!-- Pálya -->
         <Pane fx:id="canvas" prefWidth="600" prefHeight="500" style="-fx-background-color: #eef;" />
@@ -30,7 +32,7 @@
             <Label text="Akciók" style="-fx-font-weight: bold;" alignment="CENTER"/>
             <Button fx:id="sporeButton" text="Szórj spórát" visible="false"/>
             <Button fx:id="growMushroomButton" text="Növessz gombatestet" visible="false"/>
-            <Button fx:id="growThreadButton" text="Növeszd fonalat" visible="false"/>
+            <Button fx:id="growThreadButton" text="Növessz fonalat" visible="false"/>
             <Button fx:id="moveInsectButton" text="Mozogj ide" visible="false"/>
             <Button fx:id="cutThreadButton" text="Vágd el a fonalat" visible="false"/>
             <Button fx:id="consumeSporeButton" text="Edd meg a spórát" visible="false"/>
