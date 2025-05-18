@@ -29,6 +29,13 @@ public class TestSelectorController {
                 }
             }
         }
+        // Sort test names
+        testList.getItems().sort((a, b) -> {
+            int numA = extractNumber(a);
+            int numB = extractNumber(b);
+            return Integer.compare(numA, numB);
+        });        
+        
         runButton.setOnAction(e -> {
             String selected = testList.getSelectionModel().getSelectedItem();
             if (selected != null && entityController != null) {
@@ -36,5 +43,14 @@ public class TestSelectorController {
                 ((Stage)runButton.getScene().getWindow()).close();
             }
         });
+    }
+
+    // Helper method for extracting numbers from the string
+    private static int extractNumber(String name) {
+        try {
+            return Integer.parseInt(name.replaceAll("\\D+", ""));
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 }

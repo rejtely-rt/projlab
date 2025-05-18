@@ -2,24 +2,16 @@ package fungorium.gui;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
 import fungorium.model.*;
 import fungorium.utils.Interpreter;
 
@@ -75,6 +67,12 @@ public class FungoriumApp extends Application {
 
     private static void initializeGameObjects() {
         for (int i = 1; i <= 30; i++) {
+            Interpreter.executeCommand("/addt -id T" + i + " -t Tecton");
+        }
+    }
+
+    public static void initializeForTest() {
+        for (int i = 1; i <= 10; i++) {
             Interpreter.executeCommand("/addt -id T" + i + " -t Tecton");
         }
     }
