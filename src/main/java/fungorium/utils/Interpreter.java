@@ -53,6 +53,10 @@ public class Interpreter {
     private static Map<String, Command> commands = new HashMap<>();
     // Map to store created objects and their generated names.
     private static Map<String, Object> objectNames = new HashMap<>();
+
+    public static Map<String, Object> getObjectNames() {
+        return objectNames;
+    }
     // Map to keep counters for each unique prefix.
     private static final Map<String, Integer> prefixCounters = new HashMap<>();
     // Map to store already computed unique prefixes for classes.

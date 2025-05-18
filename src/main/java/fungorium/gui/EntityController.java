@@ -22,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -42,7 +43,15 @@ public class EntityController {
     @FXML
     private HBox playerBox;
     
+    @FXML
+    private Button sporeButton;
+    @FXML
+    private Button growThreadButton;
+
     private int occupiedPosition = 0;
+
+    private MushroomViewModel selectedMushroom = null;
+    private boolean sporeShootMode = false;
 
     private List<Insectist> insectists = new ArrayList<>();
     private List<Mycologist> mycologists = new ArrayList<>();
@@ -186,6 +195,13 @@ public class EntityController {
                         }
                     }
                 }
+            }
+        });
+        
+        sporeButton.setOnAction(e -> {
+            if (selectedMushroom != null) {
+                sporeShootMode = true;
+                System.out.println("Válassz egy tectont, ahova spórát lősz!");
             }
         });
     }
@@ -338,7 +354,17 @@ public class EntityController {
         });
 
         hex.setOnMouseClicked((MouseEvent e) -> {
-            System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+            if (sporeShootMode && selectedMushroom != null) {
+                String mushroomName = getObjectNameFor(selectedMushroom.getModel());
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
+                System.out.println("Parancs: " + cmd);
+                fungorium.utils.Interpreter.executeCommand(cmd);
+
+                sporeShootMode = false;
+            } else {
+                System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+            }
         });
 
         return hex;
@@ -365,6 +391,9 @@ public class EntityController {
 
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This mushroom of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+            selectedMushroom = vm;
+            sporeShootMode = false;
+            updateActionButtonsForMushroom();
         });
 
         return group;
@@ -479,5 +508,22 @@ public class EntityController {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void updateActionButtonsForMushroom() {
+        sporeButton.setVisible(true);
+        growThreadButton.setVisible(true);
+        // A többi gomb rejtése
+        // (ha több gombot is akarsz, azokat is állítsd false-ra)
+        // pl. moveInsectButton.setVisible(false); stb.
+    }
+
+    private static String getObjectNameFor(Object obj) {
+        for (Map.Entry<String, Object> entry : fungorium.utils.Interpreter.getObjectNames().entrySet()) {
+            if (entry.getValue() == obj) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }
