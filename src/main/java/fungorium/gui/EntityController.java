@@ -54,6 +54,12 @@ public class EntityController {
     private Button growMushroomButton;
     @FXML
     private Button endTurnButton;
+    @FXML
+    private Button cutThreadButton;
+    @FXML
+    private Button consumeSporeButton;
+    @FXML
+    private Button moveInsectButton;
 
     @FXML
     private VBox infoPanel;
@@ -70,6 +76,8 @@ public class EntityController {
     private boolean sporeShootMode = false;
     private boolean growThreadMode = false;
     private boolean growMushroomMode = false;
+
+    private InsectViewModel selectedInsect = null;
     
 
     private List<Insectist> insectists = new ArrayList<>();
@@ -242,6 +250,7 @@ public class EntityController {
             currentActorIndex = (currentActorIndex + 1) % turnOrder.size();
             currentActor = turnOrder.get(currentActorIndex);
             hideAllActionButtons();
+            updateActionButtonsForTurn();
             updateTurnLabel();
             if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
                 Interpreter.executeCommand("/time");
@@ -478,25 +487,10 @@ public class EntityController {
         });
 
         group.setOnMouseClicked((MouseEvent e) -> {
-            System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
-
-            InsectViewModel selectedInsect = vm;
-
-            // Create a one‑shot handler:
-            EventHandler<MouseEvent> oneShot = new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent te) {
-                    // Find the Node under the pointer:
-                    Node picked = te.getPickResult().getIntersectedNode();
-                    System.out.println("Selected insect: " + selectedInsect.getModel().getClass().getSimpleName());
-                    System.out.println("Picked node: " + picked);
-                    // Uninstall this handler so it only runs once:
-                    group.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-                    // Consume to prevent underlying handlers if you like:
-                    te.consume();
-                }
-            };
-            group.getScene().addEventHandler(MouseEvent.MOUSE_CLICKED, oneShot);
+            if (currentActor instanceof Insectist i && i == player) {
+                selectedInsect = vm;
+                updateActionButtonsForInsect();
+            }
         });
 
         return group;
@@ -572,6 +566,19 @@ public class EntityController {
         // A többi gomb rejtése
         // (ha több gombot is akarsz, azokat is állítsd false-ra)
         // pl. moveInsectButton.setVisible(false); stb.
+        cutThreadButton.setVisible(false);
+        consumeSporeButton.setVisible(false);
+        moveInsectButton.setVisible(false);
+    }
+
+    private void updateActionButtonsForInsect() {
+        moveInsectButton.setVisible(true);
+        cutThreadButton.setVisible(true);
+        consumeSporeButton.setVisible(true);
+        // A többi gomb rejtése
+        sporeButton.setVisible(false);
+        growThreadButton.setVisible(false);
+        growMushroomButton.setVisible(false);
     }
 
     private void hideAllActionButtons() {
@@ -617,6 +624,14 @@ public class EntityController {
             turnLabel.setText("Gombász lép: " + m.getName());
         } else if (currentActor instanceof Insectist i) {
             turnLabel.setText("Rovarász lép: " + i.getName());
+        }
+    }
+
+    private void updateActionButtonsForTurn() {
+        if (currentActor instanceof Mycologist) {
+            growMushroomButton.setVisible(true);
+        } else {
+            growMushroomButton.setVisible(false);
         }
     }
 }
