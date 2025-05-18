@@ -78,13 +78,6 @@ public class TectonPositioner {
             }
         }
 
-        System.out.println("Assigned positions for Tectons:");
-        for (Map.Entry<Tecton, double[]> entry : assignedPositions.entrySet()) {
-            Tecton tecton = entry.getKey();
-            double[] position = entry.getValue();
-            System.out.printf("Tecton: (%.2f, %.2f)%n", position[0], position[1]);
-        }
-
         for (Tecton tecton : assignedPositions.keySet()) {
             double[] position = assignedPositions.get(tecton);
             TectonViewModel vm = new TectonViewModel(tecton, position[0] + hexWidth / 2 + 10, position[1] + hexHeight / 2 + 10);

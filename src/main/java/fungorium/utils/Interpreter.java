@@ -1319,6 +1319,7 @@ public class Interpreter {
         objectNames.clear();
         prefixCounters.clear();
         computedPrefixes.clear();
+        controller.refreshController(objectNames);
     }
 
     public static void removeAutoDuplicates(Map<String, Object> map) {
@@ -1352,6 +1353,7 @@ public class Interpreter {
             System.out.println("Command not found.");
             EntityController.instance.appendInfo("Command not found.");
         }
+        removeAutoDuplicates(objectNames);
         controller.refreshController(objectNames);
     }
 

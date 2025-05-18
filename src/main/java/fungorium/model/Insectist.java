@@ -98,7 +98,9 @@ public class Insectist {
      */
     public void consumeSpore(int index) {
         if (index >= 0 && index < insects.size()) {
-            insects.get(index).consumeSpore();
+            if(insects.get(index).consumeSpore()){
+                addPoint();
+            }
         } else {
             System.out.println("Invalid insect index.");
         }

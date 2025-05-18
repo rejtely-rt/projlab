@@ -10,7 +10,6 @@
     <!-- Felső sáv: köridő, aktuális játékos, kör vége -->
     <HBox spacing="20" alignment="CENTER_RIGHT">
         <Label fx:id="turnLabel" text="Gombász 1 lép" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
-        <Label fx:id="timerLabel" text="00:30" style="-fx-font-size: 16px;" />
         <Button fx:id="endTurnButton" text="Lépés vége" />
     </HBox>
 

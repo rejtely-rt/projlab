@@ -83,7 +83,7 @@ public class FungoriumApp extends Application {
         }
 
         // 2. Tectonok létrehozása Interpreter parancsokkal
-        int tectonCount = 10 + rand.nextInt(3);
+        int tectonCount = 20 + rand.nextInt(3);
         List<String> tectonNames = new ArrayList<>();
         for (int i = 0; i < tectonCount; i++) {
             String id = "t" + i;
@@ -101,7 +101,7 @@ public class FungoriumApp extends Application {
 
         // 3. Tectonok összekötése (szomszédok random, Interpreter-rel)
         for (int i = 0; i < tectonCount; i++) {
-            int neighbors = 1 + rand.nextInt(2);
+            int neighbors = 2 + rand.nextInt(2);
             for (int n = 0; n < neighbors; n++) {
                 int j = rand.nextInt(tectonCount);
                 if (j != i) {
@@ -111,41 +111,36 @@ public class FungoriumApp extends Application {
         }
 
         // 4. Minden mycologist kap egy gombát egy random tectonra
-        for (Mycologist myc : mycologists) {
-            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
-            String mName = "m_" + myc.getName();
-            Interpreter.executeCommand("addm -id " + mName + " -t " + tName + " -my " + myc.getName() + " -lvl 1");
+        for (int i = 0; i < 3; i++) {
+            for (Mycologist myc : mycologists) {
+                String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+                String mName = "m_" + myc.getName() + "_" + i;
+                Interpreter.executeCommand("addm -id " + mName + " -t " + tName + " -my " + myc.getName() + " -lvl 1");
+            }
         }
 
         // 5. Minden insectist kap egy rovart egy random tectonra
-        for (Insectist ins : insectists) {
-            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
-            String iName = "i_" + ins.getName();
-            Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
-        }
-
-        // 6. Véletlenszerűen további gombák
-        int extraMushrooms = rand.nextInt(tectonCount / 2);
-        for (int i = 0; i < extraMushrooms; i++) {
-            Mycologist myc = mycologists.get(rand.nextInt(mycologists.size()));
-            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
-            String mName = "m_extra" + i;
-            Interpreter.executeCommand("addm -id " + mName + " -t " + tName + " -my " + myc.getName() + " -lvl 1");
-        }
-
-        // 7. Véletlenszerűen további rovarok
-        int extraInsects = rand.nextInt(tectonCount / 2);
-        for (int i = 0; i < extraInsects; i++) {
-            Insectist ins = insectists.get(rand.nextInt(insectists.size()));
-            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
-            String iName = "i_extra" + i;
-            Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
+        for (int i = 0; i < 30; i++) {
+            for (Insectist ins : insectists) {
+                String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+                String iName = "i_" + ins.getName() + "_" + i;
+                Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
+            }
         }
 
         System.out.println("Game initialized with random objects (Interpreter commands).");
     }
     
     public static void runTestFile(String filename, EntityController controller) throws IOException {
+        Interpreter.reset();
+        Insectist ins = new Insectist("insectist1");
+        Interpreter.setInsectists(new ArrayList<>(List.of(ins)));
+        Mycologist myc = new Mycologist("mycologist1");
+        Interpreter.setMycologists(new ArrayList<>(List.of(myc)));
+        Interpreter.getController().setPlayers(
+                new ArrayList<>(List.of(ins)),
+                new ArrayList<>(List.of(myc))
+        );
         List<String> commands = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;

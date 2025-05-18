@@ -86,6 +86,9 @@ public class EntityController {
     private List<Mycologist> mycologists = new ArrayList<>();
     
     private ObservableList<EntityViewModel> entities = FXCollections.observableArrayList();
+
+    private Map<Tecton, TectonViewModel> tectonVMs = new HashMap<>();
+    private Map<TectonViewModel, Polygon> tectonNodes = new HashMap<>();
     
     public ObservableList<EntityViewModel> getEntities() {
         return entities;
@@ -97,18 +100,26 @@ public class EntityController {
     
     public void refreshController(Map<String, Object> objects) {
         entities.clear();
-        System.out.println("Refreshing controller with objects: " + objects);
 
         TectonPositioner tectonPositioner = new TectonPositioner(this);
-        Map<Tecton, TectonViewModel> tectonVMs = tectonPositioner.createTectonViewModels(objects, 5, 6, 70, 60);
+        tectonVMs = tectonPositioner.createTectonViewModels(objects, 5, 6, 70, 60);
 
         // Insectek – csak egyszer végigmenni rajtuk!
+        Map<Tecton, Integer> insectPositions = new HashMap<>();
         for (Map.Entry<String, Object> entry : objects.entrySet()) {
             if (entry.getValue() instanceof Insect insect) {
                 Tecton tecton = insect.getLocation();
                 TectonViewModel tVM = tectonVMs.get(tecton);
                 if (tVM != null) {
-                    double[] offset = {0, 0}; // vagy calculateOffset(index), ha több is lehet egy tectonon
+                    // Ellenőrizd, hogy már van-e rovar ezen a tectonon
+                    if (insectPositions.containsKey(tecton)) {
+                        // Ha van, akkor csak növeljük az indexet
+                        insectPositions.put(tecton, insectPositions.get(tecton) + 1);
+                    } else {
+                        // Ha nincs, akkor inicializáljuk
+                        insectPositions.put(tecton, 0);
+                    }
+                    double[] offset = calculateOffset(insectPositions.get(tecton)); // vagy calculateOffset(index), ha több is lehet egy tectonon
                     double x = tVM.getX() + offset[0];
                     double y = tVM.getY() + offset[1];
                     addEntity(new InsectViewModel(insect, x, y));
@@ -179,6 +190,8 @@ public class EntityController {
         for (Mycologist m : mycologists) {
             System.out.println(m.getName() + " mushrooms: " + m.getMushrooms());
         }
+
+        updatePlayerBox();
     }
     
     @FXML
@@ -242,6 +255,9 @@ public class EntityController {
             int prevActorIndex = currentActorIndex;
             currentActorIndex = (currentActorIndex + 1) % turnOrder.size();
             currentActor = turnOrder.get(currentActorIndex);
+            if (currentActor instanceof Mycologist) {
+                currentMycologistName = ((Mycologist) currentActor).getName();
+            }
             updateActionButtonsForTurn();
             updateTurnLabel();
             if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
@@ -268,6 +284,7 @@ public class EntityController {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
                 String cmd = "/consume -i " + insectName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
             }
         });
     }
@@ -383,6 +400,7 @@ public class EntityController {
         double size = 40; // sugár
 
         Polygon hex = new Polygon();
+        tectonNodes.put(vm, hex);
         for (int i = 0; i < 6; i++) {
             double angle = Math.toRadians(60 * i - 30);
             double x = centerX + size * Math.cos(angle);
@@ -397,32 +415,49 @@ public class EntityController {
             Tooltip.install(hex, tooltip);
         });
 
+        hex.setOnMouseExited((MouseEvent e) -> {
+            hex.setFill(Color.BEIGE);
+            Tecton tecton = vm.getModel();
+            for (Tecton neighbor : tecton.getNeighbors()) {
+                tectonNodes.get(tectonVMs.get(neighbor)).setFill(Color.BEIGE);
+            }
+        });
+
         hex.setOnMouseClicked((MouseEvent e) -> {
             if (sporeShootMode && selectedMushroom != null) {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
                 sporeShootMode = false;
             } else if (growThreadMode && selectedMushroom != null) {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growt -m " + mushroomName + " -tt " + tectonName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
                 growThreadMode = false;
             } else if (growMushroomMode) {
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growm -t " + tectonName + " -my " + currentMycologistName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
                 growMushroomMode = false;
             } else if (moveInsectMode && selectedInsect != null) {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/move -i " + insectName + " -t " + tectonName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
                 moveInsectMode = false;
             } else {
                 System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+                hex.setFill(Color.RED);
+                Tecton tecton = vm.getModel();
+                for (Tecton neighbor : tecton.getNeighbors()) {
+                    tectonNodes.get(tectonVMs.get(neighbor)).setFill(Color.RED);
+                }
             }
         });
 
@@ -517,10 +552,12 @@ public class EntityController {
 
     public Node createThreadNode(ThreadViewModel vm) {
         javafx.scene.shape.Line line = new javafx.scene.shape.Line();
-        line.startXProperty().bind(vm.getMushroom().xProperty());
-        line.startYProperty().bind(vm.getMushroom().yProperty());
+        line.startXProperty().bind(vm.getFrom().xProperty());
+        line.startYProperty().bind(vm.getFrom().yProperty());
         line.endXProperty().bind(vm.getTo().xProperty());
         line.endYProperty().bind(vm.getTo().yProperty());
+        System.out.println("Thread start: " + vm.getFrom().xProperty().get() + ", " + vm.getFrom().yProperty().get());
+        System.out.println("Thread end: " + vm.getTo().xProperty().get() + ", " + vm.getTo().yProperty().get());
         line.setStrokeWidth(5.0);
         line.setStroke(Color.DARKMAGENTA);
 
@@ -530,6 +567,7 @@ public class EntityController {
                 String threadName = getObjectNameFor(vm.getModel());
                 String cmd = "/cut -i " + insectName + " -th " + threadName;
                 fungorium.utils.Interpreter.executeCommand(cmd);
+                endTurnButton.fire();
                 cutThreadMode = false;
             }
         });
@@ -559,6 +597,7 @@ public class EntityController {
     // Ezt a metódust hívja majd a TestSelectorController, ha kiválasztottak egy tesztet
     public void runSelectedTest(String testFolder) {
         try {
+            // Bezárjuk a tesztválasztó ablakot
             fungorium.gui.FungoriumApp.runTestFile("tests/" + testFolder + "/input.txt", this);
         } catch (Exception ex) {
             ex.printStackTrace();
