@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import fungorium.model.*;
 import fungorium.tectons.*;
+import fungorium.utils.Interpreter;
 import fungorium.spores.*;
 
 
@@ -237,10 +238,14 @@ public class EntityController {
         });
 
         endTurnButton.setOnAction(e -> {
+            int prevActorIndex = currentActorIndex;
             currentActorIndex = (currentActorIndex + 1) % turnOrder.size();
             currentActor = turnOrder.get(currentActorIndex);
             hideAllActionButtons();
             updateTurnLabel();
+            if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
+                Interpreter.executeCommand("/time");
+            }
         });
     }
 
@@ -607,6 +612,7 @@ public class EntityController {
     private Object currentActor = null; // mindig az aktuális játékos (Mycologist vagy Insectist)
 
     private void updateTurnLabel() {
+        // Ha ez az utolso jatekos, es a kor vegere ertunk
         if (currentActor instanceof Mycologist m) {
             turnLabel.setText("Gombász lép: " + m.getName());
         } else if (currentActor instanceof Insectist i) {
