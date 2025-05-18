@@ -47,16 +47,25 @@ public class EntityController {
     private Button sporeButton;
     @FXML
     private Button growThreadButton;
+    @FXML
+    private Button moveInsectButton;
+    @FXML
+    private Button cutThreadButton;
+    @FXML
+    private Button consumeSporeButton;
 
     private int occupiedPosition = 0;
 
     private MushroomViewModel selectedMushroom = null;
     private boolean sporeShootMode = false;
+    private boolean moveInsectMode = false;
 
     private List<Insectist> insectists = new ArrayList<>();
     private List<Mycologist> mycologists = new ArrayList<>();
     
     private ObservableList<EntityViewModel> entities = FXCollections.observableArrayList();
+
+    private Insectist currentPlayer; // Track the current player
     
     public ObservableList<EntityViewModel> getEntities() {
         return entities;
@@ -253,6 +262,10 @@ public class EntityController {
         updatePlayerBox();
     }
 
+    public void setCurrentPlayer(Insectist player) {
+        this.currentPlayer = player;
+        System.out.println("Current player set to: " + player.getName());
+    }
 
     public double[] getTectonPosition(int rows, int cols, double hexWidth, double hexHeight) {
         // Calculate row and column based on position
@@ -336,7 +349,7 @@ public class EntityController {
     public Node createTectonNode(TectonViewModel vm) {
         double centerX = vm.getX();
         double centerY = vm.getY();
-        double size = 40; // sugár
+        double size = 40; // radius
 
         Polygon hex = new Polygon();
         for (int i = 0; i < 6; i++) {
@@ -354,11 +367,28 @@ public class EntityController {
         });
 
         hex.setOnMouseClicked((MouseEvent e) -> {
-            if (sporeShootMode && selectedMushroom != null) {
+            if (moveInsectMode) {
+                System.out.println("Attempting to move insect to tecton at position: (" + vm.getX() + ", " + vm.getY() + ")");
+
+                // Ensure only the current player can move their insects
+                if (currentPlayer != null) {
+                    Tecton targetTecton = vm.getModel();
+                    for (Insect insect : currentPlayer.getInsects()) {
+                        insect.moveTo(targetTecton); // Directly call moveTo
+                        System.out.println("Insect move attempted.");
+                        refreshController(fungorium.utils.Interpreter.getObjectNames());
+                        break;
+                    }
+                } else {
+                    System.out.println("You can only move your own insects.");
+                }
+
+                moveInsectMode = false;
+            } else if (sporeShootMode && selectedMushroom != null) {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
-                System.out.println("Parancs: " + cmd);
+                System.out.println("Command: " + cmd);
                 fungorium.utils.Interpreter.executeCommand(cmd);
 
                 sporeShootMode = false;
@@ -423,23 +453,33 @@ public class EntityController {
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
 
-            InsectViewModel selectedInsect = vm;
+            // Show action buttons
+            moveInsectButton.setVisible(true);
+            cutThreadButton.setVisible(true);
+            consumeSporeButton.setVisible(true);
 
-            // Create a one‑shot handler:
-            EventHandler<MouseEvent> oneShot = new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent te) {
-                    // Find the Node under the pointer:
-                    Node picked = te.getPickResult().getIntersectedNode();
-                    System.out.println("Selected insect: " + selectedInsect.getModel().getClass().getSimpleName());
-                    System.out.println("Picked node: " + picked);
-                    // Uninstall this handler so it only runs once:
-                    group.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-                    // Consume to prevent underlying handlers if you like:
-                    te.consume();
-                }
-            };
-            group.getScene().addEventHandler(MouseEvent.MOUSE_CLICKED, oneShot);
+            // Enable move mode for this insect
+            moveInsectButton.setOnAction(event -> {
+                System.out.println("Move Insect mode activated. Click on a tecton to move the insect.");
+                moveInsectMode = true;
+
+                // Handle tecton clicks for movement
+                canvas.setOnMouseClicked(tectonEvent -> {
+                    if (moveInsectMode) {
+                        Node clickedNode = tectonEvent.getPickResult().getIntersectedNode();
+                        if (clickedNode instanceof Polygon) {
+                            TectonViewModel targetTectonVM = (TectonViewModel) clickedNode.getUserData();
+                            if (targetTectonVM != null) {
+                                vm.getModel().moveTo(targetTectonVM.getModel()); // Directly call moveTo
+                                System.out.println("Insect move attempted.");
+                                refreshController(fungorium.utils.Interpreter.getObjectNames());
+                            }
+                        }
+                        moveInsectMode = false;
+                        canvas.setOnMouseClicked(null); // Reset click handler
+                    }
+                });
+            });
         });
 
         return group;
@@ -525,5 +565,11 @@ public class EntityController {
             }
         }
         return null;
+    }
+
+    @FXML
+    private void onMoveInsectButtonClicked() {
+        System.out.println("Move Insect button clicked!");
+        moveInsectMode = true;
     }
 }

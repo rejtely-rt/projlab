@@ -31,7 +31,7 @@
             <Button fx:id="sporeButton" text="Szórj spórát" visible="false"/>
             <Button fx:id="growMushroomButton" text="Növessz gombatestet" visible="false"/>
             <Button fx:id="growThreadButton" text="Növeszd fonalat" visible="false"/>
-            <Button fx:id="moveInsectButton" text="Mozogj ide" visible="false"/>
+            <Button fx:id="moveInsectButton" text="Mozogj ide" visible="false" onAction="#onMoveInsectButtonClicked"/>
             <Button fx:id="cutThreadButton" text="Vágd el a fonalat" visible="false"/>
             <Button fx:id="consumeSporeButton" text="Edd meg a spórát" visible="false"/>
         </VBox>

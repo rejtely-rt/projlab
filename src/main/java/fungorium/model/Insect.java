@@ -149,7 +149,7 @@ public class Insect implements Tickable{
             return;
         }
         if (getSpeed() <= 0) {
-            System.out.println("Insect is paralyzed, therefore cannot move (regardless what the next line says)");
+            System.out.println("Insect is paralyzed, therefore cannot move.");
             return;
         }
 
@@ -161,7 +161,7 @@ public class Insect implements Tickable{
                 return;
             }
         }
-        System.out.println("Insect did not find a thread, therefore cannot move (regardless what the next line says)");
+        System.out.println("Insect did not find a thread, therefore cannot move.");
     }
 
     /**
