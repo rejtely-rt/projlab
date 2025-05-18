@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import fungorium.model.*;
 import fungorium.tectons.*;
 import fungorium.utils.Interpreter;
+import fungorium.utils.TectonPositioner;
 import fungorium.spores.*;
 
 
@@ -99,15 +100,8 @@ public class EntityController {
         System.out.println("Refreshing controller with objects: " + objects);
 
         // Először a tectonokat add hozzá, hogy legyenek TectonViewModeljeid
-        Map<Tecton, TectonViewModel> tectonVMs = new HashMap<>();
-        for (Map.Entry<String, Object> entry : objects.entrySet()) {
-            if (entry.getValue() instanceof Tecton tecton) {
-                double[] position = getTectonPosition(5, 8, 70, 60);
-                TectonViewModel vm = new TectonViewModel(tecton, position[0], position[1]);
-                tectonVMs.put(tecton, vm);
-                addEntity(vm);
-            }
-        }
+        TectonPositioner positioner = new TectonPositioner(this);
+        Map<Tecton, TectonViewModel> tectonVMs = positioner.createTectonViewModels(objects, 5, 7, 70, 60);
 
         // Insectek – csak egyszer végigmenni rajtuk!
         for (Map.Entry<String, Object> entry : objects.entrySet()) {
@@ -298,23 +292,6 @@ public class EntityController {
 
         updatePlayerBox();
         updateTurnLabel();
-    }
-
-
-    public double[] getTectonPosition(int rows, int cols, double hexWidth, double hexHeight) {
-        // Calculate row and column based on position
-        int row = occupiedPosition / cols + 1;
-        int col = occupiedPosition % cols + 1;
-
-        // Calculate x and y coordinates with hexagonal offset
-        double spacing = 10.0; // Spacing between hexagons, adjustable as needed
-        double offsetX = (row % 2 == 0) ? 0 : (hexWidth + spacing) / 2; // Offset for odd rows
-        double x = col * (hexWidth + spacing) + offsetX;
-        double y = row * (hexHeight + spacing);
-
-        occupiedPosition++;
-
-        return new double[] { x, y };
     }
 
     public void updatePlayerBox() {

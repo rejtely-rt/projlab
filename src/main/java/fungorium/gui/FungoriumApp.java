@@ -66,7 +66,7 @@ public class FungoriumApp extends Application {
         primaryStage.setTitle("Fungorium - The Game");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        //initializeGameObjects(insectists, mycologists);
+        initializeGameObjects(insectists, mycologists);
     }
 
 
