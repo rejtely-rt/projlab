@@ -900,6 +900,9 @@ public class Interpreter {
         }
 
         if (tectonId != null && mycologistId != null) {
+            System.out.println("Tecton ID: " + tectonId);
+            System.out.println("Mycologist ID: " + mycologistId);
+            System.out.println(Interpreter.getObjects());
             Object tectonObj = Interpreter.getObject(tectonId);
             // Helyesen: a mycologist-et a mycologistByName map-ből szedd ki!
             Mycologist mycologist = mycologistByName.get(mycologistId);
@@ -1219,11 +1222,8 @@ public class Interpreter {
         String[] parts = value.trim().split("\\s+");
         if (parts.length == 0) return;
 
-        int argCount = 0;
         String command = parts[0].substring(1); // Első karakter levágása
         String[] args = Arrays.copyOfRange(parts, 1, parts.length);
-
-        int fasz = 0;
 
         var cmd = commands.get(command);
         if (cmd != null) {

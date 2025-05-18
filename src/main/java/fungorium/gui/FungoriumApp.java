@@ -73,11 +73,19 @@ public class FungoriumApp extends Application {
     private static void initializeGameObjects(List<Insectist> insectists, List<Mycologist> mycologists) {
         Random rand = new Random();
 
-        // 1. Tectonok létrehozása különböző típusokkal
-        int tectonCount = 10 + rand.nextInt(3); // 10-12 tecton
-        List<String> tectonIds = new ArrayList<>();
+        // 1. Játékosok regisztrálása Interpreter-ben
+        for (Mycologist myc : mycologists) {
+            Interpreter.getObjectNames().put(myc.getName(), myc);
+        }
+        for (Insectist ins : insectists) {
+            Interpreter.getObjectNames().put(ins.getName(), ins);
+        }
+
+        // 2. Tectonok létrehozása Interpreter parancsokkal
+        int tectonCount = 10 + rand.nextInt(3);
+        List<String> tectonNames = new ArrayList<>();
         for (int i = 0; i < tectonCount; i++) {
-            String id = "t" + (i + 1);
+            String id = "t" + i;
             String type;
             switch (rand.nextInt(4)) {
                 case 0 -> type = "nomushtecton";
@@ -86,68 +94,57 @@ public class FungoriumApp extends Application {
                 case 3 -> type = "threadkeepertecton";
                 default -> type = "tecton";
             }
-            Interpreter.executeCommand("/addt -id " + id + " -t " + type);
-            tectonIds.add(id);
+            Interpreter.executeCommand("addt -id " + id + " -t " + type);
+            tectonNames.add(id);
         }
 
-        // 2. Tectonok összekötése (szomszédok random, de mindenki legalább 1-2 szomszéd)
+        // 3. Tectonok összekötése (szomszédok random, Interpreter-rel)
         for (int i = 0; i < tectonCount; i++) {
-            String t1 = tectonIds.get(i);
-            int neighbors = 1 + rand.nextInt(2); // 1 vagy 2 szomszéd
+            int neighbors = 1 + rand.nextInt(2);
             for (int n = 0; n < neighbors; n++) {
                 int j = rand.nextInt(tectonCount);
                 if (j != i) {
-                    String t2 = tectonIds.get(j);
-                    Interpreter.executeCommand("/altt -id " + t1 + " -addn " + t2);
+                    Interpreter.executeCommand("altt -id " + tectonNames.get(i) + " -addn " + tectonNames.get(j));
                 }
             }
         }
 
-        // 3. Minden mycologist kap egy gombát egy random tectonra
+        // 4. Minden mycologist kap egy gombát egy random tectonra
         for (Mycologist myc : mycologists) {
-            String t = tectonIds.get(rand.nextInt(tectonIds.size()));
-            String mId = "m" + myc.getName();
-            Interpreter.executeCommand("/addm -id " + mId + " -t " + t + " -my " + myc.getName());
+            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+            String mName = "m_" + myc.getName();
+            Interpreter.executeCommand("addm -id " + mName + " -t " + tName + " -my " + myc.getName() + " -lvl 1");
         }
 
-        // 4. Minden insectist kap egy rovart egy random tectonra
+        // 5. Minden insectist kap egy rovart egy random tectonra
         for (Insectist ins : insectists) {
-            String t = tectonIds.get(rand.nextInt(tectonIds.size()));
-            String iId = "i" + ins.getName();
-            Interpreter.executeCommand("/addi -id " + iId + " -t " + t + " -in " + ins.getName());
+            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+            String iName = "i_" + ins.getName();
+            Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
         }
 
-        // 5. Véletlenszerűen további gombák
+        // 6. Véletlenszerűen további gombák
         int extraMushrooms = rand.nextInt(tectonCount / 2);
         for (int i = 0; i < extraMushrooms; i++) {
             Mycologist myc = mycologists.get(rand.nextInt(mycologists.size()));
-            String t = tectonIds.get(rand.nextInt(tectonIds.size()));
-            String mId = "m" + myc.getName() + "_extra" + i;
-            Interpreter.executeCommand("/addm -id " + mId + " -t " + t + " -my " + myc.getName());
+            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+            String mName = "m_extra" + i;
+            Interpreter.executeCommand("addm -id " + mName + " -t " + tName + " -my " + myc.getName() + " -lvl 1");
         }
 
-        // 6. Véletlenszerűen további rovarok
+        // 7. Véletlenszerűen további rovarok
         int extraInsects = rand.nextInt(tectonCount / 2);
         for (int i = 0; i < extraInsects; i++) {
             Insectist ins = insectists.get(rand.nextInt(insectists.size()));
-            String t = tectonIds.get(rand.nextInt(tectonIds.size()));
-            String iId = "i" + ins.getName() + "_extra" + i;
-            Interpreter.executeCommand("/addi -id " + iId + " -t " + t + " -in " + ins.getName());
+            String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
+            String iName = "i_extra" + i;
+            Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
         }
 
-        // 7. Minden gomba termeljen random típusú spórákat induláskor
+        // 8. Minden gomba termeljen random típusú spórákat induláskor
         for (Mycologist myc : mycologists) {
             for (Mushroom m : myc.getMushrooms()) {
-                String mId = null;
-                // Find the mushroom's ID in Interpreter.objectNames
-                for (Map.Entry<String, Object> entry : Interpreter.getObjectNames().entrySet()) {
-                    if (entry.getValue() == m) {
-                        mId = entry.getKey();
-                        break;
-                    }
-                }
-                if (mId == null) continue;
-                int sporeCount = 1 + rand.nextInt(2); // 1-2 spóra
+                int sporeCount = 1 + rand.nextInt(2);
                 for (int s = 0; s < sporeCount; s++) {
                     String sporeType;
                     switch (rand.nextInt(5)) {
@@ -158,12 +155,23 @@ public class FungoriumApp extends Application {
                         case 4 -> sporeType = "speedyspore";
                         default -> sporeType = "slowyspore";
                     }
-                    Interpreter.executeCommand("/addsp -m " + mId + " -tp " + sporeType);
+                    // Az Interpreter-ben a mushroom neve a getObjectNames() alapján lehet "_auto" végű is!
+                    String mName = null;
+                    for (Map.Entry<String, Object> entry : Interpreter.getObjectNames().entrySet()) {
+                        if (entry.getValue() == m) {
+                            mName = entry.getKey();
+                            break;
+                        }
+                    }
+                    if (mName != null) {
+                        Interpreter.executeCommand("addsp -m " + mName + " -tp " + sporeType);
+                    }
                 }
             }
         }
 
         Interpreter.getController().refreshController(Interpreter.getObjects());
+        System.out.println("Game initialized with random objects (Interpreter commands).");
     }
     
     public static void runTestFile(String filename, EntityController controller) throws IOException {

@@ -40,7 +40,8 @@ public class Insectist {
      */
     public Insectist(String value) {
         Interpreter.create(this);
-        this.insects = new ArrayList<>(); this.name = value;
+        this.insects = new ArrayList<>(); 
+        this.name = value;
     }
 
     /**
