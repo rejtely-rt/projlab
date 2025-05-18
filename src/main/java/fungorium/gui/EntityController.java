@@ -71,8 +71,6 @@ public class EntityController {
     @FXML
     private Label turnLabel;
 
-    private int occupiedPosition = 0;
-
     private MushroomViewModel selectedMushroom = null;
     private boolean sporeShootMode = false;
     private boolean growThreadMode = false;
@@ -83,7 +81,7 @@ public class EntityController {
     private boolean cutThreadMode = false;
     private boolean consumeSporeMode = false;
     
-
+    
     private List<Insectist> insectists = new ArrayList<>();
     private List<Mycologist> mycologists = new ArrayList<>();
     
@@ -99,12 +97,10 @@ public class EntityController {
     
     public void refreshController(Map<String, Object> objects) {
         entities.clear();
-        occupiedPosition = 0;
         System.out.println("Refreshing controller with objects: " + objects);
 
-        // Először a tectonokat add hozzá, hogy legyenek TectonViewModeljeid
-        TectonPositioner positioner = new TectonPositioner(this);
-        Map<Tecton, TectonViewModel> tectonVMs = positioner.createTectonViewModels(objects, 5, 7, 70, 60);
+        TectonPositioner tectonPositioner = new TectonPositioner(this);
+        Map<Tecton, TectonViewModel> tectonVMs = tectonPositioner.createTectonViewModels(objects, 5, 6, 70, 60);
 
         // Insectek – csak egyszer végigmenni rajtuk!
         for (Map.Entry<String, Object> entry : objects.entrySet()) {

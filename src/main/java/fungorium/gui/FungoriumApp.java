@@ -142,36 +142,6 @@ public class FungoriumApp extends Application {
             Interpreter.executeCommand("addi -id " + iName + " -t " + tName + " -in " + ins.getName());
         }
 
-        // 8. Minden gomba termeljen random típusú spórákat induláskor
-        for (Mycologist myc : mycologists) {
-            for (Mushroom m : myc.getMushrooms()) {
-                int sporeCount = 1 + rand.nextInt(2);
-                for (int s = 0; s < sporeCount; s++) {
-                    String sporeType;
-                    switch (rand.nextInt(5)) {
-                        case 0 -> sporeType = "cannotcutspore";
-                        case 1 -> sporeType = "clonespore";
-                        case 2 -> sporeType = "paralyzespore";
-                        case 3 -> sporeType = "slowyspore";
-                        case 4 -> sporeType = "speedyspore";
-                        default -> sporeType = "slowyspore";
-                    }
-                    // Az Interpreter-ben a mushroom neve a getObjectNames() alapján lehet "_auto" végű is!
-                    String mName = null;
-                    for (Map.Entry<String, Object> entry : Interpreter.getObjectNames().entrySet()) {
-                        if (entry.getValue() == m) {
-                            mName = entry.getKey();
-                            break;
-                        }
-                    }
-                    if (mName != null) {
-                        Interpreter.executeCommand("addsp -m " + mName + " -tp " + sporeType);
-                    }
-                }
-            }
-        }
-
-        Interpreter.getController().refreshController(Interpreter.getObjects());
         System.out.println("Game initialized with random objects (Interpreter commands).");
     }
     

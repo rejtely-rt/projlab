@@ -22,6 +22,9 @@ public class TectonPositioner {
     public Map<Tecton, TectonViewModel> createTectonViewModels(Map<String, Object> objects, int rows, int cols,
             double hexWidth, double hexHeight) {
         Map<Tecton, TectonViewModel> tectonVMs = new HashMap<>();
+        assignedPositions.clear();
+        occupiedCoords.clear();
+        occupiedPosition = 0;
 
         // Find all Tectons
         List<Tecton> tectons = new ArrayList<>();
@@ -35,39 +38,25 @@ public class TectonPositioner {
             return tectonVMs;
         }
 
-        // Start with unassigned Tectons
+        // Start with the first Tecton and assign positions using a queue-based approach
         Queue<Tecton> queue = new LinkedList<>();
         Set<Tecton> visited = new HashSet<>();
+        queue.add(tectons.get(0));
+        visited.add(tectons.get(0));
 
-        // Process Tectons that already have positions
-        for (Tecton tecton : tectons) {
-            if (assignedPositions.containsKey(tecton)) {
-                // Reuse existing position
-                double[] pos = assignedPositions.get(tecton);
-                assignPosition(tecton, pos[0], pos[1], hexWidth, hexHeight, tectonVMs);
-                visited.add(tecton);
-            } else {
-                // Add unassigned Tectons to the queue for processing
-                if (queue.isEmpty() && !visited.contains(tecton)) {
-                    queue.add(tecton);
-                    visited.add(tecton);
-                    // Assign the first unassigned Tecton to the origin (0, 0) if no position exists
-                    assignPosition(tecton, 0, 0, hexWidth, hexHeight, tectonVMs);
-                }
-            }
-        }
+        // Assign the first Tecton to the origin (0, 0)
+        assignPosition(tectons.get(0), 0, 0, hexWidth, hexHeight, tectonVMs);
 
-        // Process neighbors for unassigned Tectons
         while (!queue.isEmpty()) {
             Tecton current = queue.poll();
             double[] currentPos = assignedPositions.get(current);
             int currentRow = (int) (currentPos[1] / (hexHeight + 10.0)); // Approximate row based on y
             int currentCol = (int) (currentPos[0] / (hexWidth + 10.0)); // Approximate col based on x
 
-            // Get neighbors and try to place unassigned ones
+            // Get neighbors and try to place them in adjacent hexagonal positions
             List<Tecton> neighbors = current.getNeighbors();
             for (Tecton neighbor : neighbors) {
-                if (!visited.contains(neighbor) && !assignedPositions.containsKey(neighbor)) {
+                if (!visited.contains(neighbor)) {
                     // Find an unoccupied neighboring position
                     double[] newPos = findNeighborPosition(currentRow, currentCol, rows, cols, hexWidth, hexHeight);
                     if (newPos != null) {
@@ -79,14 +68,28 @@ public class TectonPositioner {
             }
         }
 
-        // Handle any disconnected, unassigned Tectons
+        // Handle any disconnected Tectons (not reachable via neighbors)
         for (Tecton tecton : tectons) {
-            if (!visited.contains(tecton) && !assignedPositions.containsKey(tecton)) {
-                // Fallback to grid-based positioning for new Tectons
+            if (!visited.contains(tecton)) {
+                // Fallback to original grid-based positioning
                 double[] pos = getFallbackPosition(rows, cols, hexWidth, hexHeight);
                 assignPosition(tecton, pos[0], pos[1], hexWidth, hexHeight, tectonVMs);
                 visited.add(tecton);
             }
+        }
+
+        System.out.println("Assigned positions for Tectons:");
+        for (Map.Entry<Tecton, double[]> entry : assignedPositions.entrySet()) {
+            Tecton tecton = entry.getKey();
+            double[] position = entry.getValue();
+            System.out.printf("Tecton: (%.2f, %.2f)%n", position[0], position[1]);
+        }
+
+        for (Tecton tecton : assignedPositions.keySet()) {
+            double[] position = assignedPositions.get(tecton);
+            TectonViewModel vm = new TectonViewModel(tecton, position[0] + hexWidth / 2 + 10, position[1] + hexHeight / 2 + 10);
+            tectonVMs.put(tecton, vm);
+            addEntity(vm);
         }
 
         return tectonVMs;
@@ -94,12 +97,7 @@ public class TectonPositioner {
 
     private void assignPosition(Tecton tecton, double x, double y, double hexWidth, double hexHeight,
             Map<Tecton, TectonViewModel> tectonVMs) {
-        x = x + hexWidth / 2;
-        y = y + hexHeight / 2 + 10;
-        TectonViewModel vm = new TectonViewModel(tecton, x, y);
-        tectonVMs.put(tecton, vm);
         assignedPositions.put(tecton, new double[] { x, y });
-        addEntity(vm);
 
         // Mark the approximate grid position as occupied
         int row = (int) (y / (hexHeight + 10.0));
@@ -130,8 +128,8 @@ public class TectonPositioner {
     }
 
     private double[] getFallbackPosition(int rows, int cols, double hexWidth, double hexHeight) {
-        int row = occupiedPosition / cols + 1;
-        int col = occupiedPosition % cols + 1;
+        int row = occupiedPosition / cols;
+        int col = occupiedPosition % cols;
         double spacing = 10.0;
         double offsetX = (row % 2 == 0) ? 0 : (hexWidth + spacing) / 2;
         double x = col * (hexWidth + spacing) + offsetX;
@@ -141,6 +139,7 @@ public class TectonPositioner {
         return new double[] { x, y };
     }
 
+    // Placeholder for the addEntity method (as per your original code)
     private void addEntity(TectonViewModel vm) {
         entityController.addEntity(vm);
     }

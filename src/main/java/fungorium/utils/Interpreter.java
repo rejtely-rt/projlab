@@ -1340,6 +1340,7 @@ public class Interpreter {
     }
 
     public static void executeCommand(String inputString) {
+        removeAutoDuplicates(objectNames);
         inputString = inputString.trim().toLowerCase();
         System.out.println("Executing command: " + inputString);
         EntityController.instance.appendInfo(inputString);
@@ -1351,7 +1352,6 @@ public class Interpreter {
             System.out.println("Command not found.");
             EntityController.instance.appendInfo("Command not found.");
         }
-        removeAutoDuplicates(objectNames);
         controller.refreshController(objectNames);
     }
 
