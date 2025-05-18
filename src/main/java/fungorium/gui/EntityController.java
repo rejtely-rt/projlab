@@ -263,6 +263,7 @@ public class EntityController {
             if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
                 Interpreter.executeCommand("/time");
             }
+            refreshController(Interpreter.getObjects());
         });
 
         moveInsectButton.setOnAction(e -> {
@@ -471,7 +472,11 @@ public class EntityController {
                 10.0, 10.0,
                 0.0, -10.0
         );
-        triangle.setFill(Color.DARKOLIVEGREEN);
+        if (currentActor instanceof Mycologist m && m == player) {
+            triangle.setFill(Color.DARKRED);
+        } else {
+            triangle.setFill(Color.DARKOLIVEGREEN);
+        }
         triangle.setStroke(Color.BLACK);
 
         Group group = new Group(triangle);
@@ -504,7 +509,11 @@ public class EntityController {
             double y = radius * Math.sin(angle);
             circle.getPoints().addAll(x, y);
         }
-        circle.setFill(Color.LIGHTBLUE);
+        if (currentActor instanceof Insectist i && i == player) {
+            circle.setFill(Color.DARKRED);
+        } else {
+            circle.setFill(Color.LIGHTBLUE);
+        }
         circle.setStroke(Color.DARKGRAY);
 
         Group group = new Group(circle);
@@ -556,10 +565,12 @@ public class EntityController {
         line.startYProperty().bind(vm.getFrom().yProperty());
         line.endXProperty().bind(vm.getTo().xProperty());
         line.endYProperty().bind(vm.getTo().yProperty());
-        System.out.println("Thread start: " + vm.getFrom().xProperty().get() + ", " + vm.getFrom().yProperty().get());
-        System.out.println("Thread end: " + vm.getTo().xProperty().get() + ", " + vm.getTo().yProperty().get());
         line.setStrokeWidth(5.0);
-        line.setStroke(Color.DARKMAGENTA);
+        if (currentActor instanceof Mycologist i && i.getMushrooms().contains(vm.getMushroom().getModel())) {
+            line.setStroke(Color.DARKRED);
+        } else {
+            line.setStroke(Color.DARKMAGENTA);
+        }
 
         line.setOnMouseClicked(e -> {
             if (cutThreadMode && selectedInsect != null) {
