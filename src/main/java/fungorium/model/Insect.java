@@ -181,15 +181,15 @@ public class Insect implements Tickable{
      * Consume the given spore.
      */
     public boolean consumeSpore() {
-        List<Spore> sporeList = this.location.getSpores();
+        List<Spore> sporeList = this.location.getSpores(); // Get the spores at the insect's current location
         if (sporeList.isEmpty()) {
-            return false; // Nem volt spóra a helyszínen
+            return false; // No spores available at the location
         }
-        Spore spore = sporeList.get(0);
-        sporeList.remove(0);
-        spore.applyEffect(this);
-        this.spores.add(spore);
-        return true; // Sikeres spórafogyasztás
+        Spore spore = sporeList.get(0); // Take the first spore from the list
+        sporeList.remove(0); // Remove the spore from the location
+        spore.applyEffect(this); // Apply the effect of the spore to the insect
+        this.spores.add(spore); // Add the consumed spore to the insect's list of consumed spores
+        return true; // Successfully consumed the spore
     }
 
     /**

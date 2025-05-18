@@ -57,6 +57,7 @@ public class EntityController {
     private int occupiedPosition = 0;
 
     private MushroomViewModel selectedMushroom = null;
+    private InsectViewModel selectedInsect; // Track the selected insect
     private boolean sporeShootMode = false;
     private boolean moveInsectMode = false;
 
@@ -453,32 +454,18 @@ public class EntityController {
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
 
+            // Set the selected insect
+            selectedInsect = vm;
+
             // Show action buttons
             moveInsectButton.setVisible(true);
             cutThreadButton.setVisible(true);
             consumeSporeButton.setVisible(true);
 
-            // Enable move mode for this insect
-            moveInsectButton.setOnAction(event -> {
-                System.out.println("Move Insect mode activated. Click on a tecton to move the insect.");
-                moveInsectMode = true;
-
-                // Handle tecton clicks for movement
-                canvas.setOnMouseClicked(tectonEvent -> {
-                    if (moveInsectMode) {
-                        Node clickedNode = tectonEvent.getPickResult().getIntersectedNode();
-                        if (clickedNode instanceof Polygon) {
-                            TectonViewModel targetTectonVM = (TectonViewModel) clickedNode.getUserData();
-                            if (targetTectonVM != null) {
-                                vm.getModel().moveTo(targetTectonVM.getModel()); // Directly call moveTo
-                                System.out.println("Insect move attempted.");
-                                refreshController(fungorium.utils.Interpreter.getObjectNames());
-                            }
-                        }
-                        moveInsectMode = false;
-                        canvas.setOnMouseClicked(null); // Reset click handler
-                    }
-                });
+            // Enable consume spore mode for this insect
+            consumeSporeButton.setOnAction(event -> {
+                System.out.println("Consume Spore mode activated for the selected insect.");
+                onConsumeSporeButtonClicked();
             });
         });
 
@@ -571,5 +558,53 @@ public class EntityController {
     private void onMoveInsectButtonClicked() {
         System.out.println("Move Insect button clicked!");
         moveInsectMode = true;
+    }
+
+    @FXML
+    private void onCutThreadButtonClicked() {
+        System.out.println("Cut Thread button clicked!");
+
+        if (currentPlayer != null) {
+            // Iterate through the player's insects to find one that can cut a thread
+            for (Insect insect : currentPlayer.getInsects()) {
+                Tecton location = insect.getLocation();
+                if (location != null) {
+                    List<Thread> threads = location.getThreads();
+                    for (Thread thread : threads) {
+                        if (insect.cutThread(thread)) {
+                            System.out.println("Thread cut successfully!");
+                            refreshController(fungorium.utils.Interpreter.getObjectNames());
+                            return;
+                        }
+                    }
+                }
+            }
+            System.out.println("No thread could be cut by the current player's insects.");
+        } else {
+            System.out.println("No current player set.");
+        }
+    }
+
+    @FXML
+    private void onConsumeSporeButtonClicked() {
+        System.out.println("Consume Spore button clicked!");
+
+        if (currentPlayer != null && selectedInsect != null) {
+            Insect insect = selectedInsect.getModel();
+            Tecton currentTecton = insect.getLocation();
+
+            if (currentTecton != null && !currentTecton.getSpores().isEmpty()) {
+                if (insect.consumeSpore()) {
+                    System.out.println("Spore consumed successfully by the selected insect!");
+                    refreshController(fungorium.utils.Interpreter.getObjectNames());
+                } else {
+                    System.out.println("The selected insect could not consume a spore.");
+                }
+            } else {
+                System.out.println("No spores available on the current tecton.");
+            }
+        } else {
+            System.out.println("No current player or no insect selected.");
+        }
     }
 }
