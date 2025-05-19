@@ -284,8 +284,10 @@ public class EntityController {
             if (selectedInsect != null) {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
                 String cmd = "/consume -i " + insectName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
             }
         });
     }
@@ -429,28 +431,36 @@ public class EntityController {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
                 sporeShootMode = false;
             } else if (growThreadMode && selectedMushroom != null) {
                 String mushroomName = getObjectNameFor(selectedMushroom.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growt -m " + mushroomName + " -tt " + tectonName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
                 growThreadMode = false;
             } else if (growMushroomMode) {
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/growm -t " + tectonName + " -my " + currentMycologistName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
                 growMushroomMode = false;
             } else if (moveInsectMode && selectedInsect != null) {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
                 String tectonName = getObjectNameFor(vm.getModel());
                 String cmd = "/move -i " + insectName + " -t " + tectonName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
                 moveInsectMode = false;
             } else {
                 System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
@@ -577,8 +587,10 @@ public class EntityController {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
                 String threadName = getObjectNameFor(vm.getModel());
                 String cmd = "/cut -i " + insectName + " -th " + threadName;
-                fungorium.utils.Interpreter.executeCommand(cmd);
-                endTurnButton.fire();
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
                 cutThreadMode = false;
             }
         });

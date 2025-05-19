@@ -41,7 +41,7 @@ import fungorium.utils.HLogPrintStream;
 
 @FunctionalInterface
 interface Command {
-    void execute(String[] args);
+    boolean execute(String[] args);
 }
 
 public class Interpreter {
@@ -83,6 +83,7 @@ public class Interpreter {
             for (int i = 0; i < x.length; i++){
                 System.out.println(x[i] + " printed");
             }
+            return true;
         });
 
         commands.put("help", (x) -> {
@@ -90,6 +91,7 @@ public class Interpreter {
                 System.out.println("/" + cname);
             }
             System.out.println("e | exit | q | quit -- to exit");
+            return true;
         });
 
         commands.put("time", (x) -> {
@@ -117,6 +119,7 @@ public class Interpreter {
                 EntityController.instance.appendInfo("Time passed for all applicable objects.");
 
             }
+            return true;    
         });
 
         commands.put("addpm", (x) -> {
@@ -134,7 +137,9 @@ public class Interpreter {
             } else {
                 System.out.println("Error: Missing -n [NAME] parameter.");
                 EntityController.instance.appendInfo("Error: Missing -n [NAME] parameter.");
+                return false;
             }
+            return true;
         });
 
         commands.put("addpi", (x) -> {
@@ -152,7 +157,9 @@ public class Interpreter {
             } else {
                 System.out.println("Error: Missing -n [NAME] parameter.");
                 EntityController.instance.appendInfo("Error: Missing -n [NAME] parameter.");
+                return false;
             }
+            return true;
         });
 
         commands.put("addm", (x) -> {
@@ -172,12 +179,12 @@ public class Interpreter {
                             if (level < 1 || level > 2) {
                                 System.out.println("Error: Level must be between 1 and 2.");
                                 EntityController.instance.appendInfo("Error: Level must be between 1 and 2.");
-                                return;
+                                return false;
                             }
                         } catch (NumberFormatException e) {
                             System.out.println("Error: The specified level is not a number.");
                             EntityController.instance.appendInfo("Error: The specified level is not a number.");
-                            return;
+                            return false;
                         }
                         break;
                     case "-t":
@@ -207,6 +214,7 @@ public class Interpreter {
                     } else {
                         System.out.println("Error: Failed to add mushroom to tecton.");
                         EntityController.instance.appendInfo("Error: Failed to add mushroom to tecton.");
+                        return false;
                     }
                 } else {
                     if (!(tectonObj instanceof Tecton)) {
@@ -217,11 +225,14 @@ public class Interpreter {
                         System.out.println("Error: No mycologist found with name: " + mycologistName + ". (Did you create it in the menu?)");
                         EntityController.instance.appendInfo("Error: No mycologist found with name: " + mycologistName + ". (Did you create it in the menu?)");
                     }
+                    return false;
                 }
             } else {
                 System.out.println("Error: Missing required parameter(s) (-id, -t, or -my).");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) (-id, -t, or -my).");
+                return false;
             }
+            return true;
         });
 
         commands.put("addi", (x) -> {
@@ -259,11 +270,14 @@ public class Interpreter {
                 } else {
                     System.out.println("Error: Invalid tecton or insectist identifier.");
                     EntityController.instance.appendInfo("Error: Invalid tecton or insectist identifier.");
+                    return false;
                 }
             } else {
                 System.out.println("Error: Missing required parameter(s) -id, -t or -in.");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) -id, -t or -in.");
+                return false;
             }
+            return true;
         });
 
         commands.put("addt", (x) -> {
@@ -307,7 +321,7 @@ public class Interpreter {
                     default:
                         System.out.println("Error: Unknown tecton type.");
                         EntityController.instance.appendInfo("Error: Unknown tecton type.");
-                        return;
+                        return false;
                 }
 
                 System.out.println("("+id+") Tecton of type default created successfully.");
@@ -315,7 +329,9 @@ public class Interpreter {
             } else {
                 System.out.println("Error: Missing required parameter(s) -id or -t.");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) -id or -t.");
+                return false;
             }
+            return true;
         });
 
         commands.put("addth", (x) -> {
@@ -347,11 +363,14 @@ public class Interpreter {
                 } else {
                     System.out.println("Error: One or both tectons do not exist or are of invalid type.");
                     EntityController.instance.appendInfo("Error: One or both tectons do not exist or are of invalid");
+                    return false;
                 }
             } else {
                 System.out.println("Error: Missing required parameter(s) -id, -t1 or -t2.");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) -id, -t1 or -t2.");
+                return false;
             }
+            return true;
         });
 
         commands.put("addsp", (x) -> {
@@ -392,7 +411,7 @@ public class Interpreter {
                         default:
                             System.out.println("Error: Unknown spore type: " + sporeType);
                             EntityController.instance.appendInfo("Error: Unknown spore type: " + sporeType);
-                            return;
+                            return false;
                     }
 
                     ((Mushroom) mushroomObj).addSpore(spore);
@@ -401,11 +420,14 @@ public class Interpreter {
                 } else {
                     System.out.println("Error: The given identifier is not a mushroom.");
                     EntityController.instance.appendInfo("Error: The given identifier is not a mushroom.");
+                    return false;
                 }
             } else {
                 System.out.println("Error: Missing required parameter(s) -m or -tp.");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) -m or -tp.");
+                return false;
             }
+            return true;
         });
 
         commands.put("getm", (x) -> {
@@ -426,6 +448,7 @@ public class Interpreter {
                 System.out.println("Error: Missing -n parameter.");
                 EntityController.instance.appendInfo("Error: Missing -n parameter.");
             }
+            return true;
         });
 
         commands.put("geti", (x) -> {
@@ -446,12 +469,14 @@ public class Interpreter {
                 System.out.println("Error: Missing -n parameter.");
                 EntityController.instance.appendInfo("Error: Missing -n parameter.");
             }
+            return true;
         });
 
         commands.put("win", (x) -> { 
             // TODO: Mycologist , Instectist class not implemented
             // A parancs hatására véget ér a játék és mindkét fajta játékosnál a legtöbb pontot szerzett lesz a nyertes. Kiírja minden játékoshoz tartozó pontszámot. 
             System.out.println("TODO: The game ends and the player with the highest score wins.");
+            return true;
         });
 
         commands.put("altm", (x) -> {
@@ -469,12 +494,12 @@ public class Interpreter {
                             if (level < 1 || level > 2) {
                                 System.out.println("Error: Level must be between 1 and 2.");
                                 EntityController.instance.appendInfo("Error: Level must be between 1 and 2.");
-                                return;
+                                return false;
                             }
                         } catch (NumberFormatException e) {
                             System.out.println("Error: The specified level is not a number.");
                             EntityController.instance.appendInfo("Error: The specified level is not a number.");
-                            return;
+                            return false;
                         }
                         break;
                 }
@@ -483,7 +508,7 @@ public class Interpreter {
             if (id == null || level == null) {
                 System.out.println("Error: Missing required parameter(s) (-id or -lvl).");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) (-id or -lvl).");
-                return;
+                return false;
             }
         
             Object obj = Interpreter.getObject(id);
@@ -494,16 +519,18 @@ public class Interpreter {
                 } else if (level == 1 && mushroom.getLevel() == 2) {
                     System.out.println("Error: The mushroom is already at level 2.");
                     EntityController.instance.appendInfo("Error: The mushroom is already at level 2.");
-                    return;
+                    return false;
                 } else {
-                    return;
+                    return false;
                 }
                 System.out.println("Mushroom modified: " + id + ", new level: " + level);
                 EntityController.instance.appendInfo("Mushroom modified: " + id + ", new level: " + level);
             } else {
                 System.out.println("Error: No mushroom found with identifier: " + id);
                 EntityController.instance.appendInfo("Error: No mushroom found with identifier: " + id);
+                return false;
             }
+            return true;
         });
 
         commands.put("alti", (x) -> {
@@ -520,18 +547,20 @@ public class Interpreter {
             if (id == null) {
                 System.out.println("Error: Missing required parameter -id.");
                 EntityController.instance.appendInfo("Error: Missing required parameter -id.");
-                return;
+                return false;
             }
         
             Object obj = Interpreter.getObject(id);
             if (obj instanceof Insect) {
                 Insect insect = (Insect) obj;
                 // TODO: No state to modify according to documentation
-                return;
             } else {
                 System.out.println("Error: No insect found with identifier: " + id);
                 EntityController.instance.appendInfo("Error: No insect found with identifier: " + id);
+                return false;
             }
+            System.out.println("Insect modified: " + id);
+            return true;
         });
 
         commands.put("altt", (x) -> {
@@ -556,14 +585,14 @@ public class Interpreter {
             if (id == null) {
                 System.out.println("Error: Missing required parameter: -id");
                 EntityController.instance.appendInfo("Error: Missing required parameter: -id");
-                return;
+                return false;
             }
 
             Object tectonObj = Interpreter.getObject(id);
             if (!(tectonObj instanceof Tecton)) {
                 System.out.println("Error: No tecton found with identifier: " + id);
                 EntityController.instance.appendInfo("Error: No tecton found with identifier: " + id);
-                return;
+                return false;
             }
 
             Tecton tecton = (Tecton) tectonObj;
@@ -579,7 +608,9 @@ public class Interpreter {
                 } else {
                     System.out.println("Error: No neighbor tecton found with identifier: " + addNeighbor);
                     EntityController.instance.appendInfo("Error: No neighbor tecton found with identifier: " + addNeighbor);
+                    return false;
                 }
+                return true;
             }
 
             if (removeNeighbor != null) {
@@ -593,13 +624,16 @@ public class Interpreter {
                 } else {
                     System.out.println("Error: No neighbor tecton found with identifier: " + removeNeighbor);
                     EntityController.instance.appendInfo("Error: No neighbor tecton found with identifier: " + removeNeighbor);
+                    return false;
                 }
             }
 
             if (addNeighbor == null && removeNeighbor == null) {
                 System.out.println("Warning: No changes made, as no -addn or -remn parameter was provided.");
                 EntityController.instance.appendInfo("Warning: No changes made, as no -addn or -remn parameter was provided.");
+                return false;
             }
+            return true;
         });
 
         commands.put("exec", (x) -> {
@@ -614,7 +648,7 @@ public class Interpreter {
             if (name == null) {
                 System.out.println("Error: Missing filename (-n).");
                 EntityController.instance.appendInfo("Error: Missing filename (-n).");
-                return;
+                return false;
             }
 
             try {
@@ -653,7 +687,9 @@ public class Interpreter {
                 reader.close();
             } catch (Exception e) {
                 System.out.println("Error during loading: " + e.getMessage());
+                return false;
             }
+            return true;
         });
 
         commands.put("execall", (x) -> {
@@ -701,6 +737,7 @@ public class Interpreter {
                     System.out.println("Error executing " + testName + ": " + e.getMessage());
                 }
             }
+            return true;
         });
 
         commands.put("hlog", (x) -> {
@@ -713,10 +750,11 @@ public class Interpreter {
             }
             if (name == null) {
                 System.out.println("Error: Missing required parameter: -n");
-                return;
+                return false;
             }
         
             HLogPrintStream.saveLog(name);
+            return true;
         });
 
         commands.put("lstm", (x) -> {
@@ -729,6 +767,7 @@ public class Interpreter {
                     EntityController.instance.appendInfo(entry.getKey() + " - Level: " + mushroom.getLevel());
                 }
             }
+            return true;
         });
 
         commands.put("lsts", (x) -> {
@@ -749,6 +788,7 @@ public class Interpreter {
                     }
                 }
             }
+            return true;
         });
 
         commands.put("lsti", (x) -> {
@@ -778,6 +818,7 @@ public class Interpreter {
                     }
                 }
             }
+            return true;
         });
 
         commands.put("lstth", (x) -> {
@@ -791,6 +832,7 @@ public class Interpreter {
                     EntityController.instance.appendInfo(entry.getKey() + " - Size: " + thread.getSize() + ", isKept: " + thread.isKept() + ", isCutOff: " + thread.isCutOff());
                 }
             }
+            return true;
         });
 
         commands.put("lstt", (x) -> {
@@ -804,6 +846,7 @@ public class Interpreter {
                     EntityController.instance.appendInfo(entry.getKey() + " - Number of neighbors: " + tecton.getNeighbors().size());
                 }
             }
+            return true;
         });
 
         commands.put("clone", (x) -> {
@@ -818,7 +861,7 @@ public class Interpreter {
             if (id == null) {
                 System.out.println("Error: An insect must be specified with the -id switch.");
                 EntityController.instance.appendInfo("Error: An insect must be specified with the -id switch.");
-                return;
+                return false;
             }
         
             Object insectObj = Interpreter.getObject(id);
@@ -830,7 +873,9 @@ public class Interpreter {
             } else {
                 System.out.println("Error: No such insect found.");
                 EntityController.instance.appendInfo("Error: No such insect found.");
+                return false;
             }
+            return true;
         });
 
     commands.put("move", (x) -> {
@@ -867,7 +912,7 @@ public class Interpreter {
                         insectist.moveInsect(index, tecton);
                         System.out.println("Insect moved: " + insectId + " -> " + tectonId);
                         EntityController.instance.appendInfo("Insect moved: " + insectId + " -> " + tectonId);
-                        return;
+                        return true;
                     }
                 }
             }
@@ -881,6 +926,7 @@ public class Interpreter {
             System.out.println("Error: Missing required parameter(s) (-i or -t).");
             EntityController.instance.appendInfo("Error: Missing required parameter(s) (-i or -t).");
         }
+        return false;
     });
 
     commands.put("growm", (x) -> {
@@ -913,6 +959,7 @@ public class Interpreter {
                 if (success) {
                     System.out.println("Mushroom grown on tecton " + tectonId + " by mycologist " + mycologistId);
                     EntityController.instance.appendInfo("Mushroom grown on tecton " + tectonId + " by mycologist " + mycologistId);
+                    return true;
                 } else {
                     System.out.println("Error: Failed to grow mushroom on tecton " + tectonId);
                     EntityController.instance.appendInfo("Error: Failed to grow mushroom on tecton " + tectonId);
@@ -925,6 +972,7 @@ public class Interpreter {
             System.out.println("Error: Missing required parameter(s) (-t or -my).");
             EntityController.instance.appendInfo("Error: Missing required parameter(s) (-t or -my).");
         }
+        return false;
     });
 
     commands.put("growt", (x) -> {
@@ -947,7 +995,7 @@ public class Interpreter {
         if (mushroomId == null || targetTectonId == null) {
             System.out.println("Error: Missing required parameter(s) (-m or -tt).");
             EntityController.instance.appendInfo("Error: Missing required parameter(s) (-m or -tt).");
-            return;
+            return false;
         }
     
         // Retrieve objects by ID
@@ -958,12 +1006,12 @@ public class Interpreter {
         if (!(mushroomObj instanceof Mushroom)) {
             System.out.println("Error: Invalid mushroom ID: " + mushroomId);
             EntityController.instance.appendInfo("Error: Invalid mushroom ID: " + mushroomId);
-            return;
+            return false;
         }
         if (!(targetTectonObj instanceof Tecton)) {
             System.out.println("Error: Invalid target tecton ID: " + targetTectonId);
             EntityController.instance.appendInfo("Error: Invalid target tecton ID: " + targetTectonId);
-            return;
+            return false;
         }
     
         Mushroom mushroom = (Mushroom) mushroomObj;
@@ -984,7 +1032,7 @@ public class Interpreter {
         if (mycologist == null) {
             System.out.println("Error: No Mycologist found for mushroom " + mushroomId);
             EntityController.instance.appendInfo("Error: No Mycologist found for mushroom " + mushroomId);
-            return;
+            return false;
         }
     
         // Attempt to add a thread from the mushroom to the target tecton
@@ -992,10 +1040,12 @@ public class Interpreter {
         if (success) {
             System.out.println("Thread successfully grown from mushroom " + mushroomId + " to tecton " + targetTectonId);
             EntityController.instance.appendInfo("Thread successfully grown from mushroom " + mushroomId + " to tecton " + targetTectonId);
+            return true;
         } else {
             System.out.println("Error: Failed to grow thread from mushroom " + mushroomId + " to tecton " + targetTectonId);
             EntityController.instance.appendInfo("Error: Failed to grow thread from mushroom " + mushroomId + " to tecton " + targetTectonId);
         }
+        return false;
     });
 
         commands.put("shoot", (x) -> {
@@ -1018,7 +1068,7 @@ public class Interpreter {
             if (mushroomId == null || tectonId == null) {
                 System.out.println("Error: Missing required parameter(s) (-m or -t).");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) (-m or -t).");
-                return;
+                return false;
             }
         
             // Retrieve objects by ID
@@ -1029,12 +1079,12 @@ public class Interpreter {
             if (!(mushroomObj instanceof Mushroom)) {
                 System.out.println("Error: Invalid mushroom ID: " + mushroomId);
                 EntityController.instance.appendInfo("Error: Invalid mushroom ID: " + mushroomId);
-                return;
+                return false;
             }
             if (!(tectonObj instanceof Tecton)) {
                 System.out.println("Error: Invalid tecton ID: " + tectonId);
                 EntityController.instance.appendInfo("Error: Invalid tecton ID: " + tectonId);
-                return;
+                return false;
             }
         
             // Cast objects to their respective types
@@ -1046,10 +1096,12 @@ public class Interpreter {
             if (successfulShoot) {
                 System.out.println("Spore shoot from " + mushroomId + " to " + tectonId);
                 EntityController.instance.appendInfo("Spore shoot from " + mushroomId + " to " + tectonId);
+                return true;
             } else {
                 System.out.println("Error: Failed to shoot spores from " + mushroomId + " to " + tectonId);
                 EntityController.instance.appendInfo("Error: Failed to shoot spores from " + mushroomId + " to " + tectonId);
             }
+            return false;
         });
 
         commands.put("consume", (x) -> {
@@ -1070,6 +1122,7 @@ public class Interpreter {
                     if (success) {
                         System.out.println(insectId + " consumed the spore.");
                         EntityController.instance.appendInfo(insectId + " consumed the spore.");
+                        return true;
                     } else {
                         System.out.println("Error: No spore at the location.");
                         EntityController.instance.appendInfo("Error: No spore at the location.");
@@ -1082,6 +1135,7 @@ public class Interpreter {
                 System.out.println("Error: Missing -i parameter.");
                 EntityController.instance.appendInfo("Error: Missing -i parameter.");
             }
+            return false;
         });
 
         commands.put("eat", (x) -> {
@@ -1115,6 +1169,7 @@ public class Interpreter {
         
                     // Call the Mycologist's eatInsect method
                     mycologist.eatInsect(thread, insect);
+                    return true;
                 } else {
                     System.out.println("Error: Invalid insect, thread, or mycologist identifier.");
                     EntityController.instance.appendInfo("Error: Invalid insect, thread, or mycologist identifier.");
@@ -1123,6 +1178,7 @@ public class Interpreter {
                 System.out.println("Error: Missing parameter(s) (-id, -th, or -my).");
                 EntityController.instance.appendInfo("Error: Missing parameter(s) (-id, -th, or -my).");
             }
+            return false;
         });
 
         commands.put("cut", (x) -> {
@@ -1159,7 +1215,7 @@ public class Interpreter {
                                 insectist.cutThread(index, thread);
                                 System.out.println("Thread cut: " + threadId + " by insect: " + insectId);
                                 EntityController.instance.appendInfo("Thread cut: " + threadId + " by insect: " + insectId);
-                                return;
+                                return true;
                             }
                         }
                     }
@@ -1174,6 +1230,7 @@ public class Interpreter {
                 System.out.println("Error: Missing required parameter(s) (-i or -th).");
                 EntityController.instance.appendInfo("Error: Missing required parameter(s) (-i or -th).");
             }
+            return false;
         });
 
         commands.put("break", (x) -> {
@@ -1200,6 +1257,7 @@ public class Interpreter {
                         //Interpreter.putObject(newId, newTecton);
                         System.out.println("Tecton " + id + " broken, new tecton created: " + newId);
                         EntityController.instance.appendInfo("Tecton " + id + " broken, new tecton created: " + newId);
+                        return true;
                     } else {
                         System.out.println("Error: Break failed.");
                         EntityController.instance.appendInfo("Error: Break failed.");
@@ -1212,6 +1270,7 @@ public class Interpreter {
                 System.out.println("Error: Missing parameter(s) (-id or -newid).");
                 EntityController.instance.appendInfo("Error: Missing parameter(s) (-id or -newid).");
             }
+            return false;
         });
     }
 
@@ -1340,21 +1399,23 @@ public class Interpreter {
         }
     }
 
-    public static void executeCommand(String inputString) {
+    public static boolean executeCommand(String inputString) {
         removeAutoDuplicates(objectNames);
         inputString = inputString.trim().toLowerCase();
         System.out.println("Executing command: " + inputString);
         EntityController.instance.appendInfo(inputString);
         inputString = inputString.replace("/", "");
         String[] args = inputString.split(" ");
+        boolean result = false;
         if (commands.containsKey(args[0])) {
-            commands.get(args[0]).execute(Arrays.copyOfRange(args, 1, args.length));
+            result = commands.get(args[0]).execute(Arrays.copyOfRange(args, 1, args.length));
         } else {
             System.out.println("Command not found.");
             EntityController.instance.appendInfo("Command not found.");
         }
         removeAutoDuplicates(objectNames);
         controller.refreshController(objectNames);
+        return result;
     }
 
     public static void setMycologists(List<Mycologist> mycologists) {
