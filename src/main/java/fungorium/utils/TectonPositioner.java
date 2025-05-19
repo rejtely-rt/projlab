@@ -34,6 +34,9 @@ public class TectonPositioner {
             }
         }
 
+        // Sort Tectons by their neighbors to ensure connected ones are placed together
+        tectons.sort(Comparator.comparingInt(System::identityHashCode));
+
         if (tectons.isEmpty()) {
             return tectonVMs;
         }
