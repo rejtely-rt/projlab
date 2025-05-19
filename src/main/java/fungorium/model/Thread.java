@@ -147,5 +147,8 @@ public void changeSize(int i) {
             return;
         }
         changeSize(1);
+        if (this.size == 5) {
+            isKept = false;
+        }
     }
 }

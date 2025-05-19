@@ -40,7 +40,9 @@ public class Insectist {
      */
     public Insectist(String value) {
         Interpreter.create(this);
-        this.insects = new ArrayList<>(); this.name = value;
+        this.insects = new ArrayList<>(); 
+        this.name = value;
+        this.score = 0;
     }
 
     /**
@@ -97,7 +99,10 @@ public class Insectist {
      */
     public void consumeSpore(int index) {
         if (index >= 0 && index < insects.size()) {
-            insects.get(index).consumeSpore();
+            if(insects.get(index).consumeSpore()){
+                addPoint();
+                System.out.println("\n\n\nScore: " + score + "\n\n\n");
+            }
         } else {
             System.out.println("Invalid insect index.");
         }

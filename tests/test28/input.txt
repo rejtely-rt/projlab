@@ -1,8 +1,6 @@
 /addt -id T1 -t Tecton
 /addt -id T2 -t Tecton
 /altt -id T1 -addn T2
-/addpm -n mycologist1
-/addpi -n insectist1
 /addm -id m1 -t T2 -my mycologist1
 /addi -id i1 -t T1 -in insectist1
 /addsp -m m1 -tp ParalyzeSpore

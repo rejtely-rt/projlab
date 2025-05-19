@@ -144,12 +144,8 @@ public class Insect implements Tickable{
      * @return true if the insect can move to the target location, false otherwise
      */
     public void moveTo(Tecton target) {
-        if (this.location == null) {
-            this.location = target;
-            return;
-        }
         if (getSpeed() <= 0) {
-            System.out.println("Insect is paralyzed, therefore cannot move (regardless what the next line says)");
+            System.out.println("Insect is paralyzed, therefore cannot move.");
             return;
         }
 
@@ -158,10 +154,12 @@ public class Insect implements Tickable{
         for (Thread thread : currentThreads) {
             if (targetThreads.contains(thread)) {
                 this.location = target;
+                System.out.println("Insect moved to the target tecton.");
                 return;
             }
         }
-        System.out.println("Insect did not find a thread, therefore cannot move (regardless what the next line says)");
+
+        System.out.println("No thread connects the current location to the target, cannot move.");
     }
 
     /**

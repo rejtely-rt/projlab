@@ -6,9 +6,12 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -17,7 +20,11 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Stage;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -25,12 +32,15 @@ import java.util.stream.Collectors;
 
 import fungorium.model.*;
 import fungorium.tectons.*;
+import fungorium.utils.Interpreter;
+import fungorium.utils.TectonPositioner;
 import fungorium.spores.*;
 
 
 //TODO: ezt keresd
 
 public class EntityController {
+    public static EntityController instance; // <-- statikus példány
     
     @FXML
     private Pane canvas;
@@ -38,12 +48,48 @@ public class EntityController {
     @FXML
     private HBox playerBox;
     
-    private int occupiedPosition = 0;
+    @FXML
+    private Button sporeButton;
+    @FXML
+    private Button growThreadButton;
+    @FXML
+    private Button growMushroomButton;
+    @FXML
+    private Button endTurnButton;
+    @FXML
+    private Button cutThreadButton;
+    @FXML
+    private Button consumeSporeButton;
+    @FXML
+    private Button moveInsectButton;
 
+    @FXML
+    private VBox infoPanel;
+
+    @FXML
+    private ScrollPane infoScrollPane;
+
+    @FXML
+    private Label turnLabel;
+
+    private MushroomViewModel selectedMushroom = null;
+    private boolean sporeShootMode = false;
+    private boolean growThreadMode = false;
+    private boolean growMushroomMode = false;
+
+    private InsectViewModel selectedInsect = null;
+    private boolean moveInsectMode = false;
+    private boolean cutThreadMode = false;
+    private boolean consumeSporeMode = false;
+    
+    
     private List<Insectist> insectists = new ArrayList<>();
     private List<Mycologist> mycologists = new ArrayList<>();
     
     private ObservableList<EntityViewModel> entities = FXCollections.observableArrayList();
+
+    private Map<Tecton, TectonViewModel> tectonVMs = new HashMap<>();
+    private Map<TectonViewModel, Polygon> tectonNodes = new HashMap<>();
     
     public ObservableList<EntityViewModel> getEntities() {
         return entities;
@@ -55,40 +101,112 @@ public class EntityController {
     
     public void refreshController(Map<String, Object> objects) {
         entities.clear();
-        occupiedPosition = 0;
-        System.out.println("Refreshing controller with objects: " + objects);
+
+        TectonPositioner tectonPositioner = new TectonPositioner(this);
+        tectonVMs = tectonPositioner.createTectonViewModels(objects, 5, 6, 70, 60);
+
+        // Insectek – csak egyszer végigmenni rajtuk!
+        Map<Tecton, Integer> insectPositions = new HashMap<>();
         for (Map.Entry<String, Object> entry : objects.entrySet()) {
-            Object obj = entry.getValue();
-            Class<?> clazz = obj.getClass();
-            if (clazz == Insect.class) {
-                addEntity(new InsectViewModel((Insect) obj, 0, 0));
-            } else if (clazz == Tecton.class) {
-                double[] position = getTectonPosition(5, 8, 70, 60);
-                addEntity(new TectonViewModel((Tecton) obj, position[0], position[1]));
-            } else if (clazz == Thread.class) {
-                addEntity(new ThreadViewModel((Thread) obj, 0, 0));
-            } else if (clazz == Spore.class) {
-                addEntity(new SporeViewModel((Spore) obj, 0, 0));
-            } else if (clazz == Mushroom.class) {
-                addEntity(new MushroomViewModel((Mushroom) obj, 0, 0));
+            if (entry.getValue() instanceof Insect insect) {
+                Tecton tecton = insect.getLocation();
+                TectonViewModel tVM = tectonVMs.get(tecton);
+                if (tVM != null) {
+                    // Ellenőrizd, hogy már van-e rovar ezen a tectonon
+                    if (insectPositions.containsKey(tecton)) {
+                        // Ha van, akkor csak növeljük az indexet
+                        insectPositions.put(tecton, insectPositions.get(tecton) + 1);
+                    } else {
+                        // Ha nincs, akkor inicializáljuk
+                        insectPositions.put(tecton, 0);
+                    }
+                    double[] offset = calculateOffset(insectPositions.get(tecton)); // vagy calculateOffset(index), ha több is lehet egy tectonon
+                    double x = tVM.getX() + offset[0];
+                    double y = tVM.getY() + offset[1];
+                    addEntity(new InsectViewModel(insect, x, y));
+                }
             }
-            // } else if (clazz == Insectist.class) {
-            //     addInsectist((Insectist) obj);
-            // } else if (clazz == Mycologist.class) {
-            //     addMycologist((Mycologist) obj);
-            // }
         }
+
+        // Ezután minden Tectonhoz tartozó Mushroom és Spore
+        for (Tecton tecton : tectonVMs.keySet()) {
+            TectonViewModel tVM = tectonVMs.get(tecton);
+
+            // Gomba
+            Mushroom mushroom = tecton.getMushroom();
+            if (mushroom != null) {
+                double[] offset = {0, 0};
+                double x = tVM.getX() + offset[0];
+                double y = tVM.getY() + offset[1];
+                addEntity(new MushroomViewModel(mushroom, x, y));
+            }
+
+            // Spórák
+            List<Spore> spores = tecton.getSpores();
+            for (int i = 0; i < spores.size(); i++) {
+                double[] offset = calculateSporeOffset(i);
+                double x = tVM.getX() + offset[0];
+                double y = tVM.getY() + offset[1];
+                addEntity(new SporeViewModel(spores.get(i), x, y));
+            }
+        }
+
+        // Ezután:
+        // Thread-ek kirajzolása tectonok alapján
+        Set<Thread> drawnThreads = new HashSet<>();
+        for (Tecton tecton : tectonVMs.keySet()) {
+            for (Thread thread : tecton.getThreads()) {
+                if (drawnThreads.contains(thread)) continue;
+
+                // Keresd meg a két tectont, amelyek tartalmazzák ezt a thread-et
+                Tecton from = null, to = null;
+                for (Tecton other : tectonVMs.keySet()) {
+                    if (other.getThreads().contains(thread)) {
+                        if (from == null) from = other;
+                        else if (to == null && other != from) { to = other; break; }
+                    }
+                }
+
+                Mushroom mushroom = thread.getParent();
+                TectonViewModel fromVM = tectonVMs.get(from);
+                TectonViewModel toVM = tectonVMs.get(to);
+
+                // Keresd ki a MushroomViewModel-t az entities-ből:
+                MushroomViewModel mushVM = null;
+                for (EntityViewModel evm : entities) {
+                    if (evm instanceof MushroomViewModel mvm && mvm.getModel() == mushroom) {
+                        mushVM = mvm;
+                        break;
+                    }
+                }
+
+                if (fromVM != null && toVM != null && mushVM != null) {
+                    addEntity(new ThreadViewModel(thread, fromVM, toVM, mushVM));
+                    drawnThreads.add(thread);
+                }
+            }
+        }
+
+        System.out.println("Mycologists: " + mycologists);
+        for (Mycologist m : mycologists) {
+            System.out.println(m.getName() + " mushrooms: " + m.getMushrooms());
+        }
+
+        updatePlayerBox();
     }
     
     @FXML
     public void initialize() {
+        instance = this;
         System.out.println("EntityController loaded.");
         // csak canvas layout binding vagy alapbeállítások
-        double totalMapWidth = 70 * 4 + 70 / 2; // Példaértékek
-        double totalMapHeight = 60 * 4;
-        
         Group mapGroup = new Group();
         canvas.getChildren().add(mapGroup);
+
+        int rows = 4, cols = 4;
+        double hexWidth = 70, hexHeight = 60;
+        double totalMapWidth = hexWidth * cols + hexWidth / 2;
+        double totalMapHeight = hexHeight * rows;
 
         mapGroup.layoutXProperty().bind(canvas.widthProperty().divide(2).subtract(totalMapWidth / 2));
         mapGroup.layoutYProperty().bind(canvas.heightProperty().divide(2).subtract(totalMapHeight / 2));
@@ -98,16 +216,79 @@ public class EntityController {
                 if (change.wasAdded()) {
                     for (EntityViewModel vm : change.getAddedSubList()) {
                         Node view = createViewFor(vm);
-                        canvas.getChildren().add(view);
+                        if (view != null) {
+                            canvas.getChildren().add(view);
+                        }
                     }
                 }
                 if (change.wasRemoved()) {
-                    // You could track Node<->VM mapping to remove the correct nodes.
-                    // For brevity, we simply clear all and re-add:
                     canvas.getChildren().clear();
                     for (EntityViewModel vm : entities) {
-                        canvas.getChildren().add(createViewFor(vm));
+                        Node view = createViewFor(vm);
+                        if (view != null) {
+                            canvas.getChildren().add(view);
+                        }
                     }
+                }
+            }
+        });
+        
+        sporeButton.setOnAction(e -> {
+            if (selectedMushroom != null) {
+                sporeShootMode = true;
+                System.out.println("Válassz egy tectont, ahova spórát lősz!");
+            }
+        });
+
+        growThreadButton.setOnAction(e -> {
+            if (selectedMushroom != null) {
+                growThreadMode = true;
+                System.out.println("Válassz egy tectont, ahova fonalat növesztesz!");
+            }
+        });
+
+        growMushroomButton.setOnAction(e -> {
+            growMushroomMode = true;
+            appendInfo("Válassz egy tectont, ahova gombát növesztesz!");
+        });
+
+        endTurnButton.setOnAction(e -> {
+            int prevActorIndex = currentActorIndex;
+            currentActorIndex = (currentActorIndex + 1) % turnOrder.size();
+            currentActor = turnOrder.get(currentActorIndex);
+            if (currentActor instanceof Mycologist) {
+                currentMycologistName = ((Mycologist) currentActor).getName();
+            }
+            updateActionButtonsForTurn();
+            updateTurnLabel();
+            if (currentActorIndex == 0 && prevActorIndex == turnOrder.size() - 1) {
+                Interpreter.executeCommand("/time");
+            }
+            refreshController(Interpreter.getObjects());
+            checkForGameEnd();
+        });
+
+        moveInsectButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                moveInsectMode = true;
+                appendInfo("Válassz egy tectont, ahova mozgatod a rovart!");
+            }
+        });
+
+        cutThreadButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                cutThreadMode = true;
+                appendInfo("Válassz egy fonalat, amit elvágsz!");
+            }
+        });
+
+        consumeSporeButton.setOnAction(e -> {
+            if (selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String cmd = "/consume -i " + insectName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
                 }
             }
         });
@@ -143,38 +324,16 @@ public class EntityController {
         this.insectists = insectists;
         this.mycologists = mycologists;
 
-        // Pálya létrehozása
-        Group mapGroup = new Group();
-        canvas.getChildren().add(mapGroup);
+        // Sorrend: először minden gombász, aztán minden rovarász (vagy ahogy szeretnéd)
+        turnOrder.clear();
+        turnOrder.addAll(mycologists);
+        turnOrder.addAll(insectists);
 
-        // Középre helyezés
-        int rows = 4, cols = 4;
-        double hexWidth = 70, hexHeight = 60;
-        double totalMapWidth = hexWidth * cols + hexWidth / 2;
-        double totalMapHeight = hexHeight * rows;
+        currentActorIndex = 0;
+        currentActor = turnOrder.get(0);
 
-        mapGroup.layoutXProperty().bind(canvas.widthProperty().divide(2).subtract(totalMapWidth / 2));
-        mapGroup.layoutYProperty().bind(canvas.heightProperty().divide(2).subtract(totalMapHeight / 2));
-
-        // GUI frissítés
         updatePlayerBox();
-    }
-
-
-    public double[] getTectonPosition(int rows, int cols, double hexWidth, double hexHeight) {
-        // Calculate row and column based on position
-        int row = occupiedPosition / cols + 1;
-        int col = occupiedPosition % cols + 1;
-
-        // Calculate x and y coordinates with hexagonal offset
-        double spacing = 10.0; // Spacing between hexagons, adjustable as needed
-        double offsetX = (row % 2 == 0) ? 0 : (hexWidth + spacing) / 2; // Offset for odd rows
-        double x = col * (hexWidth + spacing) + offsetX;
-        double y = row * (hexHeight + spacing);
-
-        occupiedPosition++;
-
-        return new double[] { x, y };
+        updateTurnLabel();
     }
 
     public void updatePlayerBox() {
@@ -246,6 +405,7 @@ public class EntityController {
         double size = 40; // sugár
 
         Polygon hex = new Polygon();
+        tectonNodes.put(vm, hex);
         for (int i = 0; i < 6; i++) {
             double angle = Math.toRadians(60 * i - 30);
             double x = centerX + size * Math.cos(angle);
@@ -260,8 +420,58 @@ public class EntityController {
             Tooltip.install(hex, tooltip);
         });
 
+        hex.setOnMouseExited((MouseEvent e) -> {
+            hex.setFill(Color.BEIGE);
+            Tecton tecton = vm.getModel();
+            for (Tecton neighbor : tecton.getNeighbors()) {
+                tectonNodes.get(tectonVMs.get(neighbor)).setFill(Color.BEIGE);
+            }
+        });
+
         hex.setOnMouseClicked((MouseEvent e) -> {
-            System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+            if (sporeShootMode && selectedMushroom != null) {
+                String mushroomName = getObjectNameFor(selectedMushroom.getModel());
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/shoot -m " + mushroomName + " -t " + tectonName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
+                sporeShootMode = false;
+            } else if (growThreadMode && selectedMushroom != null) {
+                String mushroomName = getObjectNameFor(selectedMushroom.getModel());
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/growt -m " + mushroomName + " -tt " + tectonName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
+                growThreadMode = false;
+            } else if (growMushroomMode) {
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/growm -t " + tectonName + " -my " + currentMycologistName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
+                growMushroomMode = false;
+            } else if (moveInsectMode && selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String tectonName = getObjectNameFor(vm.getModel());
+                String cmd = "/move -i " + insectName + " -t " + tectonName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
+                moveInsectMode = false;
+            } else {
+                System.out.println("This tecton has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+                hex.setFill(Color.RED);
+                Tecton tecton = vm.getModel();
+                for (Tecton neighbor : tecton.getNeighbors()) {
+                    tectonNodes.get(tectonVMs.get(neighbor)).setFill(Color.RED);
+                }
+            }
         });
 
         return hex;
@@ -274,7 +484,11 @@ public class EntityController {
                 10.0, 10.0,
                 0.0, -10.0
         );
-        triangle.setFill(Color.DARKOLIVEGREEN);
+        if (currentActor instanceof Mycologist m && m == player) {
+            triangle.setFill(Color.DARKRED);
+        } else {
+            triangle.setFill(Color.DARKOLIVEGREEN);
+        }
         triangle.setStroke(Color.BLACK);
 
         Group group = new Group(triangle);
@@ -288,6 +502,11 @@ public class EntityController {
 
         group.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("This mushroom of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
+            if (currentActor instanceof Mycologist m && m == player) {
+                selectedMushroom = vm;
+                sporeShootMode = false;
+                updateActionButtonsForMushroom();
+            }
         });
 
         return group;
@@ -302,7 +521,11 @@ public class EntityController {
             double y = radius * Math.sin(angle);
             circle.getPoints().addAll(x, y);
         }
-        circle.setFill(Color.LIGHTBLUE);
+        if (currentActor instanceof Insectist i && i == player) {
+            circle.setFill(Color.DARKRED);
+        } else {
+            circle.setFill(Color.LIGHTBLUE);
+        }
         circle.setStroke(Color.DARKGRAY);
 
         Group group = new Group(circle);
@@ -315,25 +538,10 @@ public class EntityController {
         });
 
         group.setOnMouseClicked((MouseEvent e) -> {
-            System.out.println("This insect of " + player.getName() + " has been clicked at position: (" + vm.getX() + ", " + vm.getY() + ")");
-
-            InsectViewModel selectedInsect = vm;
-
-            // Create a one‑shot handler:
-            EventHandler<MouseEvent> oneShot = new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent te) {
-                    // Find the Node under the pointer:
-                    Node picked = te.getPickResult().getIntersectedNode();
-                    System.out.println("Selected insect: " + selectedInsect.getModel().getClass().getSimpleName());
-                    System.out.println("Picked node: " + picked);
-                    // Uninstall this handler so it only runs once:
-                    group.getScene().removeEventHandler(MouseEvent.MOUSE_CLICKED, this);
-                    // Consume to prevent underlying handlers if you like:
-                    te.consume();
-                }
-            };
-            group.getScene().addEventHandler(MouseEvent.MOUSE_CLICKED, oneShot);
+            if (currentActor instanceof Insectist i && i == player) {
+                selectedInsect = vm;
+                updateActionButtonsForInsect();
+            }
         });
 
         return group;
@@ -364,24 +572,207 @@ public class EntityController {
     }
 
     public Node createThreadNode(ThreadViewModel vm) {
-        Polygon line = new Polygon();
-        double length = 15; // hossz
-        line.getPoints().addAll(
-                -length / 2, 0.0,
-                length / 2, 0.0
-        );
-        line.setFill(Color.BROWN);
+        javafx.scene.shape.Line line = new javafx.scene.shape.Line();
+        line.startXProperty().bind(vm.getFrom().xProperty());
+        line.startYProperty().bind(vm.getFrom().yProperty());
+        line.endXProperty().bind(vm.getTo().xProperty());
+        line.endYProperty().bind(vm.getTo().yProperty());
         line.setStrokeWidth(5.0);
-        line.setStroke(Color.DARKMAGENTA);
+        if (currentActor instanceof Mycologist i && i.getMushrooms().contains(vm.getMushroom().getModel())) {
+            line.setStroke(Color.DARKRED);
+        } else {
+            line.setStroke(Color.DARKMAGENTA);
+        }
 
-        Group group = new Group(line);
-        group.layoutXProperty().bind(vm.xProperty());
-        group.layoutYProperty().bind(vm.yProperty());
+        if (vm.getModel().isCutOff()) {
+            line.getStrokeDashArray().addAll(10.0, 10.0);
+        }
 
-        return group;
+        line.setOnMouseClicked(e -> {
+            if (cutThreadMode && selectedInsect != null) {
+                String insectName = getObjectNameFor(selectedInsect.getModel());
+                String threadName = getObjectNameFor(vm.getModel());
+                String cmd = "/cut -i " + insectName + " -th " + threadName;
+                boolean success = fungorium.utils.Interpreter.executeCommand(cmd);
+                if (success) {
+                   endTurnButton.fire();
+                }
+                cutThreadMode = false;
+            }
+        });
+
+        return line;
     }
 
     public void refreshViewModels() {
         // későbbi frissítéshez
+    }
+
+    @FXML
+    private void onTestButtonClicked() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fungorium/gui/TestSelector.fxml"));
+        Parent root = loader.load();
+
+        // Átadjuk az aktuális EntityController példányt a TestSelectorController-nek
+        TestSelectorController selectorController = loader.getController();
+        selectorController.setEntityController(this);
+
+        Stage stage = new Stage();
+        stage.setTitle("Teszt kiválasztása");
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+
+    // Ezt a metódust hívja majd a TestSelectorController, ha kiválasztottak egy tesztet
+    public void runSelectedTest(String testFolder) {
+        try {
+            // Bezárjuk a tesztválasztó ablakot
+            fungorium.gui.FungoriumApp.runTestFile("tests/" + testFolder + "/input.txt", this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void updateActionButtonsForMushroom() {
+        sporeButton.setVisible(true);
+        growThreadButton.setVisible(true);
+        growMushroomButton.setVisible(true);
+        // A többi gomb rejtése
+        // (ha több gombot is akarsz, azokat is állítsd false-ra)
+        // pl. moveInsectButton.setVisible(false); stb.
+        cutThreadButton.setVisible(false);
+        consumeSporeButton.setVisible(false);
+        moveInsectButton.setVisible(false);
+    }
+
+    private void updateActionButtonsForInsect() {
+        moveInsectButton.setVisible(true);
+        cutThreadButton.setVisible(true);
+        consumeSporeButton.setVisible(true);
+        // A többi gomb rejtése
+        sporeButton.setVisible(false);
+        growThreadButton.setVisible(false);
+        growMushroomButton.setVisible(false);
+    }
+
+
+    public void appendInfo(String message) {
+        Label label = new Label(message);
+        label.setWrapText(true);
+        //label.maxWidthProperty().bind(infoScrollPane.widthProperty().subtract(20));
+        label.setMaxWidth(160);
+        label.setMinHeight(40);
+        infoPanel.getChildren().add(label);
+        if (infoPanel.getChildren().size() > 30) {
+            infoPanel.getChildren().remove(0);
+        }
+        // Automatikus görgetés a legalsóhoz:
+        infoScrollPane.layout();
+        infoScrollPane.setVvalue(1.0);
+    }
+
+    private static String getObjectNameFor(Object obj) {
+        for (Map.Entry<String, Object> entry : fungorium.utils.Interpreter.getObjectNames().entrySet()) {
+            if (entry.getValue() == obj) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private String currentMycologistName = "mycologist1"; // vagy dinamikusan állítod majd körváltásnál
+    private List<Object> turnOrder = new ArrayList<>(); // Mycologist és Insectist példányok vegyesen
+    private int currentActorIndex = 0;
+    private Object currentActor = null; // mindig az aktuális játékos (Mycologist vagy Insectist)
+
+    private void updateTurnLabel() {
+        // Ha ez az utolso jatekos, es a kor vegere ertunk
+        if (currentActor instanceof Mycologist m) {
+            turnLabel.setText("Gombász lép: " + m.getName());
+        } else if (currentActor instanceof Insectist i) {
+            turnLabel.setText("Rovarász lép: " + i.getName());
+        }
+    }
+
+    private void updateActionButtonsForTurn() {
+        if (currentActor instanceof Mycologist) {
+            // Csak a gombász gombjai látszanak
+            growMushroomButton.setVisible(true);
+            sporeButton.setVisible(false);
+            growThreadButton.setVisible(false);
+            moveInsectButton.setVisible(false);
+            cutThreadButton.setVisible(false);
+            consumeSporeButton.setVisible(false);
+        } else if (currentActor instanceof Insectist) {
+            // Csak a rovarász gombjai látszanak (alapból rejtve, csak rovarra kattintva jelennek meg)
+            growMushroomButton.setVisible(false);
+            sporeButton.setVisible(false);
+            growThreadButton.setVisible(false);
+            // Ezek csak rovarra kattintva lesznek láthatók:
+            moveInsectButton.setVisible(false);
+            cutThreadButton.setVisible(false);
+            consumeSporeButton.setVisible(false);
+        }
+    }
+
+    private void checkForGameEnd() {
+        int WIN_SCORE = 5;
+
+        // Legmagasabb pontszám keresése mindkét típusnál
+        int maxMycScore = mycologists.stream()
+                .mapToInt(Mycologist::getScore)
+                .max()
+                .orElse(0);
+        int maxInsScore = insectists.stream()
+                .mapToInt(Insectist::getScore)
+                .max()
+                .orElse(0);
+
+        // Ha bármelyik elérte a WIN_SCORE-t, vége a játéknak
+        if (maxMycScore >= WIN_SCORE || maxInsScore >= WIN_SCORE) {
+            // Csak a legmagasabb pontszámú(ak) a nyertes(ek)
+            List<Mycologist> winningMycologists = mycologists.stream()
+                    .filter(m -> m.getScore() == maxMycScore)
+                    .collect(Collectors.toList());
+            List<Insectist> winningInsectists = insectists.stream()
+                    .filter(i -> i.getScore() == maxInsScore)
+                    .collect(Collectors.toList());
+
+            showGameOver(winningMycologists, winningInsectists);
+        }
+    }
+
+    private void showGameOver(List<Mycologist> mycWinners, List<Insectist> insWinners) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Játék vége!\n\n");
+        if (!mycWinners.isEmpty()) {
+            sb.append("Gombász győztes(ek):\n");
+            for (Mycologist m : mycWinners) {
+                sb.append("- ").append(m.getName()).append(" (").append(m.getScore()).append(" pont)\n");
+            }
+        }
+        if (!insWinners.isEmpty()) {
+            sb.append("\nRovarász győztes(ek):\n");
+            for (Insectist i : insWinners) {
+                sb.append("- ").append(i.getName()).append(" (").append(i.getScore()).append(" pont)\n");
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Játék vége!");
+        alert.setHeaderText(null);
+        alert.setContentText(sb.toString());
+        alert.showAndWait();
+        
+        // Show Main Menu again
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fungorium/gui/MainMenu.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) canvas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Fungorium - Main Menu");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
