@@ -716,7 +716,7 @@ public class EntityController {
     }
 
     private void checkForGameEnd() {
-        int WIN_SCORE = 2;
+        int WIN_SCORE = 5;
 
         // Legmagasabb pontszám keresése mindkét típusnál
         int maxMycScore = mycologists.stream()
