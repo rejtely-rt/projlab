@@ -58,12 +58,6 @@ public class Tecton implements Tickable {
      * @return true if a new mushroom was successfully added, false otherwise.
      */
     public boolean addMushroom() {
-        if(threads.stream().anyMatch(thread -> !thread.getInsects().isEmpty())) {
-            Mushroom m = new Mushroom(1);
-            this.mushroom = m;
-            //System.out.println("   -> New mushroom created on Tecton by thread.");
-            return true;
-        }
         if (mushroom != null) {
             //System.out.println("   -> Already has mushroom, can't add a new one.");
             return false;
@@ -76,8 +70,18 @@ public class Tecton implements Tickable {
             //System.out.println("   -> No threads, can't grow mushroom.");
             return false;
         }
+        if(threads.stream().anyMatch(thread -> !thread.getInsects().isEmpty())) {
+            Mushroom m = new Mushroom(1);
+            this.mushroom = m;
+            Interpreter.remove(spores.get(0));
+            spores.remove(0);
+            //System.out.println("   -> New mushroom created on Tecton by thread.");
+            return true;
+        }
         Mushroom m = new Mushroom(1);
         this.mushroom = m;
+        Interpreter.remove(spores.get(0));
+        spores.remove(0);
 
         //System.out.println("   -> New mushroom created on Tecton.");
         return true;
