@@ -1120,6 +1120,22 @@ public class Interpreter {
                     Insect insect = (Insect) insectObj;
                     boolean success = insect.consumeSpore();
                     if (success) {
+                        // Find whose insect it is
+                        Insectist insectistScored = null;
+                        for (Object obj : Interpreter.objectNames.values()) {
+                            if (obj instanceof Insectist) {
+                                Insectist insectist = (Insectist) obj;
+                                List<Insect> insects = insectist.getInsects();
+                                if (insects.contains(insect)) {
+                                    insectistScored = insectist;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (insectistScored != null) {
+                            insectistScored.addPoint();
+                        }
                         System.out.println(insectId + " consumed the spore.");
                         EntityController.instance.appendInfo(insectId + " consumed the spore.");
                         return true;
