@@ -23,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
 import java.util.*;
@@ -264,6 +265,7 @@ public class EntityController {
                 Interpreter.executeCommand("/time");
             }
             refreshController(Interpreter.getObjects());
+            checkForGameEnd();
         });
 
         moveInsectButton.setOnAction(e -> {
@@ -710,6 +712,67 @@ public class EntityController {
             moveInsectButton.setVisible(false);
             cutThreadButton.setVisible(false);
             consumeSporeButton.setVisible(false);
+        }
+    }
+
+    private void checkForGameEnd() {
+        int WIN_SCORE = 2;
+
+        // Legmagasabb pontszám keresése mindkét típusnál
+        int maxMycScore = mycologists.stream()
+                .mapToInt(Mycologist::getScore)
+                .max()
+                .orElse(0);
+        int maxInsScore = insectists.stream()
+                .mapToInt(Insectist::getScore)
+                .max()
+                .orElse(0);
+
+        // Ha bármelyik elérte a WIN_SCORE-t, vége a játéknak
+        if (maxMycScore >= WIN_SCORE || maxInsScore >= WIN_SCORE) {
+            // Csak a legmagasabb pontszámú(ak) a nyertes(ek)
+            List<Mycologist> winningMycologists = mycologists.stream()
+                    .filter(m -> m.getScore() == maxMycScore)
+                    .collect(Collectors.toList());
+            List<Insectist> winningInsectists = insectists.stream()
+                    .filter(i -> i.getScore() == maxInsScore)
+                    .collect(Collectors.toList());
+
+            showGameOver(winningMycologists, winningInsectists);
+        }
+    }
+
+    private void showGameOver(List<Mycologist> mycWinners, List<Insectist> insWinners) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Játék vége!\n\n");
+        if (!mycWinners.isEmpty()) {
+            sb.append("Gombász győztes(ek):\n");
+            for (Mycologist m : mycWinners) {
+                sb.append("- ").append(m.getName()).append(" (").append(m.getScore()).append(" pont)\n");
+            }
+        }
+        if (!insWinners.isEmpty()) {
+            sb.append("\nRovarász győztes(ek):\n");
+            for (Insectist i : insWinners) {
+                sb.append("- ").append(i.getName()).append(" (").append(i.getScore()).append(" pont)\n");
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Játék vége!");
+        alert.setHeaderText(null);
+        alert.setContentText(sb.toString());
+        alert.showAndWait();
+        
+        // Show Main Menu again
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fungorium/gui/MainMenu.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) canvas.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Fungorium - Main Menu");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

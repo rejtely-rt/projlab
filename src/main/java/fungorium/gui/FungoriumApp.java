@@ -43,6 +43,9 @@ public class FungoriumApp extends Application {
     }
 
     public static void startGameFromNames(List<String> insectistNames, List<String> mycologistNames) throws Exception {
+        // Convert all name to lowercase
+        insectistNames = insectistNames.stream().map(String::toLowerCase).toList();
+        mycologistNames = mycologistNames.stream().map(String::toLowerCase).toList();
         List<Insectist> insectists = insectistNames.stream()
                 .map(Insectist::new)
                 .toList();
