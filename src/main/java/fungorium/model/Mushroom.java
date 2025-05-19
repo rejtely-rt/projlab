@@ -64,16 +64,23 @@ public class Mushroom implements Tickable {
      * Currently only logs the action without actual implementation.
      */
     public void produceSpores() {
-        List<Spore> sporeList = new ArrayList<>();
-        Spore cspore = new CannotCutSpore();
-        sporeList.add(cspore);
-        Spore pspore = new ParalyzeSpore();
-        sporeList.add(pspore);
-        Spore spspore = new SpeedySpore();
-        sporeList.add(spspore);
-        Spore slspore = new SlowlySpore();
-        sporeList.add(slspore);
-        spores.addAll(sporeList);
+        Spore spore;
+        int rand = (int) (Math.random() * 4);
+        switch (rand) {
+            case 0:
+                spore = new CannotCutSpore();
+                break;
+            case 1:
+                spore = new ParalyzeSpore();
+                break;
+            case 2:
+                spore = new SpeedySpore();
+                break;
+            default:
+                spore = new SlowlySpore();
+                break;
+        }
+        spores.add(spore);
     }
     
     

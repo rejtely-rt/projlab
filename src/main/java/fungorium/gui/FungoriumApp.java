@@ -83,7 +83,7 @@ public class FungoriumApp extends Application {
         }
 
         // 2. Tectonok létrehozása Interpreter parancsokkal
-        int tectonCount = 25 + rand.nextInt(3);
+        int tectonCount = 15 + rand.nextInt(3);
         List<String> tectonNames = new ArrayList<>();
         for (int i = 0; i < tectonCount; i++) {
             String id = "t" + i;
@@ -101,7 +101,7 @@ public class FungoriumApp extends Application {
 
         // 3. Tectonok összekötése (szomszédok random, Interpreter-rel)
         for (int i = 0; i < tectonCount; i++) {
-            int neighbors = 2 + rand.nextInt(2);
+            int neighbors = 1 + rand.nextInt(2);
             for (int n = 0; n < neighbors; n++) {
                 int j = rand.nextInt(tectonCount);
                 if (j != i) {
@@ -111,7 +111,7 @@ public class FungoriumApp extends Application {
         }
 
         // 4. Minden mycologist kap egy gombát egy random tectonra
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             for (Mycologist myc : mycologists) {
                 String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
                 String mName = "m_" + myc.getName() + "_" + i;
@@ -120,7 +120,7 @@ public class FungoriumApp extends Application {
         }
 
         // 5. Minden insectist kap egy rovart egy random tectonra
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             for (Insectist ins : insectists) {
                 String tName = tectonNames.get(rand.nextInt(tectonNames.size()));
                 String iName = "i_" + ins.getName() + "_" + i;

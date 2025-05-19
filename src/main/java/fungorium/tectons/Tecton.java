@@ -262,6 +262,8 @@ public class Tecton implements Tickable {
     @Override
     public void tick() {
         absorbThread();
-        //breakTecton();
+        if (Math.random() < 0.01) {
+            breakTecton();
+        }
     }
 }
