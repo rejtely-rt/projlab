@@ -1402,6 +1402,7 @@ public class Interpreter {
     public static boolean executeCommand(String inputString) {
         removeAutoDuplicates(objectNames);
         inputString = inputString.trim().toLowerCase();
+        System.out.println(objectNames);
         System.out.println("Executing command: " + inputString);
         EntityController.instance.appendInfo(inputString);
         inputString = inputString.replace("/", "");
@@ -1422,6 +1423,7 @@ public class Interpreter {
         mycologistByName.clear();
         for (Mycologist m : mycologists) {
             mycologistByName.put(m.getName(), m);
+            objectNames.put(m.getName(), m);
         }
     }
 
@@ -1429,6 +1431,7 @@ public class Interpreter {
         insectistByName.clear();
         for (Insectist i : insectists) {
             insectistByName.put(i.getName(), i);
+            objectNames.put(i.getName(), i);
         }
     }
 }

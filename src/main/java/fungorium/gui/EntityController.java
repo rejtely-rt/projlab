@@ -582,6 +582,10 @@ public class EntityController {
             line.setStroke(Color.DARKMAGENTA);
         }
 
+        if (vm.getModel().isCutOff()) {
+            line.getStrokeDashArray().addAll(10.0, 10.0);
+        }
+
         line.setOnMouseClicked(e -> {
             if (cutThreadMode && selectedInsect != null) {
                 String insectName = getObjectNameFor(selectedInsect.getModel());
