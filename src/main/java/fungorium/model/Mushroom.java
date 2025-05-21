@@ -8,6 +8,7 @@ import fungorium.utils.*;;
 
 public class Mushroom implements Tickable {
     private List<Spore> spores = new ArrayList<>();
+
     private List<Thread> threads = new ArrayList<>();
     private int level = 1; // Alapértelmezett szint
     private int life;      // Élettartam
@@ -20,7 +21,7 @@ public class Mushroom implements Tickable {
         this.level = level;
         Interpreter.create(this); 
     }
-    
+
     /**
      * Asks the user to determine the level of the mushroom.
      * 
@@ -63,16 +64,23 @@ public class Mushroom implements Tickable {
      * Currently only logs the action without actual implementation.
      */
     public void produceSpores() {
-        List<Spore> sporeList = new ArrayList<>();
-        Spore cspore = new CannotCutSpore();
-        sporeList.add(cspore);
-        Spore pspore = new ParalyzeSpore();
-        sporeList.add(pspore);
-        Spore spspore = new SpeedySpore();
-        sporeList.add(spspore);
-        Spore slspore = new SlowlySpore();
-        sporeList.add(slspore);
-        spores.addAll(sporeList);
+        Spore spore;
+        int rand = (int) (Math.random() * 4);
+        switch (rand) {
+            case 0:
+                spore = new CannotCutSpore();
+                break;
+            case 1:
+                spore = new ParalyzeSpore();
+                break;
+            case 2:
+                spore = new SpeedySpore();
+                break;
+            default:
+                spore = new SlowlySpore();
+                break;
+        }
+        spores.add(spore);
     }
     
     
@@ -196,7 +204,7 @@ public class Mushroom implements Tickable {
      * This is a placeholder for a depth-first search (DFS) traversal
      * implementation.
      * 
-     * @param t The starting Tecton.
+     * @param startTecton The starting Tecton.
      */
     public void threadCollector(Tecton startTecton) {
         // Step 1: Find the Tecton where the mushroom is located

@@ -3,8 +3,6 @@
 /addt -id T3 -t ThreadKeeperTecton
 /altt -id T1 -addn T2
 /altt -id T2 -addn T3
-/addpm -n mycologist1
-/addpi -n insectist1
 /addm -id m1 -lvl 2 -t T1 -my mycologist1
 /addi -id i1 -t T1 -in insectist1
 /growt -m m1 -tt T2

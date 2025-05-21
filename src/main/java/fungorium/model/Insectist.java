@@ -3,13 +3,16 @@ package fungorium.model;
 import java.util.ArrayList;
 import java.util.List;
 import fungorium.tectons.Tecton;
+import fungorium.utils.Interpreter;
 
 public class Insectist {
     /**
      * List of insects controlled by the Insectist.
      * This list contains all the insects that the Insectist can command and control.
      */
-    private final List<Insect> insects;
+    private List<Insect> insects;
+
+    private String name;
 
     /**
      * Score of the Insectist.
@@ -19,12 +22,27 @@ public class Insectist {
     private int score;
 
 
+    public void setScore(int value)  {
+        this.score = value;
+    }
+
+    public void setName(String value)  {
+        this.name = value;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
     /**
      * Constructor for the Insectist class.
      * Initializes the list of insects controlled by the Insectist.
      */
-    public Insectist() {
-        this.insects = new ArrayList<>();
+    public Insectist(String value) {
+        Interpreter.create(this);
+        this.insects = new ArrayList<>(); 
+        this.name = value;
+        this.score = 0;
     }
 
     /**
@@ -81,7 +99,10 @@ public class Insectist {
      */
     public void consumeSpore(int index) {
         if (index >= 0 && index < insects.size()) {
-            insects.get(index).consumeSpore();
+            if(insects.get(index).consumeSpore()){
+                addPoint();
+                System.out.println("\n\n\nScore: " + score + "\n\n\n");
+            }
         } else {
             System.out.println("Invalid insect index.");
         }
